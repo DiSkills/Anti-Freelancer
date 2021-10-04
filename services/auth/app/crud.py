@@ -1,5 +1,5 @@
-from app.models import User
-from app.schemas import Register
+from app.models import User, Verification
+from app.schemas import Register, VerificationCreate
 from crud import CRUD
 
 
@@ -8,4 +8,10 @@ class UserCRUD(CRUD[User, Register, Register]):
     pass
 
 
+class VerificationCRUD(CRUD[Verification, VerificationCreate, VerificationCreate]):
+    """ Verification CRUD """
+    pass
+
+
 user_crud = UserCRUD(User)
+verification_crud = VerificationCRUD(Verification)

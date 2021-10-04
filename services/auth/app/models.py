@@ -2,8 +2,28 @@ import datetime
 import typing
 
 import sqlalchemy
+from sqlalchemy.orm import relationship
 
 from db import Base
+
+
+class Verification(Base):
+    """ Verification """
+
+    __tablename__ = 'verification'
+
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    link: str = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+
+    user_id: int = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('user.id', ondelete='CASCADE'), nullable=False
+    )
+
+    def __str__(self):
+        return f'<Verification {self.id}>'
+
+    def __repr__(self):
+        return f'<Verification {self.id}>'
 
 
 class User(Base):
@@ -25,6 +45,10 @@ class User(Base):
     )
     last_login: datetime.datetime = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.utcnow, nullable=False
+    )
+
+    verification: typing.Union[relationship, Verification] = relationship(
+        Verification, backref='user', lazy='selectin', cascade='all, delete', uselist=False,
     )
 
     def __str__(self):

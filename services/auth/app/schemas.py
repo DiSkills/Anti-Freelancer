@@ -32,3 +32,16 @@ class Register(Password):
 
     username: str
     email: EmailStr
+
+
+class VerificationCreate(BaseModel):
+    """ Verification create """
+
+    user_id: int
+    link: str
+
+
+class ActivateUser(BaseModel):
+    """ User activate """
+
+    is_active: bool = True

@@ -1,9 +1,13 @@
+from uuid import uuid4
+
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud import user_crud
-from app.schemas import Register
+from app.crud import user_crud, verification_crud
+from app.schemas import Register, VerificationCreate
+from app.send_email import send_register_email
 from app.service import get_password_hash
+from config import SERVER_BACKEND, API
 
 
 async def register(db: AsyncSession, schema: Register):
@@ -16,4 +20,9 @@ async def register(db: AsyncSession, schema: Register):
 
     del schema.confirm_password
     user = await user_crud.create(db, **{**schema.dict(), 'password': get_password_hash(schema.password)})
-    return user
+
+    verification = await verification_crud.create(db, **VerificationCreate(user_id=user.id, link=str(uuid4())).dict())
+
+    send_register_email(user.email, user.username, f'{SERVER_BACKEND}{API}verify?link={verification.link}')
+
+    return {'msg': 'Send email for activate your account'}
