@@ -4,6 +4,8 @@ from email.mime.text import MIMEText
 
 from jinja2 import Template
 
+from config import TEST
+
 sender = os.environ.get('EMAIL')
 sender_password = os.environ.get('PASSWORD_EMAIL')
 
@@ -20,6 +22,10 @@ def send_email(recipient: str, subject: str, template: str, **data) -> None:
         :param data: Jinja data
         :return: None
     """
+
+    if int(TEST):
+        return
+
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
 
