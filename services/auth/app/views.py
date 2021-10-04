@@ -33,6 +33,26 @@ async def register(db: AsyncSession, schema: Register) -> dict[str, str]:
 
     verification = await verification_crud.create(db, **VerificationCreate(user_id=user.id, link=str(uuid4())).dict())
 
-    send_register_email(user.email, user.username, f'{SERVER_BACKEND}{API}verify?link={verification.link}')
+    send_register_email(user.email, user.username, f'{SERVER_BACKEND}{API}/verify?link={verification.link}')
 
     return {'msg': 'Send email for activate your account'}
+
+
+async def verify(db: AsyncSession, link: str) -> dict[str, str]:
+    """
+        Verification account
+        :param db: DB
+        :type db: AsyncSession
+        :param link: Link
+        :type link: str
+        :return: Message
+        :rtype: dict
+    """
+
+    if not await verification_crud.exist(db, link=link):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Verification not exist')
+
+    verification = await verification_crud.get(db, link=link)
+    await user_crud.update(db, {'id': verification.user_id}, is_active=True)
+    await verification_crud.remove(db, id=verification.id)
+    return {'msg': 'Your account has been activated'}

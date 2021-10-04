@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 PROJECT_NAME = 'Freelancer'
 SERVER_BACKEND = 'http://localhost:8000/'
-API = 'api/v1/'
+API = 'api/v1'
 
 TEST = os.environ.get('TEST', 0)
 

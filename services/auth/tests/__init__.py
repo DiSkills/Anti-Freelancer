@@ -49,47 +49,64 @@ class AuthTestCase(TestCase):
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 0)
 
         # Invalid passwords
-        response = self.client.post('/register', json={**self.data, 'password': 'test'})
+        response = self.client.post('/api/v1/register', json={**self.data, 'password': 'test'})
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()['detail'][0]['msg'], 'Password invalid')
         self.assertEqual(len(async_loop(user_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 0)
 
-        response = self.client.post('/register', json={**self.data, 'password': 'test241fg'})
+        response = self.client.post('/api/v1/register', json={**self.data, 'password': 'test241fg'})
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()['detail'][0]['msg'], 'Password invalid')
         self.assertEqual(len(async_loop(user_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 0)
 
-        response = self.client.post('/register', json={**self.data, 'password': 'test241fg!'})
+        response = self.client.post('/api/v1/register', json={**self.data, 'password': 'test241fg!'})
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()['detail'][0]['msg'], 'Password invalid')
         self.assertEqual(len(async_loop(user_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 0)
 
-        response = self.client.post('/register', json={**self.data, 'confirm_password': 'test241fg!'})
+        response = self.client.post('/api/v1/register', json={**self.data, 'confirm_password': 'test241fg!'})
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()['detail'][0]['msg'], 'Passwords do not match')
         self.assertEqual(len(async_loop(user_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 0)
 
         # Register
-        response = self.client.post('/register', json=self.data)
+        response = self.client.post('/api/v1/register', json=self.data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json(), {'msg': 'Send email for activate your account'})
         self.assertEqual(len(async_loop(user_crud.all(self.session))), 1)
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 1)
 
-        response = self.client.post('/register', json=self.data)
+        response = self.client.post('/api/v1/register', json=self.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Username exist'})
         self.assertEqual(len(async_loop(user_crud.all(self.session))), 1)
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 1)
 
-        response = self.client.post('/register', json={**self.data, 'username': 'test2'})
+        response = self.client.post('/api/v1/register', json={**self.data, 'username': 'test2'})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Email exist'})
         self.assertEqual(len(async_loop(user_crud.all(self.session))), 1)
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 1)
 
         self.assertEqual(async_loop(verification_crud.get(self.session, id=1)).user_id, 1)
+
+    def test_verification(self):
+        self.client.post('/api/v1/register', json=self.data)
+        self.assertEqual(len(async_loop(verification_crud.all(self.session))), 1)
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).is_active, False)
+
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        response = self.client.get(f'/api/v1/verify?link={verification.link}')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Your account has been activated'})
+
+        self.assertEqual(len(async_loop(verification_crud.all(self.session))), 0)
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).is_active, True)
+
+        response = self.client.get(f'/api/v1/verify?link={verification.link}')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Verification not exist'})

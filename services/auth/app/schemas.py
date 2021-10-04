@@ -45,9 +45,3 @@ class VerificationCreate(BaseModel):
 
     user_id: int
     link: str
-
-
-class ActivateUser(BaseModel):
-    """ User activate """
-
-    is_active: bool = True
