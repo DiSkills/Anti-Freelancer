@@ -9,6 +9,9 @@ from db import Base
 class User(Base):
     """ User """
 
+    __tablename__ = 'user'
+
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     username: str = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
     email: str = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
     password: str = sqlalchemy.Column(sqlalchemy.String, nullable=False)
