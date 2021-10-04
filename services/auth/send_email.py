@@ -8,15 +8,23 @@ sender = os.environ.get('EMAIL')
 sender_password = os.environ.get('PASSWORD_EMAIL')
 
 
-def send_email(recipient: str, subject: str, template: str, **data):
+def send_email(recipient: str, subject: str, template: str, **data) -> None:
+    """
+        Send email
+        :param recipient: Recipient
+        :type recipient: str
+        :param subject: Subject
+        :type subject: str
+        :param template: Template
+        :type template: str
+        :param data: Jinja data
+        :return: None
+    """
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
 
-    try:
-        with open(template) as file:
-            html = file.read()
-    except IOError:
-        return 'The template file not found'
+    with open(template) as file:
+        html = file.read()
 
     t = Template(html)
     message = t.render(**data)

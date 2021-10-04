@@ -3,6 +3,12 @@ import re
 from pydantic import BaseModel, validator, EmailStr
 
 
+class Message(BaseModel):
+    """ Message """
+
+    msg: str
+
+
 class Password(BaseModel):
     """ Password """
 

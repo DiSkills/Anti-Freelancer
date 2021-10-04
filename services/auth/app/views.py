@@ -10,7 +10,17 @@ from app.service import get_password_hash
 from config import SERVER_BACKEND, API
 
 
-async def register(db: AsyncSession, schema: Register):
+async def register(db: AsyncSession, schema: Register) -> dict[str, str]:
+    """
+        Register
+        :param db: DB
+        :type db: AsyncSession
+        :param schema: Register data
+        :type schema: Register
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Username or email exist
+    """
 
     if await user_crud.exist(db, username=schema.username):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Username exist')
