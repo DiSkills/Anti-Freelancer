@@ -9,6 +9,8 @@ BASE_DIR = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 PROJECT_NAME = 'Freelancer'
+SERVER_BACKEND = 'http://localhost:8000/'
+API = 'api/v1/'
 
 DB_USER = os.environ.get('DB_USER')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
