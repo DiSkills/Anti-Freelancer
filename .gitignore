@@ -1,3 +1,4 @@
 /services/auth/.idea/
 /services/auth/venv/
 /.idea/
+/services/auth/config.env
