@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import time
 from unittest import TestCase
 
 import jwt
@@ -192,7 +191,6 @@ class AuthTestCase(TestCase):
             SECRET_KEY,
             ALGORITHM,
         )
-        time.sleep(0.5)
         response = self.client.post(f'/api/v1/refresh?token={refresh}')
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json(), {'detail': 'Token lifetime ended'})
@@ -204,10 +202,15 @@ class AuthTestCase(TestCase):
     def test_permission_urls(self):
         self.client.post('/api/v1/register', json=self.data)
 
+        last_login_register = async_loop(user_crud.get(self.session, id=1)).last_login
+
         verification = async_loop(verification_crud.get(self.session, id=1))
         self.client.get(f'/api/v1/verify?link={verification.link}')
 
         tokens = self.client.post('/api/v1/login', data={'username': 'test', 'password': 'Test1234!'}).json()
+
+        last_login_login = async_loop(user_crud.get(self.session, id=1)).last_login
+        self.assertNotEqual(last_login_login, last_login_register)
 
         headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
 
@@ -215,6 +218,9 @@ class AuthTestCase(TestCase):
         response = self.client.post('/api/v1/is-authenticated', headers=headers)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'user_id': 1})
+
+        last_login_is_auth = async_loop(user_crud.get(self.session, id=1)).last_login
+        self.assertNotEqual(last_login_is_auth, last_login_login)
 
         response = self.client.post(
             '/api/v1/is-authenticated', headers={'Authorization': f'Bearer {tokens["refresh_token"]}'}
@@ -237,6 +243,9 @@ class AuthTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'user_id': 1})
 
+        last_login_is_active = async_loop(user_crud.get(self.session, id=1)).last_login
+        self.assertNotEqual(last_login_is_active, last_login_is_auth)
+
         response = self.client.post(
             '/api/v1/is-active', headers={'Authorization': f'Bearer {tokens["refresh_token"]}'}
         )
@@ -256,6 +265,9 @@ class AuthTestCase(TestCase):
         response = self.client.post('/api/v1/is-superuser', headers=headers)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'user_id': 1})
+
+        last_login_is_superuser = async_loop(user_crud.get(self.session, id=1)).last_login
+        self.assertNotEqual(last_login_is_superuser, last_login_is_active)
 
         response = self.client.post(
             '/api/v1/is-superuser', headers={'Authorization': f'Bearer {tokens["refresh_token"]}'}

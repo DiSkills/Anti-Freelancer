@@ -101,6 +101,8 @@ async def verify_token(db: AsyncSession, token: str, sub: str, error_message: st
         if not await user_crud.exist(db, id=decoded['user_id']):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
 
+        await user_crud.update(db, {'id': decoded['user_id']}, last_login=datetime.datetime.utcnow())
+
         return decoded['user_id']
     except jwt.exceptions.ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token lifetime ended')

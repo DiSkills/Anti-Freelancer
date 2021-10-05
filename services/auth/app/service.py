@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,4 +33,7 @@ async def validate_login(db: AsyncSession, username: str, password: str) -> User
 
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You not activated')
+
+    await user_crud.update(db, {'id': user.id}, last_login=datetime.datetime.utcnow())
+
     return user
