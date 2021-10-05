@@ -110,6 +110,16 @@ async def is_authenticated(token: str = Security(reusable_oauth2)) -> int:
 
 
 async def is_active(db: AsyncSession, user_id: int) -> dict[str, int]:
+    """
+        Is active
+        :param db: DB
+        :type db: AsyncSession
+        :param user_id: User ID
+        :type user_id: int
+        :return: User ID
+        :rtype: dict
+        :raise HTTPException 403: User not activated
+    """
 
     user = await user_crud.get(db, id=user_id)
 
@@ -119,6 +129,16 @@ async def is_active(db: AsyncSession, user_id: int) -> dict[str, int]:
 
 
 async def is_superuser(db: AsyncSession, user_id: int) -> dict[str, int]:
+    """
+        Is superuser
+        :param db: DB
+        :type db: AsyncSession
+        :param user_id: User ID
+        :type user_id: int
+        :return: User ID
+        :rtype: dict
+        :raise HTTPException 403: User not superuser
+    """
 
     user = await user_crud.get(db, id=user_id)
 
