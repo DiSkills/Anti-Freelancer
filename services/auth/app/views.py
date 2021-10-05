@@ -146,6 +146,17 @@ async def is_superuser(user: User = Depends(is_active)) -> User:
 
 
 async def avatar(db: AsyncSession, user: User, file: UploadFile) -> dict[str, str]:
+    """
+        Avatar
+        :param db: DB
+        :type db: AsyncSession
+        :param user: User
+        :type user: User
+        :param file: File
+        :type file: UploadFile
+        :return: Message
+        :rtype: dict
+    """
 
     if file.content_type != 'image/png':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Avatar only in png format')
