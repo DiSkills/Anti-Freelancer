@@ -41,7 +41,7 @@ async def verify(link: str, db: AsyncSession = Depends(get_db)):
     response_description='Tokens',
     status_code=status.HTTP_200_OK,
     response_model=Tokens,
-    tags=['auth']
+    tags=['auth'],
 )
 async def login(
         username: str = Form(...),
