@@ -49,6 +49,7 @@ async def verify(db: AsyncSession, link: str) -> dict[str, str]:
         :type link: str
         :return: Message
         :rtype: dict
+        :raise HTTPException 400: Verification not found
     """
 
     if not await verification_crud.exist(db, link=link):
@@ -77,6 +78,16 @@ async def login(db: AsyncSession, username: str, password: str) -> dict[str, str
 
 
 async def refresh(db: AsyncSession, token: str) -> dict[str, str]:
+    """
+        Refresh
+        :param db: DB
+        :type db: AsyncSession
+        :param token: Refresh token
+        :type token: str
+        :return: Access token and token type
+        :rtype: dict
+        :raise HTTPException 400: User not found
+    """
 
     user_id = verify_refresh_token(token)
 

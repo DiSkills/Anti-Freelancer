@@ -74,6 +74,13 @@ def create_login_tokens(user_id: int) -> dict[str, str]:
 
 
 def verify_token_decorator(function):
+    """
+        Verify token decorator
+        :param function: Function
+        :return: wrapper
+        :raise HTTPException 401: Token lifetime ended
+        :raise HTTPException 403: Could not validate credentials
+    """
 
     @wraps(function)
     def wrapper(*args, **kwargs):
@@ -89,6 +96,14 @@ def verify_token_decorator(function):
 
 @verify_token_decorator
 def verify_refresh_token(token: str) -> int:
+    """
+        Verify refresh token
+        :param token: Refresh token
+        :type token: str
+        :return: User ID
+        :rtype: int
+        :raise HTTPException 400: Refresh token not found
+    """
 
     decoded = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     if decoded['sub'] != 'refresh':

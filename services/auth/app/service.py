@@ -2,10 +2,24 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud
+from app.models import User
 from app.security import verify_password_hash
 
 
-async def validate_login(db: AsyncSession, username: str, password: str):
+async def validate_login(db: AsyncSession, username: str, password: str) -> User:
+    """
+        Validate login data
+        :param db: DB
+        :type db: AsyncSession
+        :param username: Username
+        :type username: str
+        :param password: Password
+        :type password: str
+        :return: User
+        :rtype: User
+        :raise HTTPException 400: Username not found and Password mismatch
+        :raise HTTPException 403: You not activated
+    """
 
     if not await user_crud.exist(db, username=username):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Username not found')
