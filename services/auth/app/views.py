@@ -107,3 +107,21 @@ async def is_authenticated(token: str = Security(reusable_oauth2)) -> int:
     """
     async with async_session() as db:
         return await verify_token(db, token, 'access', 'Access token not found')
+
+
+async def is_active(db: AsyncSession, user_id: int) -> dict[str, int]:
+
+    user = await user_crud.get(db, id=user_id)
+
+    if not user.is_active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User not activated')
+    return {'user_id': user_id}
+
+
+async def is_superuser(db: AsyncSession, user_id: int) -> dict[str, int]:
+
+    user = await user_crud.get(db, id=user_id)
+
+    if not user.is_superuser:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User not superuser')
+    return {'user_id': user_id}

@@ -65,7 +65,7 @@ async def refresh(token: str, db: AsyncSession = Depends(get_db)):
 
 
 @auth_router.post(
-    '/auth',
+    '/is-authenticated',
     name='Authenticated user',
     description='Authenticated user',
     response_description='User ID',
@@ -75,3 +75,29 @@ async def refresh(token: str, db: AsyncSession = Depends(get_db)):
 )
 async def is_authenticated(user_id: int = Depends(views.is_authenticated)):
     return {'user_id': user_id}
+
+
+@auth_router.post(
+    '/is-active',
+    name='Is activated user',
+    description='Is activated user',
+    response_description='User ID',
+    status_code=status.HTTP_200_OK,
+    response_model=PermissionResponse,
+    tags=['permission'],
+)
+async def is_active(user_id: int = Depends(views.is_authenticated), db: AsyncSession = Depends(get_db)):
+    return await views.is_active(db, user_id)
+
+
+@auth_router.post(
+    '/is-superuser',
+    name='Is superuser user',
+    description='Is superuser user',
+    response_description='User ID',
+    status_code=status.HTTP_200_OK,
+    response_model=PermissionResponse,
+    tags=['permission'],
+)
+async def is_superuser(user_id: int = Depends(views.is_authenticated), db: AsyncSession = Depends(get_db)):
+    return await views.is_superuser(db, user_id)

@@ -201,22 +201,68 @@ class AuthTestCase(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json(), {'detail': 'Could not validate credentials'})
 
-    def test_is_auth(self):
+    def test_permission_urls(self):
         self.client.post('/api/v1/register', json=self.data)
+
         verification = async_loop(verification_crud.get(self.session, id=1))
         self.client.get(f'/api/v1/verify?link={verification.link}')
 
         tokens = self.client.post('/api/v1/login', data={'username': 'test', 'password': 'Test1234!'}).json()
 
         headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
-        response = self.client.post('/api/v1/auth', headers=headers)
+
+        # Is authenticated
+        response = self.client.post('/api/v1/is-authenticated', headers=headers)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'user_id': 1})
 
-        response = self.client.post('/api/v1/auth', headers={'Authorization': f'Bearer {tokens["refresh_token"]}'})
+        response = self.client.post(
+            '/api/v1/is-authenticated', headers={'Authorization': f'Bearer {tokens["refresh_token"]}'}
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Access token not found'})
 
-        response = self.client.post('/api/v1/auth')
+        response = self.client.post('/api/v1/is-authenticated')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json(), {'detail': 'Not authenticated'})
+
+        # Is active
+        async_loop(user_crud.update(self.session, {'id': 1}, is_active=False))
+        response = self.client.post('/api/v1/is-active', headers=headers)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'User not activated'})
+
+        async_loop(user_crud.update(self.session, {'id': 1}, is_active=True))
+        response = self.client.post('/api/v1/is-active', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'user_id': 1})
+
+        response = self.client.post(
+            '/api/v1/is-active', headers={'Authorization': f'Bearer {tokens["refresh_token"]}'}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Access token not found'})
+
+        response = self.client.post('/api/v1/is-active')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json(), {'detail': 'Not authenticated'})
+
+        # Is superuser
+        response = self.client.post('/api/v1/is-superuser', headers=headers)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'User not superuser'})
+
+        async_loop(user_crud.update(self.session, {'id': 1}, is_superuser=True))
+        response = self.client.post('/api/v1/is-superuser', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'user_id': 1})
+
+        response = self.client.post(
+            '/api/v1/is-superuser', headers={'Authorization': f'Bearer {tokens["refresh_token"]}'}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Access token not found'})
+
+        response = self.client.post('/api/v1/is-superuser')
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json(), {'detail': 'Not authenticated'})
