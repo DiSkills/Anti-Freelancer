@@ -333,3 +333,12 @@ class AuthTestCase(TestCase):
         async_loop(self.session.commit())
         user = async_loop(user_crud.get(self.session, id=1))
         self.assertEqual(os.path.exists(user.avatar), True)
+
+        # Media
+        avatar = user.avatar.replace('media/tests/', '')
+        response = self.client.get(f'/media/{avatar}')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(f'/media/test2/image.png')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json(), {'detail': 'File not found'})
