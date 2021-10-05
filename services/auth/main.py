@@ -10,7 +10,7 @@ from config import PROJECT_NAME, API, MEDIA_ROOT
 app = FastAPI(
     title=PROJECT_NAME,
     version='0.1.0',
-    description='Freelance by Counter',
+    description='Auth Service Anti-Freelancer by Counter',
 )
 
 app.add_middleware(
