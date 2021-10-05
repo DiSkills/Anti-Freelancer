@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "Auth"
+name = "Auth Service Anti-Freelancer"
 version = "0.1.0"
 description = ""
 authors = ["_Counter021_"]

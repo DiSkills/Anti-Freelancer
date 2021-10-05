@@ -8,7 +8,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-PROJECT_NAME = 'Freelancer'
+PROJECT_NAME = 'Anti-Freelancer'
 SERVER_BACKEND = 'http://localhost:8000/'
 API = 'api/v1'
 
