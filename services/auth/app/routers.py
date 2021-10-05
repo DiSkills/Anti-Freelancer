@@ -86,8 +86,8 @@ async def is_authenticated(user_id: int = Depends(views.is_authenticated)):
     response_model=PermissionResponse,
     tags=['permission'],
 )
-async def is_active(user_id: int = Depends(views.is_authenticated), db: AsyncSession = Depends(get_db)):
-    return await views.is_active(db, user_id)
+async def is_active(user_id: int = Depends(views.is_active)):
+    return {'user_id': user_id}
 
 
 @auth_router.post(
@@ -99,5 +99,5 @@ async def is_active(user_id: int = Depends(views.is_authenticated), db: AsyncSes
     response_model=PermissionResponse,
     tags=['permission'],
 )
-async def is_superuser(user_id: int = Depends(views.is_authenticated), db: AsyncSession = Depends(get_db)):
-    return await views.is_superuser(db, user_id)
+async def is_superuser(user_id: int = Depends(views.is_superuser)):
+    return {'user_id': user_id}

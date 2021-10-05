@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from fastapi import HTTPException, status, Security
+from fastapi import HTTPException, status, Security, Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -109,39 +109,37 @@ async def is_authenticated(token: str = Security(reusable_oauth2)) -> int:
         return await verify_token(db, token, 'access', 'Access token not found')
 
 
-async def is_active(db: AsyncSession, user_id: int) -> dict[str, int]:
+async def is_active(user_id: int = Depends(is_authenticated)) -> int:
     """
         Is active
-        :param db: DB
-        :type db: AsyncSession
         :param user_id: User ID
         :type user_id: int
         :return: User ID
-        :rtype: dict
+        :rtype: int
         :raise HTTPException 403: User not activated
     """
 
-    user = await user_crud.get(db, id=user_id)
+    async with async_session() as db:
+        user = await user_crud.get(db, id=user_id)
 
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User not activated')
-    return {'user_id': user_id}
+    return user_id
 
 
-async def is_superuser(db: AsyncSession, user_id: int) -> dict[str, int]:
+async def is_superuser(user_id: int = Depends(is_authenticated)) -> int:
     """
         Is superuser
-        :param db: DB
-        :type db: AsyncSession
         :param user_id: User ID
         :type user_id: int
         :return: User ID
-        :rtype: dict
+        :rtype: int
         :raise HTTPException 403: User not superuser
     """
 
-    user = await user_crud.get(db, id=user_id)
+    async with async_session() as db:
+        user = await user_crud.get(db, id=user_id)
 
     if not user.is_superuser:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User not superuser')
-    return {'user_id': user_id}
+    return user_id
