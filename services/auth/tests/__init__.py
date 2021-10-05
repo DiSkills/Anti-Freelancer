@@ -1,4 +1,6 @@
 import asyncio
+import datetime
+import time
 from unittest import TestCase
 
 import jwt
@@ -156,3 +158,45 @@ class AuthTestCase(TestCase):
         response = self.client.post('/api/v1/login', data={'username': 'test', 'password': 't' * 25})
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()['detail'][0]['msg'], 'ensure this value has at most 20 characters')
+
+    def test_refresh(self):
+        self.client.post('/api/v1/register', json=self.data)
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(f'/api/v1/verify?link={verification.link}')
+
+        tokens = self.client.post('/api/v1/login', data={'username': 'test', 'password': 'Test1234!'}).json()
+
+        response = self.client.post(f'/api/v1/refresh?token={tokens["refresh_token"]}')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['type'], 'bearer')
+        self.assertEqual('access_token' in response.json(), True)
+        access = jwt.decode(response.json()['access_token'], SECRET_KEY, algorithms=[ALGORITHM])
+        self.assertEqual(access['user_id'], 1)
+        self.assertEqual(access['sub'], 'access')
+
+        response = self.client.post(f'/api/v1/refresh?token={tokens["access_token"]}')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Refresh token not found'})
+
+        refresh = jwt.encode(
+            {'user_id': 2, 'sub': 'refresh', 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=3)},
+            SECRET_KEY,
+            ALGORITHM,
+        )
+        response = self.client.post(f'/api/v1/refresh?token={refresh}')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'User not found'})
+
+        refresh = jwt.encode(
+            {'user_id': 1, 'sub': 'refresh', 'exp': datetime.datetime.utcnow() + datetime.timedelta(microseconds=1)},
+            SECRET_KEY,
+            ALGORITHM,
+        )
+        time.sleep(0.5)
+        response = self.client.post(f'/api/v1/refresh?token={refresh}')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json(), {'detail': 'Token lifetime ended'})
+
+        response = self.client.post(f'/api/v1/refresh?token={refresh + "gf"}')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'Could not validate credentials'})

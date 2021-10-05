@@ -1,6 +1,8 @@
 import datetime
+from functools import wraps
 
 import jwt
+from fastapi import HTTPException, status
 
 from config import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES
 
@@ -69,3 +71,26 @@ def create_login_tokens(user_id: int) -> dict[str, str]:
         :rtype: dict
     """
     return {**create_access_token(user_id), **create_refresh_token(user_id)}
+
+
+def verify_token_decorator(function):
+
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except jwt.exceptions.ExpiredSignatureError:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token lifetime ended')
+        except jwt.exceptions.PyJWTError:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Could not validate credentials')
+
+    return wrapper
+
+
+@verify_token_decorator
+def verify_refresh_token(token: str) -> int:
+
+    decoded = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    if decoded['sub'] != 'refresh':
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Refresh token not found')
+    return decoded['user_id']

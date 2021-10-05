@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import views
-from app.schemas import Register, Message, Tokens
+from app.schemas import Register, Message, Tokens, AccessToken
 from db import get_db
 
 auth_router = APIRouter()
@@ -49,3 +49,16 @@ async def login(
         db: AsyncSession = Depends(get_db),
 ):
     return await views.login(db, username, password)
+
+
+@auth_router.post(
+    '/refresh',
+    name='Refresh token',
+    description='Refresh token',
+    response_description='Access token',
+    status_code=status.HTTP_200_OK,
+    response_model=AccessToken,
+    tags=['auth'],
+)
+async def refresh(token: str, db: AsyncSession = Depends(get_db)):
+    return await views.refresh(db, token)
