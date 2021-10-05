@@ -26,3 +26,5 @@
   - [x] Is superuser
   - [x] Test is superuser
 - [x] Last login
+- [ ] Celery email send
+- [ ] Create superuser
