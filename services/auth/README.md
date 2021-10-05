@@ -16,7 +16,8 @@
   - [ ] Reset password
   - [ ] Get username
   - [ ] Change password
-  - [ ] Load avatar
+  - [x] Load avatar
+  - [x] Test load avatar
   - [ ] GitHub
 - [x] Permission
   - [x] Is authenticated
@@ -28,3 +29,5 @@
 - [x] Last login
 - [ ] Celery email send
 - [ ] Create superuser
+- [x] Get media
+- [x] Test get media
