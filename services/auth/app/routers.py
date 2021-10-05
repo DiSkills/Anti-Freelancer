@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, status, Form
+from fastapi import APIRouter, Depends, status, Form, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import views
+from app.models import User
 from app.schemas import Register, Message, Tokens, AccessToken, PermissionResponse
 from db import get_db
 
@@ -86,8 +87,8 @@ async def is_authenticated(user_id: int = Depends(views.is_authenticated)):
     response_model=PermissionResponse,
     tags=['permission'],
 )
-async def is_active(user_id: int = Depends(views.is_active)):
-    return {'user_id': user_id}
+async def is_active(user: User = Depends(views.is_active)):
+    return {'user_id': user.id}
 
 
 @auth_router.post(
@@ -99,5 +100,20 @@ async def is_active(user_id: int = Depends(views.is_active)):
     response_model=PermissionResponse,
     tags=['permission'],
 )
-async def is_superuser(user_id: int = Depends(views.is_superuser)):
-    return {'user_id': user_id}
+async def is_superuser(user: User = Depends(views.is_superuser)):
+    return {'user_id': user.id}
+
+
+@auth_router.post(
+    '/avatar',
+    name='Avatar',
+    description='User avatar',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['change-data'],
+)
+async def avatar(
+        file: UploadFile = File(...), user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)
+):
+    return await views.avatar(db, user, file)

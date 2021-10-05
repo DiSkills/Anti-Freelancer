@@ -1,16 +1,19 @@
+import os
+from datetime import datetime
 from uuid import uuid4
 
-from fastapi import HTTPException, status, Security, Depends
+from fastapi import HTTPException, status, Security, Depends, UploadFile
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud
+from app.models import User
 from app.schemas import Register, VerificationCreate
 from app.security import get_password_hash
 from app.send_email import send_register_email
-from app.service import validate_login
+from app.service import validate_login, remove_file, write_file
 from app.tokens import create_login_tokens, verify_token, create_access_token
-from config import SERVER_BACKEND, API
+from config import SERVER_BACKEND, API, MEDIA_ROOT
 from db import async_session
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl='/api/v1/login')
@@ -109,13 +112,13 @@ async def is_authenticated(token: str = Security(reusable_oauth2)) -> int:
         return await verify_token(db, token, 'access', 'Access token not found')
 
 
-async def is_active(user_id: int = Depends(is_authenticated)) -> int:
+async def is_active(user_id: int = Depends(is_authenticated)) -> User:
     """
         Is active
         :param user_id: User ID
         :type user_id: int
         :return: User ID
-        :rtype: int
+        :rtype: User
         :raise HTTPException 403: User not activated
     """
 
@@ -124,22 +127,37 @@ async def is_active(user_id: int = Depends(is_authenticated)) -> int:
 
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User not activated')
-    return user_id
+    return user
 
 
-async def is_superuser(user_id: int = Depends(is_authenticated)) -> int:
+async def is_superuser(user: User = Depends(is_active)) -> User:
     """
         Is superuser
-        :param user_id: User ID
-        :type user_id: int
+        :param user: User
+        :type user: User
         :return: User ID
-        :rtype: int
+        :rtype: User
         :raise HTTPException 403: User not superuser
     """
 
-    async with async_session() as db:
-        user = await user_crud.get(db, id=user_id)
-
     if not user.is_superuser:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User not superuser')
-    return user_id
+    return user
+
+
+async def avatar(db: AsyncSession, user: User, file: UploadFile) -> dict[str, str]:
+
+    if file.content_type != 'image/png':
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Avatar only in png format')
+
+    if (user.avatar is not None) and (MEDIA_ROOT in user.avatar):
+        remove_file(user.avatar)
+
+    if not os.path.exists(MEDIA_ROOT + user.username):
+        os.mkdir(MEDIA_ROOT + user.username)
+
+    avatar_name = f'{MEDIA_ROOT}{user.username}/{datetime.utcnow().timestamp()}.png'
+
+    await write_file(avatar_name, file)
+    await user_crud.update(db, {'id': user.id}, avatar=avatar_name)
+    return {'msg': 'Avatar has been saved'}

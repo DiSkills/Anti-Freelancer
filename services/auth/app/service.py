@@ -1,6 +1,8 @@
 import datetime
+import os
 
-from fastapi import HTTPException, status
+import aiofiles
+from fastapi import HTTPException, status, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud
@@ -37,3 +39,16 @@ async def validate_login(db: AsyncSession, username: str, password: str) -> User
     await user_crud.update(db, {'id': user.id}, last_login=datetime.datetime.utcnow())
 
     return user
+
+
+async def write_file(file_name: str, file: UploadFile) -> None:
+
+    async with aiofiles.open(file_name, 'wb') as buffer:
+        data = await file.read()
+        await buffer.write(data)
+
+
+def remove_file(file_name: str) -> None:
+
+    if os.path.exists(file_name):
+        os.remove(file_name)

@@ -2,3 +2,4 @@
 /services/auth/venv/
 /.idea/
 /services/auth/config.env
+/services/auth/media/

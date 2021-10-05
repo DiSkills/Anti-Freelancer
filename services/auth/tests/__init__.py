@@ -1,14 +1,17 @@
 import asyncio
 import datetime
+import os
+import shutil
 from unittest import TestCase
 
 import jwt
+from fastapi import UploadFile
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud
 from app.tokens import ALGORITHM
-from config import SECRET_KEY
+from config import SECRET_KEY, MEDIA_ROOT
 from db import engine, Base
 from main import app
 
@@ -44,10 +47,12 @@ class AuthTestCase(TestCase):
             'freelancer': False,
         }
         async_loop(create_all())
+        os.makedirs(MEDIA_ROOT)
 
     def tearDown(self) -> None:
         async_loop(self.session.close())
         async_loop(drop_all())
+        shutil.rmtree(MEDIA_ROOT)
 
     def test_register(self):
         self.assertEqual(len(async_loop(user_crud.all(self.session))), 0)
@@ -278,3 +283,53 @@ class AuthTestCase(TestCase):
         response = self.client.post('/api/v1/is-superuser')
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json(), {'detail': 'Not authenticated'})
+
+    def test_avatar(self):
+        self.client.post('/api/v1/register', json=self.data)
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(f'/api/v1/verify?link={verification.link}')
+
+        tokens = self.client.post('/api/v1/login', data={'username': 'test', 'password': 'Test1234!'}).json()
+        headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
+
+        user = async_loop(user_crud.get(self.session, id=1))
+
+        self.assertEqual(user.avatar, None)
+
+        file = UploadFile('image.png', content_type='image/png')
+        response = self.client.post(
+            '/api/v1/avatar', headers=headers, files={'file': ('image.png', async_loop(file.read()), 'image/png')}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Avatar has been saved'})
+        async_loop(self.session.commit())
+
+        user = async_loop(user_crud.get(self.session, id=1))
+        avatar = user.avatar
+        self.assertEqual(os.path.exists(avatar), True)
+
+        file = UploadFile('image.png', content_type='image/png')
+        response = self.client.post(
+            '/api/v1/avatar', headers=headers, files={'file': ('image.png', async_loop(file.read()), 'image/png')}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Avatar has been saved'})
+        async_loop(self.session.commit())
+
+        user = async_loop(user_crud.get(self.session, id=1))
+        self.assertEqual(os.path.exists(avatar), False)
+        self.assertEqual(os.path.exists(user.avatar), True)
+
+        self.assertNotEqual(avatar, user.avatar)
+
+        # Errors
+        file = UploadFile('image.gif', content_type='image/gif')
+        response = self.client.post(
+            '/api/v1/avatar', headers=headers, files={'file': ('image.gif', async_loop(file.read()), 'image/gif')}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Avatar only in png format'})
+
+        async_loop(self.session.commit())
+        user = async_loop(user_crud.get(self.session, id=1))
+        self.assertEqual(os.path.exists(user.avatar), True)
