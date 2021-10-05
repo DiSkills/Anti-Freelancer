@@ -5,8 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud
 from app.schemas import Register, VerificationCreate
+from app.security import get_password_hash
 from app.send_email import send_register_email
-from app.service import get_password_hash
+from app.service import validate_login
+from app.tokens import create_login_tokens
 from config import SERVER_BACKEND, API
 
 
@@ -56,3 +58,19 @@ async def verify(db: AsyncSession, link: str) -> dict[str, str]:
     await user_crud.update(db, {'id': verification.user_id}, is_active=True)
     await verification_crud.remove(db, id=verification.id)
     return {'msg': 'Your account has been activated'}
+
+
+async def login(db: AsyncSession, username: str, password: str) -> dict[str, str]:
+    """
+        Login user
+        :param db: DB
+        :type db: AsyncSession
+        :param username: Username
+        :type username: str
+        :param password: Password
+        :type password: str
+        :return: Tokens
+        :rtype: dict
+    """
+    user = await validate_login(db, username, password)
+    return create_login_tokens(user.id)

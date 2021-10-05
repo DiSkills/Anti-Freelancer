@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import views
-from app.schemas import Register, Message
+from app.schemas import Register, Message, Tokens
 from db import get_db
 
 auth_router = APIRouter()
@@ -32,3 +32,20 @@ async def register(schema: Register, db: AsyncSession = Depends(get_db)):
 )
 async def verify(link: str, db: AsyncSession = Depends(get_db)):
     return await views.verify(db, link)
+
+
+@auth_router.post(
+    '/login',
+    name='Login',
+    description='Login user',
+    response_description='Tokens',
+    status_code=status.HTTP_200_OK,
+    response_model=Tokens,
+    tags=['auth']
+)
+async def login(
+        username: str = Form(...),
+        password: str = Form(..., min_length=8, max_length=20),
+        db: AsyncSession = Depends(get_db),
+):
+    return await views.login(db, username, password)

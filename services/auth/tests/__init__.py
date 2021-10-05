@@ -1,10 +1,13 @@
 import asyncio
 from unittest import TestCase
 
+import jwt
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud
+from app.tokens import ALGORITHM
+from config import SECRET_KEY
 from db import engine, Base
 from main import app
 
@@ -113,3 +116,43 @@ class AuthTestCase(TestCase):
         response = self.client.get(f'/api/v1/verify?link={verification.link}')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Verification not exist'})
+
+    def test_login(self):
+        self.client.post('/api/v1/register', json=self.data)
+
+        response = self.client.post('/api/v1/login', data={'username': 'test', 'password': 'Test1234!'})
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'You not activated'})
+
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(f'/api/v1/verify?link={verification.link}')
+
+        response = self.client.post('/api/v1/login', data={'username': 'test', 'password': 'Test1234!'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['type'], 'bearer')
+        self.assertEqual('access_token' in response.json(), True)
+        self.assertEqual('refresh_token' in response.json(), True)
+
+        access = jwt.decode(response.json()['access_token'], SECRET_KEY, algorithms=[ALGORITHM])
+        self.assertEqual(access['user_id'], 1)
+        self.assertEqual(access['sub'], 'access')
+
+        refresh = jwt.decode(response.json()['refresh_token'], SECRET_KEY, algorithms=[ALGORITHM])
+        self.assertEqual(refresh['user_id'], 1)
+        self.assertEqual(refresh['sub'], 'refresh')
+
+        response = self.client.post('/api/v1/login', data={'username': 'test2', 'password': 'Test1234!'})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Username not found'})
+
+        response = self.client.post('/api/v1/login', data={'username': 'test', 'password': 'Test1234!!'})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Password mismatch'})
+
+        response = self.client.post('/api/v1/login', data={'username': 'test', 'password': 't'})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()['detail'][0]['msg'], 'ensure this value has at least 8 characters')
+
+        response = self.client.post('/api/v1/login', data={'username': 'test', 'password': 't' * 25})
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()['detail'][0]['msg'], 'ensure this value has at most 20 characters')

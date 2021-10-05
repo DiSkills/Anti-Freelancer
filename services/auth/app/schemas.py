@@ -46,3 +46,23 @@ class VerificationCreate(BaseModel):
 
     user_id: int
     link: str
+
+
+class AccessToken(BaseModel):
+    """ Access token """
+
+    access_token: str
+    type: str
+
+
+class RefreshToken(BaseModel):
+    """ Refresh token """
+
+    refresh_token: str
+    type: str
+
+
+class Tokens(AccessToken, RefreshToken):
+    """ Tokens """
+
+    pass
