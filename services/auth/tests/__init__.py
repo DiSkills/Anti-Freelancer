@@ -37,6 +37,7 @@ class AuthTestCase(TestCase):
             'confirm_password': 'Test1234!',
             'username': 'test',
             'email': 'test@example.com',
+            'freelancer': False,
         }
         async_loop(create_all())
 
@@ -93,9 +94,11 @@ class AuthTestCase(TestCase):
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 1)
 
         self.assertEqual(async_loop(verification_crud.get(self.session, id=1)).user_id, 1)
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).freelancer, False)
 
     def test_verification(self):
-        self.client.post('/api/v1/register', json=self.data)
+        self.client.post('/api/v1/register', json={**self.data, 'freelancer': True})
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).freelancer, True)
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 1)
         self.assertEqual(async_loop(user_crud.get(self.session, id=1)).is_active, False)
 

@@ -19,7 +19,7 @@ class Password(BaseModel):
     def validate_password(cls, password):
         """ Validate password """
 
-        reg = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,20}$'
+        reg = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{8,20}$'
         if not re.search(reg, password):
             raise ValueError('Password invalid')
         return password
@@ -38,6 +38,7 @@ class Register(Password):
 
     username: str
     email: EmailStr
+    freelancer: bool = False
 
 
 class VerificationCreate(BaseModel):
