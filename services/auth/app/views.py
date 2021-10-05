@@ -156,6 +156,7 @@ async def avatar(db: AsyncSession, user: User, file: UploadFile) -> dict[str, st
         :type file: UploadFile
         :return: Message
         :rtype: dict
+        :raise HTTPException 400: Avatar only in png format
     """
 
     if file.content_type != 'image/png':
