@@ -66,3 +66,9 @@ class Tokens(AccessToken, RefreshToken):
     """ Tokens """
 
     pass
+
+
+class PermissionResponse(BaseModel):
+    """ Permission response """
+
+    user_id: int

@@ -3,7 +3,9 @@ from functools import wraps
 
 import jwt
 from fastapi import HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.crud import user_crud
 from config import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES
 
 ALGORITHM = 'HS256'
@@ -73,39 +75,34 @@ def create_login_tokens(user_id: int) -> dict[str, str]:
     return {**create_access_token(user_id), **create_refresh_token(user_id)}
 
 
-def verify_token_decorator(function):
+async def verify_token(db: AsyncSession, token: str, sub: str, error_message: str) -> int:
     """
-        Verify token decorator
-        :param function: Function
-        :return: wrapper
+        Verify token
+        :param db: DB
+        :type db: AsyncSession
+        :param token: Token
+        :type token: str
+        :param sub: Subject
+        :type sub: str
+        :param error_message: Error message
+        :type error_message: str
+        :return: User ID
+        :rtype: int
+        :raise HTTPException 400: Error message or User not found
         :raise HTTPException 401: Token lifetime ended
         :raise HTTPException 403: Could not validate credentials
     """
 
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        try:
-            return function(*args, **kwargs)
-        except jwt.exceptions.ExpiredSignatureError:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token lifetime ended')
-        except jwt.exceptions.PyJWTError:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Could not validate credentials')
+    try:
+        decoded = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if decoded['sub'] != sub:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error_message)
 
-    return wrapper
+        if not await user_crud.exist(db, id=decoded['user_id']):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
 
-
-@verify_token_decorator
-def verify_refresh_token(token: str) -> int:
-    """
-        Verify refresh token
-        :param token: Refresh token
-        :type token: str
-        :return: User ID
-        :rtype: int
-        :raise HTTPException 400: Refresh token not found
-    """
-
-    decoded = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    if decoded['sub'] != 'refresh':
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Refresh token not found')
-    return decoded['user_id']
+        return decoded['user_id']
+    except jwt.exceptions.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token lifetime ended')
+    except jwt.exceptions.PyJWTError:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Could not validate credentials')

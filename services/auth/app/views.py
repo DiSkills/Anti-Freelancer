@@ -1,6 +1,7 @@
 from uuid import uuid4
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Security
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud
@@ -8,8 +9,11 @@ from app.schemas import Register, VerificationCreate
 from app.security import get_password_hash
 from app.send_email import send_register_email
 from app.service import validate_login
-from app.tokens import create_login_tokens, verify_refresh_token, create_access_token
+from app.tokens import create_login_tokens, verify_token, create_access_token
 from config import SERVER_BACKEND, API
+from db import async_session
+
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl='/api/v1/login')
 
 
 async def register(db: AsyncSession, schema: Register) -> dict[str, str]:
@@ -86,12 +90,20 @@ async def refresh(db: AsyncSession, token: str) -> dict[str, str]:
         :type token: str
         :return: Access token and token type
         :rtype: dict
-        :raise HTTPException 400: User not found
     """
 
-    user_id = verify_refresh_token(token)
-
-    if not await user_crud.exist(db, id=user_id):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
+    user_id = await verify_token(db, token, 'refresh', 'Refresh token not found')
 
     return create_access_token(user_id)
+
+
+async def is_authenticated(token: str = Security(reusable_oauth2)) -> int:
+    """
+        Is authenticated
+        :param token: Access token
+        :type token: str
+        :return: User ID
+        :rtype: int
+    """
+    async with async_session() as db:
+        return await verify_token(db, token, 'access', 'Access token not found')

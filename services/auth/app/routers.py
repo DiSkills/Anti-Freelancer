@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import views
-from app.schemas import Register, Message, Tokens, AccessToken
+from app.schemas import Register, Message, Tokens, AccessToken, PermissionResponse
 from db import get_db
 
 auth_router = APIRouter()
@@ -62,3 +62,16 @@ async def login(
 )
 async def refresh(token: str, db: AsyncSession = Depends(get_db)):
     return await views.refresh(db, token)
+
+
+@auth_router.post(
+    '/auth',
+    name='Authenticated user',
+    description='Authenticated user',
+    response_description='User ID',
+    status_code=status.HTTP_200_OK,
+    response_model=PermissionResponse,
+    tags=['permission'],
+)
+async def is_authenticated(user_id: int = Depends(views.is_authenticated)):
+    return {'user_id': user_id}

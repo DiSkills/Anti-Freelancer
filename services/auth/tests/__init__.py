@@ -188,7 +188,7 @@ class AuthTestCase(TestCase):
         self.assertEqual(response.json(), {'detail': 'User not found'})
 
         refresh = jwt.encode(
-            {'user_id': 1, 'sub': 'refresh', 'exp': datetime.datetime.utcnow() + datetime.timedelta(microseconds=1)},
+            {'user_id': 1, 'sub': 'refresh', 'exp': datetime.datetime.utcnow() - datetime.timedelta(minutes=1)},
             SECRET_KEY,
             ALGORITHM,
         )
@@ -200,3 +200,23 @@ class AuthTestCase(TestCase):
         response = self.client.post(f'/api/v1/refresh?token={refresh + "gf"}')
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json(), {'detail': 'Could not validate credentials'})
+
+    def test_is_auth(self):
+        self.client.post('/api/v1/register', json=self.data)
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(f'/api/v1/verify?link={verification.link}')
+
+        tokens = self.client.post('/api/v1/login', data={'username': 'test', 'password': 'Test1234!'}).json()
+
+        headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
+        response = self.client.post('/api/v1/auth', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'user_id': 1})
+
+        response = self.client.post('/api/v1/auth', headers={'Authorization': f'Bearer {tokens["refresh_token"]}'})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Access token not found'})
+
+        response = self.client.post('/api/v1/auth')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json(), {'detail': 'Not authenticated'})
