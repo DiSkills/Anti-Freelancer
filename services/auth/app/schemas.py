@@ -79,6 +79,7 @@ class PermissionResponse(BaseModel):
 
 
 class UserChangeData(BaseModel):
+    """ User change data """
 
     username: str
     email: EmailStr
@@ -86,6 +87,7 @@ class UserChangeData(BaseModel):
 
 
 class UserPublic(UserChangeData):
+    """ User data """
 
     id: int
     date_joined: datetime.datetime
