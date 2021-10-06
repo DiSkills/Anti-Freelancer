@@ -175,7 +175,18 @@ async def avatar(db: AsyncSession, user: User, file: UploadFile) -> dict[str, st
     return {'msg': 'Avatar has been saved'}
 
 
-async def change_data(db: AsyncSession, schema: UserChangeData, user: User):
+async def change_data(db: AsyncSession, schema: UserChangeData, user: User) -> dict:
+    """
+        Change data
+        :param db: DB
+        :type db: AsyncSession
+        :param schema: Changed data
+        :type schema: UserChangeData
+        :param user: User
+        :type user: User
+        :return: User data
+        :rtype: dict
+    """
 
     if user.username != schema.username:
         if await user_crud.exist(db, username=schema.username):
