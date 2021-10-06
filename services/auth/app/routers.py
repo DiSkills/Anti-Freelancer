@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import views
 from app.models import User
-from app.schemas import Register, Message, Tokens, AccessToken, PermissionResponse
+from app.schemas import Register, Message, Tokens, AccessToken, PermissionResponse, UserChangeData, UserPublic
 from db import get_db
 
 auth_router = APIRouter()
@@ -117,3 +117,29 @@ async def avatar(
         file: UploadFile = File(...), user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)
 ):
     return await views.avatar(db, user, file)
+
+
+@auth_router.get(
+    '/change-data',
+    name='Get data',
+    description='Get data',
+    response_description='User data',
+    status_code=status.HTTP_200_OK,
+    response_model=UserPublic,
+    tags=['change-data'],
+)
+async def get_data(user: User = Depends(views.is_active)):
+    return user.__dict__
+
+
+@auth_router.put(
+    '/change-data',
+    name='Change data',
+    description='Change data',
+    response_description='User data',
+    status_code=status.HTTP_200_OK,
+    response_model=UserPublic,
+    tags=['change-data'],
+)
+async def change_data(schema: UserChangeData, user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)):
+    return await views.change_data(db, schema, user)

@@ -1,6 +1,10 @@
+import datetime
 import re
+import typing
 
 from pydantic import BaseModel, validator, EmailStr
+
+from config import SERVER_BACKEND
 
 
 class Message(BaseModel):
@@ -72,3 +76,22 @@ class PermissionResponse(BaseModel):
     """ Permission response """
 
     user_id: int
+
+
+class UserChangeData(BaseModel):
+
+    username: str
+    email: EmailStr
+    about: typing.Optional[str]
+
+
+class UserPublic(UserChangeData):
+
+    id: int
+    date_joined: datetime.datetime
+    last_login: datetime.datetime
+    avatar: typing.Optional[str]
+
+    @validator('avatar')
+    def set_avatar(cls, avatar):
+        return SERVER_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'

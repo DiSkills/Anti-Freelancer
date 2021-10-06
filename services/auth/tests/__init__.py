@@ -343,3 +343,75 @@ class AuthTestCase(TestCase):
         response = self.client.get(f'/media/test2/image.png')
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json(), {'detail': 'File not found'})
+
+    def test_change_data(self):
+        self.client.post(self.url + '/register', json=self.data)
+
+        register_date = async_loop(user_crud.get(self.session, id=1)).last_login
+
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(self.url + f'/verify?link={verification.link}')
+
+        tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'}).json()
+        headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
+
+        # Get data
+        response = self.client.get(self.url + '/change-data', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['id'], 1)
+        self.assertEqual(response.json()['username'], 'test')
+
+        get_data_date = async_loop(user_crud.get(self.session, id=1)).last_login
+        self.assertEqual(get_data_date > register_date, True)
+
+        current_user_data = response.json()
+
+        response = self.client.put(self.url + '/change-data', headers=headers, json={
+            'username': 'test',
+            'email': 'test@example.com',
+            'about': 'Hello world!',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(response.json(), current_user_data)
+        self.assertEqual(response.json()['username'], current_user_data['username'])
+        self.assertEqual(response.json()['email'], current_user_data['email'])
+
+        change_data_date = async_loop(user_crud.get(self.session, id=1)).last_login
+        self.assertEqual(get_data_date < change_data_date, True)
+
+        self.client.post(self.url + '/register', json={**self.data, 'username': 'test2', 'email': 'test2@example.com'})
+
+        response = self.client.put(self.url + '/change-data', headers=headers, json={
+            'username': 'test2',
+            'email': 'test@example.com',
+            'about': 'Hello world!',
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Username exist'})
+
+        response = self.client.put(self.url + '/change-data', headers=headers, json={
+            'username': 'test',
+            'email': 'test2@example.com',
+            'about': 'Hello world!',
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Email exist'})
+
+        response = self.client.put(self.url + '/change-data', headers=headers, json={
+            'username': 'test',
+            'email': 'test@example.com',
+            'about': 'Hello world!',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['username'], current_user_data['username'])
+        self.assertEqual(response.json()['email'], current_user_data['email'])
+
+        response = self.client.put(self.url + '/change-data', headers=headers, json={
+            'username': 'test3',
+            'email': 'test3@example.com',
+            'about': 'Hello world!',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertNotEqual(response.json(), current_user_data)
+        self.assertNotEqual(response.json()['username'], current_user_data['username'])
+        self.assertNotEqual(response.json()['email'], current_user_data['email'])

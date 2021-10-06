@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud
 from app.models import User
-from app.schemas import Register, VerificationCreate
+from app.schemas import Register, VerificationCreate, UserChangeData
 from app.security import get_password_hash
 from app.send_email import send_register_email
 from app.service import validate_login, remove_file, write_file
@@ -173,3 +173,21 @@ async def avatar(db: AsyncSession, user: User, file: UploadFile) -> dict[str, st
     await write_file(avatar_name, file)
     await user_crud.update(db, {'id': user.id}, avatar=avatar_name)
     return {'msg': 'Avatar has been saved'}
+
+
+async def change_data(db: AsyncSession, schema: UserChangeData, user: User):
+
+    if user.username != schema.username:
+        if await user_crud.exist(db, username=schema.username):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Username exist')
+    else:
+        del schema.username
+
+    if user.email != schema.email:
+        if await user_crud.exist(db, email=schema.email):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email exist')
+    else:
+        del schema.email
+
+    user = await user_crud.update(db, {'id': user.id}, **schema.dict())
+    return user.__dict__
