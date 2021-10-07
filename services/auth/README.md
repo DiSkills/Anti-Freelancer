@@ -11,12 +11,12 @@
   - [x] Login
   - [x] Activation account
   - [x] Refresh access token
+  - [x] Change data
+  - [x] Load avatar
   - [ ] OTP auth
-  - [ ] Change data
   - [ ] Reset password
   - [ ] Get username
   - [ ] Change password
-  - [x] Load avatar
   - [ ] GitHub
 - [x] Permission
   - [x] Is authenticated
@@ -32,3 +32,4 @@
   - [x] Test is active
   - [x] Test is superuser
   - [x] Test get media
+  - [x] Test change data

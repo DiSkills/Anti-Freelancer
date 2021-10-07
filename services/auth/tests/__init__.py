@@ -295,6 +295,9 @@ class AuthTestCase(TestCase):
 
         user = async_loop(user_crud.get(self.session, id=1))
 
+        response = self.client.get(self.url + '/change-data', headers=headers)
+        self.assertEqual(response.json()['avatar'], 'https://via.placeholder.com/400x400')
+
         self.assertEqual(user.avatar, None)
 
         file = UploadFile('image.png', content_type='image/png')
@@ -334,6 +337,9 @@ class AuthTestCase(TestCase):
         async_loop(self.session.commit())
         user = async_loop(user_crud.get(self.session, id=1))
         self.assertEqual(os.path.exists(user.avatar), True)
+
+        response = self.client.get(self.url + '/change-data', headers=headers)
+        self.assertEqual(response.json()['avatar'], f'http://localhost:8000/{user.avatar}')
 
         # Media
         avatar = user.avatar.replace('media/tests/', '')
