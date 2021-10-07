@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud
-from app.tokens import ALGORITHM
+from app.tokens import ALGORITHM, create_reset_password_token
 from config import SECRET_KEY, MEDIA_ROOT, API
 from db import engine, Base
 from main import app
@@ -466,3 +466,56 @@ class AuthTestCase(TestCase):
 
         response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!!'})
         self.assertEqual(response.status_code, 200)
+
+    def test_reset_password(self):
+        self.client.post(self.url + '/register', json=self.data)
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(self.url + f'/verify?link={verification.link}')
+
+        # Request
+        response = self.client.post(f'{self.url}/reset-password/request?email=test@example.com')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Send reset password email. Check your email address'})
+
+        response = self.client.post(f'{self.url}/reset-password/request?email=test2@example.com')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Email not found'})
+
+        # Reset password
+        token = create_reset_password_token(1)
+        response = self.client.post(f'{self.url}/reset-password?token={token}', json={
+            'password': 'Test1234!!',
+            'confirm_password': 'Test1234!!',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Password has been reset'})
+
+        response = self.client.post(f'{self.url}/reset-password?token={token}', json={
+            'password': 'Test1234!!',
+            'confirm_password': 'Test1234!!',
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'The new password cannot be the same as the old one'})
+
+        response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Password mismatch'})
+
+        response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!!'})
+        self.assertEqual(response.status_code, 200)
+
+        token = create_reset_password_token(2)
+        response = self.client.post(f'{self.url}/reset-password?token={token}', json={
+            'password': 'Test1234!!',
+            'confirm_password': 'Test1234!!',
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'User not found'})
+
+        tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!!'}).json()
+        response = self.client.post(f'{self.url}/reset-password?token={tokens["access_token"]}', json={
+            'password': 'Test1234!!',
+            'confirm_password': 'Test1234!!',
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Reset token not found'})

@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud
-from config import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES
+from config import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES, RESET_TOKEN_EXPIRE_MINUTES
 
 ALGORITHM = 'HS256'
 
@@ -62,6 +62,12 @@ def create_refresh_token(user_id: int) -> dict[str, str]:
         'refresh_token': create_jwt_token({'user_id': user_id}, 'refresh', expires),
         'type': 'bearer',
     }
+
+
+def create_reset_password_token(user_id: int) -> str:
+
+    expires = datetime.timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES)
+    return create_jwt_token({'user_id': user_id}, 'reset', expires)
 
 
 def create_login_tokens(user_id: int) -> dict[str, str]:

@@ -14,3 +14,9 @@ def send_register_email(recipient: str, username: str, link: str) -> None:
         :return: None
     """
     send_email(recipient, f'Register email - {PROJECT_NAME}', 'emails/register.html', username=username, link=link)
+
+
+def send_reset_password_email(recipient: str, username: str, link: str) -> None:
+    send_email(
+        recipient, f'Reset password email - {PROJECT_NAME}', 'emails/reset_password.html', username=username, link=link,
+    )

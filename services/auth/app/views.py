@@ -8,11 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud
 from app.models import User
-from app.schemas import Register, VerificationCreate, UserChangeData, ChangePassword
+from app.schemas import Register, VerificationCreate, UserChangeData, ChangePassword, Password
 from app.security import get_password_hash, verify_password_hash
-from app.send_email import send_register_email
+from app.send_email import send_register_email, send_reset_password_email
 from app.service import validate_login, remove_file, write_file
-from app.tokens import create_login_tokens, verify_token, create_access_token
+from app.tokens import create_login_tokens, verify_token, create_access_token, create_reset_password_token
 from config import SERVER_BACKEND, API, MEDIA_ROOT
 from db import async_session
 
@@ -224,3 +224,33 @@ async def change_password(db: AsyncSession, user: User, schema: ChangePassword) 
 
     await user_crud.update(db, {'id': user.id}, password=get_password_hash(schema.password))
     return {'msg': 'Password has been changed'}
+
+
+async def reset_password_request(db: AsyncSession, email: str):
+
+    if not await user_crud.exist(db, email=email):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email not found')
+
+    user = await user_crud.get(db, email=email)
+    token = create_reset_password_token(user.id)
+    link = SERVER_BACKEND + f'{API}/reset-password?token={token}'
+    send_reset_password_email(user.email, user.username, link)
+    return {'msg': 'Send reset password email. Check your email address'}
+
+
+async def reset_password(db: AsyncSession, schema: Password, token: str):
+
+    user_id = await verify_token(db, token, 'reset', 'Reset token not found')
+
+    if not await user_crud.exist(db, id=user_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
+
+    user = await user_crud.get(db, id=user_id)
+
+    if verify_password_hash(schema.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail='The new password cannot be the same as the old one',
+        )
+
+    await user_crud.update(db, {'id': user_id}, password=get_password_hash(schema.password))
+    return {'msg': 'Password has been reset'}

@@ -11,7 +11,7 @@ from app.schemas import (
     PermissionResponse,
     UserChangeData,
     UserPublic,
-    ChangePassword,
+    ChangePassword, Password,
 )
 from db import get_db
 
@@ -169,3 +169,29 @@ async def change_password(
         schema: ChangePassword, user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)
 ):
     return await views.change_password(db, user, schema)
+
+
+@auth_router.post(
+    '/reset-password/request',
+    name='Reset password request',
+    description='Reset password request',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['reset-password'],
+)
+async def reset_password_request(email: str, db: AsyncSession = Depends(get_db)):
+    return await views.reset_password_request(db, email)
+
+
+@auth_router.post(
+    '/reset-password',
+    name='Reset password',
+    description='Reset password',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['reset-password'],
+)
+async def reset_password(token: str, schema: Password, db: AsyncSession = Depends(get_db)):
+    return await views.reset_password(db, schema, token)
