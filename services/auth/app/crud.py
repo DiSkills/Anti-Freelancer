@@ -14,6 +14,7 @@ class VerificationCRUD(CRUD[Verification, VerificationCreate, VerificationCreate
 
 
 class GitHubCRUD(CRUD[GitHub, GitHub, GitHub]):
+    """ GitHub CRUD """
     pass
 
 
