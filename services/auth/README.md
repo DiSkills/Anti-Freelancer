@@ -18,6 +18,8 @@
     - [x] Get username
     - [ ] OTP auth
     - [ ] GitHub
+    - [ ] Profile
+    - [ ] Skills
 - [x] Permission
     - [x] Is authenticated
     - [x] Is active
