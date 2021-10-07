@@ -352,3 +352,22 @@ async def github_bind(db: AsyncSession, request: Request, user_id: int) -> dict[
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='GitHub account exist')
 
     return {'msg': 'GitHub account has been bind'}
+
+
+async def github_unbind(db: AsyncSession, user: User) -> dict[str, str]:
+    """
+        GitHub unbind
+        :param db: DB
+        :type db: AsyncSession
+        :param user: User
+        :type user: User
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: GitHub not exist
+    """
+
+    if not await github_crud.exist(db, user_id=user.id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='GitHub not exist')
+
+    await github_crud.remove(db, user_id=user.id)
+    return {'msg': 'GitHub account has been deleted'}

@@ -17,8 +17,9 @@
     - [x] Change password
     - [x] Reset password
     - [x] Get username
+    - [x] GitHub bind
+    - [x] GitHub unbind
     - [ ] OTP auth
-    - [ ] GitHub
     - [ ] Profile
     - [ ] Skills
 - [ ] Admin
@@ -44,3 +45,5 @@
     - [x] Test change password
     - [x] Test reset password
     - [x] Test get username
+    - [ ] Test GitHub bind
+    - [x] Test GitHub unbind

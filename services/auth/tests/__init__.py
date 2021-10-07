@@ -9,8 +9,8 @@ from fastapi import UploadFile
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud import user_crud, verification_crud
-from app.tokens import ALGORITHM, create_reset_password_token
+from app.crud import user_crud, verification_crud, github_crud
+from app.tokens import ALGORITHM, create_reset_password_token, create_access_token
 from config import SECRET_KEY, MEDIA_ROOT, API
 from db import engine, Base
 from main import app
@@ -545,3 +545,17 @@ class AuthTestCase(TestCase):
         response = self.client.get(f'{self.url}/github/bind?user_id=2')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'User not found'})
+
+        async_loop(github_crud.create(self.session, git_id=12, git_username='Counter021', user_id=1))
+        async_loop(self.session.commit())
+
+        tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'}).json()
+        headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
+
+        response = self.client.post(f'{self.url}/github/unbind', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'GitHub account has been deleted'})
+
+        response = self.client.post(f'{self.url}/github/unbind', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'GitHub not exist'})

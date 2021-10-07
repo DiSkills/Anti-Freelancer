@@ -227,12 +227,25 @@ async def github_request(request: Request, user_id: int, db: AsyncSession = Depe
 
 @auth_router.get(
     '/github/bind',
-    name='GitHub',
-    description='GitHub',
+    name='GitHub bind',
+    description='GitHub bind',
     response_description='Message',
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
     response_model=Message,
     tags=['github'],
 )
 async def github_bind(request: Request, user_id: int, db: AsyncSession = Depends(get_db)):
     return await views.github_bind(db, request, user_id)
+
+
+@auth_router.post(
+    '/github/unbind',
+    name='GitHub unbind',
+    description='GitHub unbind',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['github'],
+)
+async def github_unbind(user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)):
+    return await views.github_unbind(db, user)
