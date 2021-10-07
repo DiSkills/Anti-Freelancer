@@ -519,3 +519,16 @@ class AuthTestCase(TestCase):
         })
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Reset token not found'})
+
+    def test_get_username(self):
+        self.client.post(self.url + '/register', json=self.data)
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(self.url + f'/verify?link={verification.link}')
+
+        response = self.client.get(f'{self.url}/username?email=test@example.com')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Email send'})
+
+        response = self.client.get(f'{self.url}/username?email=test2@example.com')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'User not found'})

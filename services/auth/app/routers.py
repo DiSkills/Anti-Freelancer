@@ -62,6 +62,19 @@ async def login(
     return await views.login(db, username, password)
 
 
+@auth_router.get(
+    '/username',
+    name='Get username',
+    description='Get username',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['auth'],
+)
+async def get_username(email: str, db: AsyncSession = Depends(get_db)):
+    return await views.get_username(db, email)
+
+
 @auth_router.post(
     '/refresh',
     name='Refresh token',

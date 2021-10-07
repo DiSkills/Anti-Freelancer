@@ -10,7 +10,7 @@ from app.crud import user_crud, verification_crud
 from app.models import User
 from app.schemas import Register, VerificationCreate, UserChangeData, ChangePassword, Password
 from app.security import get_password_hash, verify_password_hash
-from app.send_email import send_register_email, send_reset_password_email
+from app.send_email import send_register_email, send_reset_password_email, send_username_email
 from app.service import validate_login, remove_file, write_file
 from app.tokens import create_login_tokens, verify_token, create_access_token, create_reset_password_token
 from config import SERVER_BACKEND, API, MEDIA_ROOT
@@ -82,6 +82,27 @@ async def login(db: AsyncSession, username: str, password: str) -> dict[str, str
     """
     user = await validate_login(db, username, password)
     return create_login_tokens(user.id)
+
+
+async def get_username(db: AsyncSession, email: str) -> dict[str, str]:
+    """
+        Get username
+        :param db: DB
+        :type db: AsyncSession
+        :param email: Email
+        :type email: str
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Email not found
+    """
+
+    if not await user_crud.exist(db, email=email):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
+
+    user = await user_crud.get(db, email=email)
+    send_username_email(user.email, user.username)
+
+    return {'msg': 'Email send'}
 
 
 async def refresh(db: AsyncSession, token: str) -> dict[str, str]:
