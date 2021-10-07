@@ -3,8 +3,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import views
 from app.models import User
-from app.schemas import Register, Message, Tokens, AccessToken, PermissionResponse, UserChangeData, UserPublic, \
-    ChangePassword
+from app.schemas import (
+    Register,
+    Message,
+    Tokens,
+    AccessToken,
+    PermissionResponse,
+    UserChangeData,
+    UserPublic,
+    ChangePassword,
+)
 from db import get_db
 
 auth_router = APIRouter()
