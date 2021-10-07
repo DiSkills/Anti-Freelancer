@@ -226,7 +226,17 @@ async def change_password(db: AsyncSession, user: User, schema: ChangePassword) 
     return {'msg': 'Password has been changed'}
 
 
-async def reset_password_request(db: AsyncSession, email: str):
+async def reset_password_request(db: AsyncSession, email: str) -> dict[str, str]:
+    """
+        Reset password request
+        :param db: DB
+        :type db: AsyncSession
+        :param email: Email
+        :type email: str
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Email not found
+    """
 
     if not await user_crud.exist(db, email=email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email not found')
@@ -238,7 +248,20 @@ async def reset_password_request(db: AsyncSession, email: str):
     return {'msg': 'Send reset password email. Check your email address'}
 
 
-async def reset_password(db: AsyncSession, schema: Password, token: str):
+async def reset_password(db: AsyncSession, schema: Password, token: str) -> dict[str, str]:
+    """
+        Reset password
+        :param db: DB
+        :type db: AsyncSession
+        :param schema: New password
+        :type schema: Password
+        :param token: Reset token
+        :type token: str
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: User not found
+        :raise HTTPException 400: The new password cannot be the same as the old one
+    """
 
     user_id = await verify_token(db, token, 'reset', 'Reset token not found')
 

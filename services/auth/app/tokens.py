@@ -65,6 +65,13 @@ def create_refresh_token(user_id: int) -> dict[str, str]:
 
 
 def create_reset_password_token(user_id: int) -> str:
+    """
+        Create reset password token
+        :param user_id: User ID
+        :type user_id: int
+        :return: Reset password token
+        :rtype: str
+    """
 
     expires = datetime.timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES)
     return create_jwt_token({'user_id': user_id}, 'reset', expires)
