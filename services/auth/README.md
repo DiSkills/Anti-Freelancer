@@ -14,8 +14,8 @@
     - [x] Change data
     - [x] Load avatar
     - [x] Change password
+    - [x] Reset password
     - [ ] OTP auth
-    - [ ] Reset password
     - [ ] Get username
     - [ ] GitHub
 - [x] Permission
@@ -34,3 +34,4 @@
     - [x] Test get media
     - [x] Test change data
     - [x] Test change password
+    - [x] Test reset password
