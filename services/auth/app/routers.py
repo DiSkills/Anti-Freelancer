@@ -214,8 +214,8 @@ async def reset_password(token: str, schema: Password, db: AsyncSession = Depend
 
 @auth_router.get(
     '/github/request',
-    name='GitHub',
-    description='GitHub',
+    name='GitHub Request',
+    description='GitHub Request',
     response_description='Redirect',
     status_code=status.HTTP_302_FOUND,
     response_class=RedirectResponse,
