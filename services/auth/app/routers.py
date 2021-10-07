@@ -11,7 +11,8 @@ from app.schemas import (
     PermissionResponse,
     UserChangeData,
     UserPublic,
-    ChangePassword, Password,
+    ChangePassword,
+    Password,
 )
 from db import get_db
 
