@@ -340,8 +340,11 @@ async def github_bind(db: AsyncSession, request: Request, user_id: int) -> dict[
     if not await user_crud.exist(db, id=user_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
 
-    token = await social_auth.github.authorize_access_token(request)
-    response = await social_auth.github.get('user', token=token)
+    try:
+        token = await social_auth.github.authorize_access_token(request)
+        response = await social_auth.github.get('user', token=token)
+    except Exception as _ex:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='GitHub error')
     github_profile = response.json()
 
     git_id = github_profile['id']

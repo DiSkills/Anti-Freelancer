@@ -546,6 +546,10 @@ class AuthTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'User not found'})
 
+        response = self.client.get(f'{self.url}/github/bind?user_id=1')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'GitHub error'})
+
         async_loop(github_crud.create(self.session, git_id=12, git_username='Counter021', user_id=1))
         async_loop(self.session.commit())
 
