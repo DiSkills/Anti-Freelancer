@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import os
 import shutil
-from unittest import TestCase, mock
+from unittest import TestCase
 
 import jwt
 from fastapi import UploadFile
