@@ -7,7 +7,7 @@ from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-from app.models import User, Verification
+from app.models import User, Verification, GitHub
 from db import Base
 
 config = context.config

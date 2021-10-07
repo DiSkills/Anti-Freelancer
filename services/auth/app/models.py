@@ -26,6 +26,26 @@ class Verification(Base):
         return f'<Verification {self.id}>'
 
 
+class GitHub(Base):
+    """ GitHub """
+
+    __tablename__ = 'github'
+
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    git_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, unique=True)
+    git_username: str = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
+
+    user_id: int = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('user.id', ondelete='CASCADE'), nullable=False, unique=True,
+    )
+
+    def __str__(self):
+        return f'<GitHub {self.git_username}>'
+
+    def __repr__(self):
+        return f'<GitHub {self.git_username}>'
+
+
 class User(Base):
     """ User """
 
@@ -49,6 +69,9 @@ class User(Base):
 
     verification: typing.Union[relationship, Verification] = relationship(
         Verification, backref='user', lazy='selectin', cascade='all, delete', uselist=False,
+    )
+    github: typing.Union[relationship, GitHub] = relationship(
+        GitHub, backref='user', lazy='selectin', cascade='all, delete', uselist=False,
     )
 
     def __str__(self):

@@ -223,3 +223,16 @@ async def reset_password(token: str, schema: Password, db: AsyncSession = Depend
 )
 async def github_request(request: Request, user_id: int, db: AsyncSession = Depends(get_db)):
     return await views.github_request(db, request, user_id)
+
+
+@auth_router.get(
+    '/github/bind',
+    name='GitHub',
+    description='GitHub',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['github'],
+)
+async def github_bind(request: Request, user_id: int, db: AsyncSession = Depends(get_db)):
+    return await views.github_bind(db, request, user_id)

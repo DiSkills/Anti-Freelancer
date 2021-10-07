@@ -37,7 +37,7 @@ ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
 
 social_auth = OAuth()
-redirect_url = f'{SERVER_BACKEND}{API}/github'
+redirect_url = f'{SERVER_BACKEND}{API}/github/bind'
 
 social_auth.register(
     name='github',

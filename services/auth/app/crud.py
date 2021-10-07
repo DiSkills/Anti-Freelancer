@@ -1,4 +1,4 @@
-from app.models import User, Verification
+from app.models import User, Verification, GitHub
 from app.schemas import Register, VerificationCreate
 from crud import CRUD
 
@@ -13,5 +13,10 @@ class VerificationCRUD(CRUD[Verification, VerificationCreate, VerificationCreate
     pass
 
 
+class GitHubCRUD(CRUD[GitHub, GitHub, GitHub]):
+    pass
+
+
 user_crud = UserCRUD(User)
 verification_crud = VerificationCRUD(Verification)
+github_crud = GitHubCRUD(GitHub)

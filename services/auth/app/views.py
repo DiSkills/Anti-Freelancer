@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud import user_crud, verification_crud
+from app.crud import user_crud, verification_crud, github_crud
 from app.models import User
 from app.schemas import Register, VerificationCreate, UserChangeData, ChangePassword, Password
 from app.security import get_password_hash, verify_password_hash
@@ -320,3 +320,35 @@ async def github_request(db: AsyncSession, request: Request, user_id: int) -> Re
 
     github = social_auth.create_client('github')
     return await github.authorize_redirect(request, redirect_url + f'?user_id={user_id}')
+
+
+async def github_bind(db: AsyncSession, request: Request, user_id: int) -> dict[str, str]:
+    """
+        GitHub
+        :param db: DB
+        :type db: AsyncSession
+        :param request: Request
+        :type request: Request
+        :param user_id: User ID
+        :type user_id: int
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: User not found
+        :raise HTTPException 400: GitHub account exist
+    """
+
+    if not await user_crud.exist(db, id=user_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
+
+    token = await social_auth.github.authorize_access_token(request)
+    response = await social_auth.github.get('user', token=token)
+    github_profile = response.json()
+
+    git_id = github_profile['id']
+
+    if (not await github_crud.exist(db, git_id=git_id)) and (not await github_crud.exist(db, user_id=user_id)):
+        await github_crud.create(db, git_id=git_id, git_username=github_profile['login'], user_id=user_id)
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='GitHub account exist')
+
+    return {'msg': 'GitHub account has been bind'}

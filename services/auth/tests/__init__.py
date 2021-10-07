@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import os
 import shutil
-from unittest import TestCase
+from unittest import TestCase, mock
 
 import jwt
 from fastapi import UploadFile
@@ -539,5 +539,9 @@ class AuthTestCase(TestCase):
         self.client.get(self.url + f'/verify?link={verification.link}')
 
         response = self.client.get(f'{self.url}/github/request?user_id=2')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'User not found'})
+
+        response = self.client.get(f'{self.url}/github/bind?user_id=2')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'User not found'})
