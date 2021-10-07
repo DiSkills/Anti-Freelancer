@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, status, Form, UploadFile, File
+from fastapi import APIRouter, Depends, status, Form, UploadFile, File, Request
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import views
@@ -209,3 +210,16 @@ async def reset_password_request(email: str, db: AsyncSession = Depends(get_db))
 )
 async def reset_password(token: str, schema: Password, db: AsyncSession = Depends(get_db)):
     return await views.reset_password(db, schema, token)
+
+
+@auth_router.get(
+    '/github/request',
+    name='GitHub',
+    description='GitHub',
+    response_description='Redirect',
+    status_code=status.HTTP_302_FOUND,
+    response_class=RedirectResponse,
+    tags=['github'],
+)
+async def github_request(request: Request, user_id: int, db: AsyncSession = Depends(get_db)):
+    return await views.github_request(db, request, user_id)

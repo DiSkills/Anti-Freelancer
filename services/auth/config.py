@@ -1,5 +1,6 @@
 import os
 
+from authlib.integrations.starlette_client import OAuth
 from dotenv import load_dotenv
 
 load_dotenv('config.env')
@@ -34,3 +35,18 @@ RESET_TOKEN_EXPIRE_MINUTES = 15
 ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
+
+social_auth = OAuth()
+redirect_url = f'{SERVER_BACKEND}{API}/github'
+
+social_auth.register(
+    name='github',
+    client_id=os.environ.get('GITHUB_ID'),
+    client_secret=os.environ.get('GITHUB_SECRET'),
+    access_token_url='https://github.com/login/oauth/access_token',
+    access_token_params=None,
+    authorize_url='https://github.com/login/oauth/authorize',
+    authorize_params=None,
+    api_base_url='https://api.github.com/',
+    client_kwargs={'scope': 'user:email'},
+)

@@ -2,7 +2,8 @@ import os
 from datetime import datetime
 from uuid import uuid4
 
-from fastapi import HTTPException, status, Security, Depends, UploadFile
+from fastapi import HTTPException, status, Security, Depends, UploadFile, Request
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,7 +14,7 @@ from app.security import get_password_hash, verify_password_hash
 from app.send_email import send_register_email, send_reset_password_email, send_username_email
 from app.service import validate_login, remove_file, write_file
 from app.tokens import create_login_tokens, verify_token, create_access_token, create_reset_password_token
-from config import SERVER_BACKEND, API, MEDIA_ROOT
+from config import SERVER_BACKEND, API, MEDIA_ROOT, social_auth, redirect_url
 from db import async_session
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl='/api/v1/login')
@@ -298,3 +299,24 @@ async def reset_password(db: AsyncSession, schema: Password, token: str) -> dict
 
     await user_crud.update(db, {'id': user_id}, password=get_password_hash(schema.password))
     return {'msg': 'Password has been reset'}
+
+
+async def github_request(db: AsyncSession, request: Request, user_id: int) -> RedirectResponse:
+    """
+        GitHub request
+        :param db: DB
+        :type db: AsyncSession
+        :param request: Request
+        :type request: Request
+        :param user_id: User ID
+        :type user_id: int
+        :return: Redirect
+        :rtype: RedirectResponse
+        :raise HTTPException 400: User not found
+    """
+
+    if not await user_crud.exist(db, id=user_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
+
+    github = social_auth.create_client('github')
+    return await github.authorize_redirect(request, redirect_url + f'?user_id={user_id}')

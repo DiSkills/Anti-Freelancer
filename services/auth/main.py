@@ -3,9 +3,10 @@ import os
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from starlette.middleware.sessions import SessionMiddleware
 
 from app.routers import auth_router
-from config import PROJECT_NAME, API, MEDIA_ROOT, ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL
+from config import PROJECT_NAME, API, MEDIA_ROOT, ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL, SECRET_KEY
 from createsuperuser import createsuperuser
 from db import async_session
 
@@ -14,6 +15,8 @@ app = FastAPI(
     version='0.1.0',
     description='Auth Service Anti-Freelancer by Counter',
 )
+
+app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 
 app.add_middleware(
     CORSMiddleware,
