@@ -335,6 +335,7 @@ async def github_bind(db: AsyncSession, request: Request, user_id: int) -> dict[
         :rtype: dict
         :raise HTTPException 400: User not found
         :raise HTTPException 400: GitHub account exist
+        :raise HTTPException 400: GitHub error
     """
 
     if not await user_crud.exist(db, id=user_id):
