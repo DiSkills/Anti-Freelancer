@@ -87,11 +87,14 @@ class UserChangeData(BaseModel):
 
 
 class ChangePassword(Password):
+    """ Change password """
 
     old_password: str
 
     @validator('old_password')
     def validate_confirm_password(cls, old_password, values, **kwargs):
+        """ Old password and new password mismatch """
+
         if 'password' in values and old_password == values['password']:
             raise ValueError('Old password and new password match')
         return old_password
