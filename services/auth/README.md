@@ -13,10 +13,10 @@
     - [x] Refresh access token
     - [x] Change data
     - [x] Load avatar
+    - [x] Change password
     - [ ] OTP auth
     - [ ] Reset password
     - [ ] Get username
-    - [ ] Change password
     - [ ] GitHub
 - [x] Permission
     - [x] Is authenticated
@@ -33,3 +33,4 @@
     - [x] Test is superuser
     - [x] Test get media
     - [x] Test change data
+    - [x] Test change password

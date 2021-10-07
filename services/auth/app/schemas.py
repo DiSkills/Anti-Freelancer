@@ -86,6 +86,17 @@ class UserChangeData(BaseModel):
     about: typing.Optional[str]
 
 
+class ChangePassword(Password):
+
+    old_password: str
+
+    @validator('old_password')
+    def validate_confirm_password(cls, old_password, values, **kwargs):
+        if 'password' in values and old_password == values['password']:
+            raise ValueError('Old password and new password match')
+        return old_password
+
+
 class UserPublic(UserChangeData):
     """ User data """
 

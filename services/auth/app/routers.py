@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import views
 from app.models import User
-from app.schemas import Register, Message, Tokens, AccessToken, PermissionResponse, UserChangeData, UserPublic
+from app.schemas import Register, Message, Tokens, AccessToken, PermissionResponse, UserChangeData, UserPublic, \
+    ChangePassword
 from db import get_db
 
 auth_router = APIRouter()
@@ -141,5 +142,22 @@ async def get_data(user: User = Depends(views.is_active)):
     response_model=UserPublic,
     tags=['change-data'],
 )
-async def change_data(schema: UserChangeData, user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)):
+async def change_data(
+        schema: UserChangeData, user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)
+):
     return await views.change_data(db, schema, user)
+
+
+@auth_router.put(
+    '/change-password',
+    name='Change password',
+    description='Change password',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['change-data'],
+)
+async def change_password(
+        schema: ChangePassword, user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)
+):
+    return await views.change_password(db, user, schema)

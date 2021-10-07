@@ -8,8 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud
 from app.models import User
-from app.schemas import Register, VerificationCreate, UserChangeData
-from app.security import get_password_hash
+from app.schemas import Register, VerificationCreate, UserChangeData, ChangePassword
+from app.security import get_password_hash, verify_password_hash
 from app.send_email import send_register_email
 from app.service import validate_login, remove_file, write_file
 from app.tokens import create_login_tokens, verify_token, create_access_token
@@ -186,6 +186,7 @@ async def change_data(db: AsyncSession, schema: UserChangeData, user: User) -> d
         :type user: User
         :return: User data
         :rtype: dict
+        :raise HTTPException 400: Email or username exist
     """
 
     if user.username != schema.username:
@@ -202,3 +203,24 @@ async def change_data(db: AsyncSession, schema: UserChangeData, user: User) -> d
 
     user = await user_crud.update(db, {'id': user.id}, **schema.dict())
     return user.__dict__
+
+
+async def change_password(db: AsyncSession, user: User, schema: ChangePassword) -> dict[str, str]:
+    """
+        Change password
+        :param db: DB
+        :type db: AsyncSession
+        :param user: User
+        :type user: User
+        :param schema: New passwords and old password
+        :type schema: ChangePassword
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Old password mismatch
+    """
+
+    if not verify_password_hash(schema.old_password, user.password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Old password mismatch')
+
+    await user_crud.update(db, {'id': user.id}, password=get_password_hash(schema.password))
+    return {'msg': 'Password has been changed'}

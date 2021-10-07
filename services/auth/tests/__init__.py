@@ -421,3 +421,48 @@ class AuthTestCase(TestCase):
         self.assertNotEqual(response.json(), current_user_data)
         self.assertNotEqual(response.json()['username'], current_user_data['username'])
         self.assertNotEqual(response.json()['email'], current_user_data['email'])
+
+    def test_change_password(self):
+        self.client.post(self.url + '/register', json=self.data)
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(self.url + f'/verify?link={verification.link}')
+
+        tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'}).json()
+        headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
+
+        response = self.client.put(
+            f'{self.url}/change-password', headers=headers, json={
+                'old_password': 'Test1234!',
+                'password': 'Test1234!',
+                'confirm_password': 'Test1234!',
+            }
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()['detail'][0]['msg'], 'Old password and new password match')
+
+        response = self.client.put(
+            f'{self.url}/change-password', headers=headers, json={
+                'old_password': 'Test1234',
+                'password': 'Test1234!',
+                'confirm_password': 'Test1234!',
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Old password mismatch'})
+
+        response = self.client.put(
+            f'{self.url}/change-password', headers=headers, json={
+                'old_password': 'Test1234!',
+                'password': 'Test1234!!',
+                'confirm_password': 'Test1234!!',
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Password has been changed'})
+
+        response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Password mismatch'})
+
+        response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!!'})
+        self.assertEqual(response.status_code, 200)
