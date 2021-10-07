@@ -4,8 +4,9 @@
 
 - [x] Last login
 - [ ] Celery email send
-- [ ] Create superuser
+- [x] Create superuser
 - [x] Get media
+- [ ] Docker
 - [ ] Auth
     - [x] Registration
     - [x] Login
@@ -20,6 +21,11 @@
     - [ ] GitHub
     - [ ] Profile
     - [ ] Skills
+- [ ] Admin
+  - [ ] Create user admin
+  - [ ] Get all users
+  - [ ] Get user
+  - [ ] Update user
 - [x] Permission
     - [x] Is authenticated
     - [x] Is active

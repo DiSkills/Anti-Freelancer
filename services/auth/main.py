@@ -5,7 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from app.routers import auth_router
-from config import PROJECT_NAME, API, MEDIA_ROOT
+from config import PROJECT_NAME, API, MEDIA_ROOT, ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL
+from createsuperuser import createsuperuser
+from db import async_session
 
 app = FastAPI(
     title=PROJECT_NAME,
@@ -26,6 +28,8 @@ app.add_middleware(
 async def startup():
     if not os.path.exists(MEDIA_ROOT):
         os.makedirs(MEDIA_ROOT)
+    async with async_session() as session:
+        await createsuperuser(session, ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL)
 
 
 @app.get(
