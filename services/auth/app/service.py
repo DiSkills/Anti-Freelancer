@@ -1,13 +1,34 @@
 import datetime
 import os
+import typing
 
 import aiofiles
-from fastapi import HTTPException, status, UploadFile
+from fastapi import HTTPException, status, UploadFile, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud
 from app.models import User
 from app.security import verify_password_hash
+from config import social_auth
+
+
+async def github_data(request: Request) -> dict[str, typing.Any]:
+    """
+        GitHub request data
+        :param request: Request
+        :type request: Request
+        :return: GitHub data
+        :rtype: dict
+        :raise HTTPException 400: GitHub error
+    """
+
+    try:
+        token = await social_auth.github.authorize_access_token(request)
+        response = await social_auth.github.get('user', token=token)
+    except Exception as _ex:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='GitHub error')
+    github_profile = response.json()
+    return github_profile
 
 
 async def validate_login(db: AsyncSession, username: str, password: str) -> User:

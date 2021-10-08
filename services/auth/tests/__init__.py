@@ -560,6 +560,13 @@ class AuthTestCase(TestCase):
 
         self.assertEqual(len(async_loop(github_crud.all(self.session))), 1)
 
+        with mock.patch('app.views.github_data', return_value={'id': 25, 'login': 'Counter021'}) as _:
+            response = self.client.get(f'{self.url}/github/bind?user_id=1')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'GitHub account exist'})
+
+        self.assertEqual(len(async_loop(github_crud.all(self.session))), 1)
+
         # Unbind
         tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'}).json()
         headers = {'Authorization': f'Bearer {tokens["access_token"]}'}

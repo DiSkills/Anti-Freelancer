@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from typing import Any
 from uuid import uuid4
 
 from fastapi import HTTPException, status, Security, Depends, UploadFile, Request
@@ -13,7 +12,7 @@ from app.models import User
 from app.schemas import Register, VerificationCreate, UserChangeData, ChangePassword, Password
 from app.security import get_password_hash, verify_password_hash
 from app.send_email import send_register_email, send_reset_password_email, send_username_email
-from app.service import validate_login, remove_file, write_file
+from app.service import validate_login, remove_file, write_file, github_data
 from app.tokens import create_login_tokens, verify_token, create_access_token, create_reset_password_token
 from config import SERVER_BACKEND, API, MEDIA_ROOT, social_auth, redirect_url
 from db import async_session
@@ -321,25 +320,6 @@ async def github_request(db: AsyncSession, request: Request, user_id: int) -> Re
 
     github = social_auth.create_client('github')
     return await github.authorize_redirect(request, redirect_url + f'?user_id={user_id}')
-
-
-async def github_data(request: Request) -> dict[str, Any]:
-    """
-        GitHub request data
-        :param request: Request
-        :type request: Request
-        :return: GitHub data
-        :rtype: dict
-        :raise HTTPException 400: GitHub error
-    """
-
-    try:
-        token = await social_auth.github.authorize_access_token(request)
-        response = await social_auth.github.get('user', token=token)
-    except Exception as _ex:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='GitHub error')
-    github_profile = response.json()
-    return github_profile
 
 
 async def github_bind(db: AsyncSession, request: Request, user_id: int) -> dict[str, str]:
