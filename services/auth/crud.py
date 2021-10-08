@@ -97,3 +97,22 @@ class CRUD(typing.Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             sqlalchemy.select(self.__model).order_by(self.__model.id.desc()).offset(skip).limit(limit)
         )
         return query.scalars().all()
+
+    async def exist_page(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> bool:
+        """
+            Exist page?
+            :param db: DB
+            :type db: AsyncSession
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Exist page?
+            :rtype: dict
+        """
+        query = await db.execute(
+            sqlalchemy.exists(
+                sqlalchemy.select(self.__model.id).order_by(self.__model.id.desc()).offset(skip).limit(limit)
+            ).select()
+        )
+        return query.scalar()

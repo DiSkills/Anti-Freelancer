@@ -10,6 +10,7 @@ from app.crud import user_crud
 from app.models import User
 from app.security import verify_password_hash
 from config import social_auth
+from crud import CRUD
 
 
 async def github_data(request: Request) -> dict[str, typing.Any]:
@@ -87,3 +88,55 @@ def remove_file(file_name: str) -> None:
 
     if os.path.exists(file_name):
         os.remove(file_name)
+
+
+def paginate(crud: CRUD, url: str):
+    """
+        Paginate
+        :param crud: CRUD
+        :type crud: CRUD
+        :param url: URL
+        :type url: str
+        :return: Decorator
+    """
+
+    def paginate_wrapper(function):
+        """
+            Decorator
+            :param function: Function
+            :return: Wrapper
+        """
+
+        async def wrapper(*args, **kwargs) -> dict[str, typing.Any]:
+            """
+                Wrapper
+                :param args: args
+                :param kwargs: kwargs
+                :return: Paginate dict
+                :rtype: dict
+                :raise HTTPException 400: Results not found
+            """
+
+            page: int = kwargs['page']
+            page_size: int = kwargs['page_size']
+            db: AsyncSession = kwargs['db']
+            skip = page_size * (page - 1)
+            queryset = await crud.all(db, skip, page_size)
+
+            if not queryset:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Results not found')
+
+            next_page = f'{url}?page={page + 1}&page_size={page_size}' if await crud.exist_page(db, skip + page_size, page_size) else None
+            previous_page = None
+
+            if (page - 1) > 0:
+                previous_page = f'{url}?page={page - 1}&page_size={page_size}' if await crud.exist_page(db, skip - page_size, page_size) else None
+
+            return {
+                'next': next_page,
+                'previous': previous_page,
+                'page': page,
+                'results': await function(*args, queryset=queryset, **kwargs),
+            }
+        return wrapper
+    return paginate_wrapper

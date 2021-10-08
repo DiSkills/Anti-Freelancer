@@ -16,7 +16,7 @@ from app.models import User
 from app.schemas import Register, VerificationCreate, UserChangeData, ChangePassword, Password
 from app.security import get_password_hash, verify_password_hash
 from app.send_email import send_register_email, send_reset_password_email, send_username_email
-from app.service import validate_login, remove_file, write_file, github_data
+from app.service import validate_login, remove_file, write_file, github_data, paginate
 from app.tokens import create_login_tokens, verify_token, create_access_token, create_reset_password_token
 from config import SERVER_BACKEND, API, MEDIA_ROOT, social_auth, redirect_url, PROJECT_NAME
 from db import async_session
@@ -452,3 +452,20 @@ async def otp_login(db: AsyncSession, username: str, password: str, code: str) -
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Bad code')
 
     return create_login_tokens(user.id)
+
+
+@paginate(user_crud, f'{SERVER_BACKEND}{API}/admin/users')
+async def admin_users_all(*, db: AsyncSession, page: int, page_size: int, queryset: list):
+    """
+        Users all for admin
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: str
+        :param queryset: Queryset
+        :type queryset: list
+        :return: Users
+    """
+    return (user.__dict__ for user in queryset)

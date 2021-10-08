@@ -111,3 +111,31 @@ class UserPublic(UserChangeData):
     @validator('avatar')
     def set_avatar(cls, avatar):
         return SERVER_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'
+
+
+class UserGetAdmin(BaseModel):
+    """ Users get for admin """
+
+    id: int
+    username: str
+    avatar: typing.Optional[str]
+    is_superuser: bool
+
+    @validator('avatar')
+    def set_avatar(cls, avatar):
+        return SERVER_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'
+
+
+class Paginate(BaseModel):
+    """ Paginate """
+
+    next: typing.Optional[str]
+    previous: typing.Optional[str]
+    page: int
+    results: list
+
+
+class UsersPaginate(Paginate):
+    """ Users paginate """
+
+    results: list[UserGetAdmin]
