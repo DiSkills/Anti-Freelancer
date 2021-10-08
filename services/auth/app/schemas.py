@@ -107,6 +107,7 @@ class UserPublic(UserChangeData):
     date_joined: datetime.datetime
     last_login: datetime.datetime
     avatar: typing.Optional[str]
+    freelancer: bool
 
     @validator('avatar')
     def set_avatar(cls, avatar):
@@ -119,6 +120,7 @@ class UserGetAdmin(BaseModel):
     id: int
     username: str
     avatar: typing.Optional[str]
+    freelancer: bool
     is_superuser: bool
 
     @validator('avatar')
