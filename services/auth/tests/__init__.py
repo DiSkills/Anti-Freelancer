@@ -579,3 +579,34 @@ class AuthTestCase(TestCase):
         response = self.client.post(f'{self.url}/github/unbind', headers=headers)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'GitHub not exist'})
+
+    def test_otp(self):
+        self.client.post(self.url + '/register', json=self.data)
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(self.url + f'/verify?link={verification.link}')
+
+        tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'}).json()
+        headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
+
+        # On
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).otp, False)
+
+        response = self.client.post(f'{self.url}/otp/on', headers=headers)
+        self.assertEqual(response.status_code, 206)
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).otp, True)
+
+        response = self.client.post(f'{self.url}/otp/on', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'User already have 2-step auth'})
+
+        # Off
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).otp, True)
+
+        response = self.client.post(f'{self.url}/otp/off', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': '2-step auth off'})
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).otp, False)
+
+        response = self.client.post(f'{self.url}/otp/off', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': "User already haven't 2-step auth"})

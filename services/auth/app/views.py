@@ -1,10 +1,14 @@
+import io
 import os
 from datetime import datetime
 from uuid import uuid4
 
+import qrcode
 from fastapi import HTTPException, status, Security, Depends, UploadFile, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, StreamingResponse
 from fastapi.security import OAuth2PasswordBearer
+from pyotp import TOTP
+from qrcode.image.pil import PilImage
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud, github_crud
@@ -14,7 +18,7 @@ from app.security import get_password_hash, verify_password_hash
 from app.send_email import send_register_email, send_reset_password_email, send_username_email
 from app.service import validate_login, remove_file, write_file, github_data
 from app.tokens import create_login_tokens, verify_token, create_access_token, create_reset_password_token
-from config import SERVER_BACKEND, API, MEDIA_ROOT, social_auth, redirect_url
+from config import SERVER_BACKEND, API, MEDIA_ROOT, social_auth, redirect_url, PROJECT_NAME
 from db import async_session
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl='/api/v1/login')
@@ -369,3 +373,47 @@ async def github_unbind(db: AsyncSession, user: User) -> dict[str, str]:
 
     await github_crud.remove(db, user_id=user.id)
     return {'msg': 'GitHub account has been deleted'}
+
+
+async def otp_on(db: AsyncSession, user: User) -> StreamingResponse:
+    """
+        2-step auth on
+        :param db: DB
+        :type db: AsyncSession
+        :param user: User
+        :type user: User
+        :return: QRCode
+        :rtype: StreamingResponse
+        :raise HTTPException 400: User already have 2-step auth
+    """
+
+    if user.otp:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User already have 2-step auth')
+    img: PilImage = qrcode.make(TOTP(user.otp_secret).provisioning_uri(user.username, PROJECT_NAME))
+    byte_io = io.BytesIO()
+    img.save(byte_io, format='PNG')
+
+    await user_crud.update(db, {'id': user.id}, otp=True)
+
+    return StreamingResponse(
+        io.BytesIO(byte_io.getvalue()), media_type='image/png', status_code=status.HTTP_206_PARTIAL_CONTENT,
+    )
+
+
+async def otp_off(db: AsyncSession, user: User) -> dict[str, str]:
+    """
+        2-step auth off
+        :param db: DB
+        :type db: AsyncSession
+        :param user: User
+        :type user: User
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: User already haven't 2-step auth
+    """
+
+    if not user.otp:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User already haven\'t 2-step auth')
+
+    await user_crud.update(db, {'id': user.id}, otp=False)
+    return {'msg': '2-step auth off'}

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status, Form, UploadFile, File, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import views
@@ -249,3 +249,29 @@ async def github_bind(request: Request, user_id: int, db: AsyncSession = Depends
 )
 async def github_unbind(user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)):
     return await views.github_unbind(db, user)
+
+
+@auth_router.post(
+    '/otp/on',
+    name='On 2-step auth',
+    description='On 2-step auth',
+    response_description='QRCode',
+    status_code=status.HTTP_206_PARTIAL_CONTENT,
+    response_class=StreamingResponse,
+    tags=['OTP'],
+)
+async def otp_on(user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)):
+    return await views.otp_on(db, user)
+
+
+@auth_router.post(
+    '/otp/off',
+    name='Off 2-step auth',
+    description='Off 2-step auth',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['OTP'],
+)
+async def otp_off(user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)):
+    return await views.otp_off(db, user)

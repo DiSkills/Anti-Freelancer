@@ -2,6 +2,7 @@ import datetime
 import typing
 
 import sqlalchemy
+from pyotp import random_base32
 from sqlalchemy.orm import relationship
 
 from db import Base
@@ -60,6 +61,8 @@ class User(Base):
     about: typing.Optional[str] = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     freelancer: bool = sqlalchemy.Column(sqlalchemy.Boolean, nullable=False, default=False)
     avatar: typing.Optional[str] = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    otp: bool = sqlalchemy.Column(sqlalchemy.Boolean, default=False, nullable=False)
+    otp_secret: str = sqlalchemy.Column(sqlalchemy.String, nullable=False, default=random_base32)
     date_joined: datetime.datetime = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.utcnow, nullable=False
     )
