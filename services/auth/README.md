@@ -25,10 +25,10 @@
     - [ ] Profile
     - [ ] Skills
 - [ ] Admin
-  - [ ] Create user admin
-  - [ ] Get all users
-  - [ ] Get user
-  - [ ] Update user
+    - [x] Get all users
+    - [ ] Create user admin
+    - [ ] Get user
+    - [ ] Update user
 - [x] Permission
     - [x] Is authenticated
     - [x] Is active
@@ -52,3 +52,4 @@
     - [x] Test OTP on and off
     - [x] Test OTP login
     - [x] Test off OTP in reset password
+    - [x] Test get all users (admin)
