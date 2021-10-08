@@ -7,6 +7,7 @@ from unittest import TestCase, mock
 import jwt
 from fastapi import UploadFile
 from fastapi.testclient import TestClient
+from pyotp import TOTP
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud, github_crud
@@ -585,8 +586,9 @@ class AuthTestCase(TestCase):
         verification = async_loop(verification_crud.get(self.session, id=1))
         self.client.get(self.url + f'/verify?link={verification.link}')
 
-        tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'}).json()
-        headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
+        tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'})
+        self.assertEqual(tokens.status_code, 200)
+        headers = {'Authorization': f'Bearer {tokens.json()["access_token"]}'}
 
         # On
         self.assertEqual(async_loop(user_crud.get(self.session, id=1)).otp, False)
@@ -599,6 +601,23 @@ class AuthTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'User already have 2-step auth'})
 
+        # Login
+        response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'})
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'You have 2-step auth'})
+
+        code = TOTP(async_loop(user_crud.get(self.session, id=1)).otp_secret).now()
+        response = self.client.post(
+            f'{self.url}/otp/login', data={'username': 'test', 'password': 'Test1234!', 'code': code}
+        )
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post(
+            f'{self.url}/otp/login', data={'username': 'test', 'password': 'Test1234!', 'code': '432343'}
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'Bad code'})
+
         # Off
         self.assertEqual(async_loop(user_crud.get(self.session, id=1)).otp, True)
 
@@ -610,3 +629,12 @@ class AuthTestCase(TestCase):
         response = self.client.post(f'{self.url}/otp/off', headers=headers)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': "User already haven't 2-step auth"})
+
+        response = self.client.post(
+            f'{self.url}/otp/login', data={'username': 'test', 'password': 'Test1234!', 'code': '432343'}
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': "You don't have 2-step auth"})
+
+        response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'})
+        self.assertEqual(response.status_code, 200)

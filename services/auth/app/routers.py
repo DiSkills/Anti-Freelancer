@@ -275,3 +275,21 @@ async def otp_on(user: User = Depends(views.is_active), db: AsyncSession = Depen
 )
 async def otp_off(user: User = Depends(views.is_active), db: AsyncSession = Depends(get_db)):
     return await views.otp_off(db, user)
+
+
+@auth_router.post(
+    '/otp/login',
+    name='OTP login',
+    description='OTP login',
+    response_description='Tokens',
+    status_code=status.HTTP_200_OK,
+    response_model=Tokens,
+    tags=['OTP'],
+)
+async def otp_login(
+        username: str = Form(...),
+        password: str = Form(..., min_length=8, max_length=20),
+        code: str = Form(..., min_length=6, max_length=6),
+        db: AsyncSession = Depends(get_db),
+):
+    return await views.otp_login(db, username, password, code)

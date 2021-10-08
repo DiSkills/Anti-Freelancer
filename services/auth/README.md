@@ -20,7 +20,7 @@
     - [x] GitHub bind
     - [x] GitHub unbind
     - [x] OTP on and off
-    - [ ] OTP login
+    - [x] OTP login
     - [ ] Profile
     - [ ] Skills
 - [ ] Admin
@@ -49,3 +49,4 @@
     - [x] Test GitHub bind
     - [x] Test GitHub unbind
     - [x] Test OTP on and off
+    - [x] Test OTP login

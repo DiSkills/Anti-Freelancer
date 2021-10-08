@@ -84,8 +84,13 @@ async def login(db: AsyncSession, username: str, password: str) -> dict[str, str
         :type password: str
         :return: Tokens
         :rtype: dict
+        :raise HTTPException 403: User have 2-step auth
     """
     user = await validate_login(db, username, password)
+
+    if user.otp:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You have 2-step auth')
+
     return create_login_tokens(user.id)
 
 
@@ -417,3 +422,33 @@ async def otp_off(db: AsyncSession, user: User) -> dict[str, str]:
 
     await user_crud.update(db, {'id': user.id}, otp=False)
     return {'msg': '2-step auth off'}
+
+
+async def otp_login(db: AsyncSession, username: str, password: str, code: str) -> dict[str, str]:
+    """
+        OTP login
+        :param db: DB
+        :type db: AsyncSession
+        :param username: Username
+        :type username: str
+        :param password: Password
+        :type password: str
+        :param code: Code
+        :type code: str
+        :return: Tokens
+        :rtype: dict
+        :raise HTTPException 403: User don't have 2-step auth
+        :raise HTTPException 403: Bad code
+    """
+
+    user = await validate_login(db, username, password)
+
+    if not user.otp:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You don\'t have 2-step auth')
+
+    totp = TOTP(user.otp_secret)
+
+    if not totp.verify(code):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Bad code')
+
+    return create_login_tokens(user.id)
