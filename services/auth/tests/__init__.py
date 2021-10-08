@@ -11,8 +11,8 @@ from pyotp import TOTP
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import user_crud, verification_crud, github_crud
-from app.tokens import ALGORITHM, create_reset_password_token, create_access_token
-from config import SECRET_KEY, MEDIA_ROOT, API, SERVER_BACKEND
+from app.tokens import ALGORITHM, create_reset_password_token
+from config import SECRET_KEY, MEDIA_ROOT, API
 from db import engine, Base
 from main import app
 
@@ -554,14 +554,14 @@ class AuthTestCase(TestCase):
         self.assertEqual(response.json(), {'detail': 'GitHub error'})
 
         self.assertEqual(len(async_loop(github_crud.all(self.session))), 0)
-        with mock.patch('app.views.github_data', return_value={'id': 25, 'login': 'Counter021'}) as _:
+        with mock.patch('app.auth.views.github_data', return_value={'id': 25, 'login': 'Counter021'}) as _:
             response = self.client.get(f'{self.url}/github/bind?user_id=1')
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.json(), {'msg': 'GitHub account has been bind'})
 
         self.assertEqual(len(async_loop(github_crud.all(self.session))), 1)
 
-        with mock.patch('app.views.github_data', return_value={'id': 25, 'login': 'Counter021'}) as _:
+        with mock.patch('app.auth.views.github_data', return_value={'id': 25, 'login': 'Counter021'}) as _:
             response = self.client.get(f'{self.url}/github/bind?user_id=1')
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'GitHub account exist'})

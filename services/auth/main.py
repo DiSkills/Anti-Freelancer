@@ -5,7 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.routers import auth_router
+from app.admin.routers import admin_router
+from app.auth.routers import auth_router
+from app.routers import permission_router
 from config import PROJECT_NAME, API, MEDIA_ROOT, ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL, SECRET_KEY
 from createsuperuser import createsuperuser
 from db import async_session
@@ -61,4 +63,6 @@ async def media(directory: str, file_name: str) -> FileResponse:
     return FileResponse(f'{MEDIA_ROOT}{directory}/{file_name}', status_code=status.HTTP_200_OK)
 
 
+app.include_router(admin_router, prefix=f'/{API}/admin')
 app.include_router(auth_router, prefix=f'/{API}')
+app.include_router(permission_router, prefix=f'/{API}')

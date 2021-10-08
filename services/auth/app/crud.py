@@ -1,5 +1,5 @@
+from app.auth.schemas import Register, VerificationCreate
 from app.models import User, Verification, GitHub
-from app.schemas import Register, VerificationCreate
 from crud import CRUD
 
 
