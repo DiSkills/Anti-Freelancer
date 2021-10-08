@@ -1,13 +1,14 @@
+import datetime
 import typing
 
-from pydantic import validator, BaseModel
+from pydantic import validator, BaseModel, EmailStr
 
 from app.schemas import Paginate
 from config import SERVER_BACKEND
 
 
-class UserGetAdmin(BaseModel):
-    """ Users get for admin """
+class UserMinimal(BaseModel):
+    """ User minimum """
 
     id: int
     username: str
@@ -20,7 +21,18 @@ class UserGetAdmin(BaseModel):
         return SERVER_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'
 
 
+class UserMaximal(UserMinimal):
+    """ User maximum """
+
+    email: EmailStr
+    about: typing.Optional[str]
+    github: typing.Optional[str]
+    is_active: bool
+    last_login: datetime.datetime
+    date_joined: datetime.datetime
+
+
 class UsersPaginate(Paginate):
     """ Users paginate """
 
-    results: list[UserGetAdmin]
+    results: list[UserMinimal]

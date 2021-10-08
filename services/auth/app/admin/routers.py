@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin import views
-from app.admin.schemas import UsersPaginate
+from app.admin.schemas import UsersPaginate, UserMaximal
 from app.views import is_superuser
 from db import get_db
 
@@ -19,9 +19,23 @@ admin_router = APIRouter()
     tags=['admin'],
     dependencies=[Depends(is_superuser)],
 )
-async def admin_users_all(
+async def get_all_users(
         page: int = Query(default=1, gt=0),
         page_size: int = Query(default=1, gt=0),
         db: AsyncSession = Depends(get_db),
 ):
-    return await views.admin_users_all(db=db, page=page, page_size=page_size)
+    return await views.get_all_users(db=db, page=page, page_size=page_size)
+
+
+@admin_router.get(
+    '/user/{user_id}',
+    name='Get user',
+    description='Get user',
+    response_description='User',
+    status_code=status.HTTP_200_OK,
+    response_model=UserMaximal,
+    tags=['admin'],
+    dependencies=[Depends(is_superuser)],
+)
+async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
+    return await views.get_user(db, user_id)
