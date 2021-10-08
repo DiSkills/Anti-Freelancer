@@ -19,7 +19,8 @@
     - [x] Get username
     - [x] GitHub bind
     - [x] GitHub unbind
-    - [ ] OTP auth
+    - [x] OTP on and off
+    - [ ] OTP login
     - [ ] Profile
     - [ ] Skills
 - [ ] Admin
@@ -47,3 +48,4 @@
     - [x] Test get username
     - [x] Test GitHub bind
     - [x] Test GitHub unbind
+    - [x] Test OTP on and off
