@@ -24,10 +24,11 @@
     - [x] Off OTP in reset password
     - [ ] Profile
     - [ ] Skills
+    - [ ] Resend email for activation account if user request
 - [ ] Admin
     - [x] Get all users
+    - [x] Get user
     - [ ] Create user admin
-    - [ ] Get user
     - [ ] Update user
 - [x] Permission
     - [x] Is authenticated
@@ -53,3 +54,4 @@
     - [x] Test OTP login
     - [x] Test off OTP in reset password
     - [x] Test get all users (admin)
+    - [x] Test get user
