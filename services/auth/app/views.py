@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from typing import Any
 from uuid import uuid4
 
 from fastapi import HTTPException, status, Security, Depends, UploadFile, Request
@@ -322,6 +323,25 @@ async def github_request(db: AsyncSession, request: Request, user_id: int) -> Re
     return await github.authorize_redirect(request, redirect_url + f'?user_id={user_id}')
 
 
+async def github_data(request: Request) -> dict[str, Any]:
+    """
+        GitHub request data
+        :param request: Request
+        :type request: Request
+        :return: GitHub data
+        :rtype: dict
+        :raise HTTPException 400: GitHub error
+    """
+
+    try:
+        token = await social_auth.github.authorize_access_token(request)
+        response = await social_auth.github.get('user', token=token)
+    except Exception as _ex:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='GitHub error')
+    github_profile = response.json()
+    return github_profile
+
+
 async def github_bind(db: AsyncSession, request: Request, user_id: int) -> dict[str, str]:
     """
         GitHub
@@ -335,18 +355,12 @@ async def github_bind(db: AsyncSession, request: Request, user_id: int) -> dict[
         :rtype: dict
         :raise HTTPException 400: User not found
         :raise HTTPException 400: GitHub account exist
-        :raise HTTPException 400: GitHub error
     """
 
     if not await user_crud.exist(db, id=user_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
 
-    try:
-        token = await social_auth.github.authorize_access_token(request)
-        response = await social_auth.github.get('user', token=token)
-    except Exception as _ex:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='GitHub error')
-    github_profile = response.json()
+    github_profile = await github_data(request)
 
     git_id = github_profile['id']
 

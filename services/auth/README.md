@@ -45,5 +45,5 @@
     - [x] Test change password
     - [x] Test reset password
     - [x] Test get username
-    - [ ] Test GitHub bind
+    - [x] Test GitHub bind
     - [x] Test GitHub unbind

@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import os
 import shutil
-from unittest import TestCase
+from unittest import TestCase, mock
 
 import jwt
 from fastapi import UploadFile
@@ -538,10 +538,12 @@ class AuthTestCase(TestCase):
         verification = async_loop(verification_crud.get(self.session, id=1))
         self.client.get(self.url + f'/verify?link={verification.link}')
 
+        self.assertEqual(len(async_loop(github_crud.all(self.session))), 0)
         response = self.client.get(f'{self.url}/github/request?user_id=2')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'User not found'})
 
+        # Bind
         response = self.client.get(f'{self.url}/github/bind?user_id=2')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'User not found'})
@@ -550,15 +552,22 @@ class AuthTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'GitHub error'})
 
-        async_loop(github_crud.create(self.session, git_id=12, git_username='Counter021', user_id=1))
-        async_loop(self.session.commit())
+        self.assertEqual(len(async_loop(github_crud.all(self.session))), 0)
+        with mock.patch('app.views.github_data', return_value={'id': 25, 'login': 'Counter021'}) as _:
+            response = self.client.get(f'{self.url}/github/bind?user_id=1')
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(response.json(), {'msg': 'GitHub account has been bind'})
 
+        self.assertEqual(len(async_loop(github_crud.all(self.session))), 1)
+
+        # Unbind
         tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'}).json()
         headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
 
         response = self.client.post(f'{self.url}/github/unbind', headers=headers)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'msg': 'GitHub account has been deleted'})
+        self.assertEqual(len(async_loop(github_crud.all(self.session))), 0)
 
         response = self.client.post(f'{self.url}/github/unbind', headers=headers)
         self.assertEqual(response.status_code, 400)
