@@ -306,7 +306,7 @@ async def reset_password(db: AsyncSession, schema: Password, token: str) -> dict
             status_code=status.HTTP_400_BAD_REQUEST, detail='The new password cannot be the same as the old one',
         )
 
-    await user_crud.update(db, {'id': user_id}, password=get_password_hash(schema.password))
+    await user_crud.update(db, {'id': user_id}, password=get_password_hash(schema.password), otp=False)
     return {'msg': 'Password has been reset'}
 
 

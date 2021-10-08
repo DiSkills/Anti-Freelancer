@@ -638,3 +638,23 @@ class AuthTestCase(TestCase):
 
         response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'})
         self.assertEqual(response.status_code, 200)
+
+        # Reset password off 2-step auth
+        response = self.client.post(f'{self.url}/otp/on', headers=headers)
+        self.assertEqual(response.status_code, 206)
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).otp, True)
+
+        response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'})
+        self.assertEqual(response.status_code, 403)
+
+        token = create_reset_password_token(1)
+        response = self.client.post(f'{self.url}/reset-password?token={token}', json={
+            'password': 'Test1234!!',
+            'confirm_password': 'Test1234!!',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Password has been reset'})
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).otp, False)
+
+        response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!!'})
+        self.assertEqual(response.status_code, 200)

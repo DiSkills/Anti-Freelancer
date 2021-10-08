@@ -21,6 +21,7 @@
     - [x] GitHub unbind
     - [x] OTP on and off
     - [x] OTP login
+    - [x] Off OTP in reset password
     - [ ] Profile
     - [ ] Skills
 - [ ] Admin
@@ -50,3 +51,4 @@
     - [x] Test GitHub unbind
     - [x] Test OTP on and off
     - [x] Test OTP login
+    - [x] Test off OTP in reset password
