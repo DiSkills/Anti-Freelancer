@@ -34,11 +34,11 @@
   - [x] Create skill
   - [x] Update skill
   - [x] Delete skill
-- [ ] Admin
+- [x] Admin
     - [x] Get all users
     - [x] Get user
     - [x] Create user
-    - [ ] Update user
+    - [x] Update user
     - [x] Unbind GitHub account
 - [x] Permission
     - [x] Is authenticated
@@ -66,6 +66,7 @@
     - [x] Test get all users (admin)
     - [x] Test get user (admin)
     - [x] Test create user (admin)
+    - [x] Test update user (admin)
     - [x] Test unbind GitHub account (admin)
     - [x] Test import skills from excel
     - [x] Test get skills
