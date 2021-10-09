@@ -2,12 +2,39 @@ from unittest import TestCase, mock
 
 from fastapi import UploadFile
 
-from app.crud import user_crud, verification_crud
+from app.crud import user_crud, verification_crud, github_crud
 from config import SERVER_BACKEND
 from tests import BaseTest, async_loop
 
 
 class AdminTestCase(BaseTest, TestCase):
+
+    def test_unbind_github(self):
+        self.client.post(self.url + '/register', json={**self.user_data, 'freelancer': True})
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(self.url + f'/verify?link={verification.link}')
+        async_loop(user_crud.update(self.session, {'id': 1}, is_superuser=True))
+        async_loop(self.session.commit())
+
+        tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'})
+        headers = {'Authorization': f'Bearer {tokens.json()["access_token"]}'}
+
+        with mock.patch('app.auth.views.github_data', return_value={'id': 25, 'login': 'Counter021'}) as _:
+            response = self.client.get(f'{self.url}/github/bind?user_id=1')
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(response.json(), {'msg': 'GitHub account has been bind'})
+
+        self.assertEqual(len(async_loop(github_crud.all(self.session))), 1)
+
+        response = self.client.delete(f'{self.url}/admin/github/unbind/1', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'GitHub account has been deleted'})
+
+        self.assertEqual(len(async_loop(github_crud.all(self.session))), 0)
+
+        response = self.client.delete(f'{self.url}/admin/github/unbind/143', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'GitHub account not found'})
 
     def test_create_user(self):
         self.client.post(self.url + '/register', json={**self.user_data, 'freelancer': True})
@@ -95,7 +122,11 @@ class AdminTestCase(BaseTest, TestCase):
             'date_joined': response.json()['date_joined'],
             'email': 'test@example.com',
             'freelancer': True,
-            'github': 'Counter021',
+            'github': {
+                'git_username': 'Counter021',
+                'git_id': 25,
+                'id': 1,
+            },
             'id': 1,
             'is_active': True,
             'is_superuser': True,

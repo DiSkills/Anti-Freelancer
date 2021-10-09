@@ -22,12 +22,20 @@ class UserMinimal(BaseModel):
         return SERVER_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'
 
 
+class GitHub(BaseModel):
+    """ GitHub """
+
+    git_id: int
+    id: int
+    git_username: str
+
+
 class UserMaximal(UserMinimal):
     """ User maximum """
 
     email: EmailStr
     about: typing.Optional[str]
-    github: typing.Optional[str]
+    github: typing.Optional[GitHub]
     is_active: bool
     last_login: datetime.datetime
     date_joined: datetime.datetime

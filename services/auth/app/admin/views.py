@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin.schemas import RegisterAdmin
-from app.crud import user_crud
+from app.crud import user_crud, github_crud
 from app.security import get_password_hash
 from app.service import paginate
 from config import SERVER_BACKEND, API
@@ -42,7 +42,7 @@ async def get_user(db: AsyncSession, user_id: int) -> dict[str, typing.Any]:
     if not await user_crud.exist(db, id=user_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
     user = await user_crud.get(db, id=user_id)
-    return {**user.__dict__, 'github': user.github.git_username if user.github else None}
+    return {**user.__dict__, 'github': user.github.__dict__ if user.github else None}
 
 
 async def create_user(db: AsyncSession, schema: RegisterAdmin) -> dict[str, str]:
@@ -66,3 +66,22 @@ async def create_user(db: AsyncSession, schema: RegisterAdmin) -> dict[str, str]
     del schema.confirm_password
     await user_crud.create(db, **{**schema.dict(), 'password': get_password_hash(schema.password)})
     return {'msg': 'User has been created'}
+
+
+async def unbind_github(db: AsyncSession, pk: int) -> dict[str, str]:
+    """
+        Unbind GitHub
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: GitHub ID
+        :type pk: int
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: GitHub account not found
+    """
+
+    if not await github_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='GitHub account not found')
+
+    await github_crud.remove(db, id=pk)
+    return {'msg': 'GitHub account has been deleted'}

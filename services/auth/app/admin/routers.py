@@ -54,3 +54,17 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
 )
 async def create_user(schema: RegisterAdmin, db: AsyncSession = Depends(get_db)):
     return await views.create_user(db, schema)
+
+
+@admin_router.delete(
+    '/github/unbind/{pk}',
+    name='Unbind GitHub',
+    description='Unbind GitHub',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['admin'],
+    dependencies=[Depends(is_superuser)],
+)
+async def unbind_github(pk: int, db: AsyncSession = Depends(get_db)):
+    return await views.unbind_github(db, pk)

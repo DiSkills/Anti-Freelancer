@@ -39,7 +39,7 @@
     - [x] Get user
     - [x] Create user
     - [ ] Update user
-    - [ ] Delete git account
+    - [x] Unbind GitHub account
 - [x] Permission
     - [x] Is authenticated
     - [x] Is active
@@ -65,6 +65,8 @@
     - [x] Test off OTP in reset password
     - [x] Test get all users (admin)
     - [x] Test get user (admin)
+    - [x] Test create user (admin)
+    - [x] Test unbind GitHub account (admin)
     - [x] Test import skills from excel
     - [x] Test get skills
     - [x] Test get skill
