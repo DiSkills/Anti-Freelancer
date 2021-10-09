@@ -54,4 +54,4 @@
     - [x] Test OTP login
     - [x] Test off OTP in reset password
     - [x] Test get all users (admin)
-    - [x] Test get user
+    - [x] Test get user (admin)

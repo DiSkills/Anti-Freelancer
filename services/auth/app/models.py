@@ -47,6 +47,40 @@ class GitHub(Base):
         return f'<GitHub {self.git_username}>'
 
 
+class Skill(Base):
+
+    __tablename__ = 'skill'
+
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    image: str = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
+    name: str = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
+
+    def __str__(self):
+        return f'<Skill {self.name}>'
+
+    def __repr__(self):
+        return f'<Skill {self.name}>'
+
+
+class UserSkill(Base):
+
+    __tablename__ = 'user_skill'
+
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    user_id: int = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('user.id', ondelete='CASCADE'), nullable=False,
+    )
+    skill_id: int = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('skill.id', ondelete='CASCADE'), nullable=False,
+    )
+
+    def __str__(self):
+        return f'<UserSkill {self.id}>'
+
+    def __repr__(self):
+        return f'<UserSkill {self.id}>'
+
+
 class User(Base):
     """ User """
 
@@ -75,6 +109,9 @@ class User(Base):
     )
     github: typing.Union[relationship, GitHub] = relationship(
         GitHub, backref='user', lazy='selectin', cascade='all, delete', uselist=False,
+    )
+    skills: typing.Union[relationship, list[UserSkill]] = relationship(
+        Skill, secondary='user_skill', lazy='selectin', cascade='all, delete',
     )
 
     def __str__(self):
