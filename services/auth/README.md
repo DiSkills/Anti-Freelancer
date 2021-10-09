@@ -23,8 +23,14 @@
     - [x] OTP login
     - [x] Off OTP in reset password
     - [ ] Profile
-    - [ ] Skills
     - [ ] Resend email for activation account if user request
+- [ ] Skills
+  - [x] Import skills from excel
+  - [x] Get skills
+  - [x] Get skill
+  - [x] Create skill
+  - [x] Update skill
+  - [x] Delete skill
 - [ ] Admin
     - [x] Get all users
     - [x] Get user
@@ -55,3 +61,9 @@
     - [x] Test off OTP in reset password
     - [x] Test get all users (admin)
     - [x] Test get user (admin)
+    - [x] Test import skills from excel
+    - [x] Test get skills
+    - [x] Test get skill
+    - [x] Test create skill
+    - [x] Test update skill
+    - [x] Test delete skill
