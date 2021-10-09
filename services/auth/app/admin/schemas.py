@@ -52,3 +52,12 @@ class RegisterAdmin(Register):
 
     is_superuser: bool = True
     is_active: bool = True
+
+
+class UpdateUser(BaseModel):
+    """ Update user """
+
+    email: EmailStr
+    about: typing.Optional[str]
+    freelancer: bool
+    is_superuser: bool = False

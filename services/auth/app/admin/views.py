@@ -3,7 +3,7 @@ import typing
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.admin.schemas import RegisterAdmin
+from app.admin.schemas import RegisterAdmin, UpdateUser
 from app.crud import user_crud, github_crud
 from app.security import get_password_hash
 from app.service import paginate
@@ -66,6 +66,33 @@ async def create_user(db: AsyncSession, schema: RegisterAdmin) -> dict[str, str]
     del schema.confirm_password
     await user_crud.create(db, **{**schema.dict(), 'password': get_password_hash(schema.password)})
     return {'msg': 'User has been created'}
+
+
+async def update_user(db: AsyncSession, schema: UpdateUser, user_id: int) -> dict[str, typing.Any]:
+    """
+        Update user
+        :param db: DB
+        :type db: AsyncSession
+        :param schema: New user data
+        :type schema: UpdateUser
+        :param user_id: User ID
+        :type user_id: int
+        :return: User
+        :rtype: dict
+        :raise HTTPException 400: User not found
+        :raise HTTPException 400: Email exist
+    """
+
+    if not await user_crud.exist(db, id=user_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
+
+    user = await user_crud.get(db, id=user_id)
+
+    if (await user_crud.exist(db, email=schema.email)) and (user.email != schema.email):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email exist')
+
+    user = await user_crud.update(db, {'id': user_id}, **schema.dict())
+    return user.__dict__
 
 
 async def unbind_github(db: AsyncSession, pk: int) -> dict[str, str]:
