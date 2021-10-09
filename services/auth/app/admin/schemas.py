@@ -40,6 +40,7 @@ class UsersPaginate(Paginate):
 
 
 class RegisterAdmin(Register):
+    """ Register user for admin  """
 
     is_superuser: bool = True
     is_active: bool = True
