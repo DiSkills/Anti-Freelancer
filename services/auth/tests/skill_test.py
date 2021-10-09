@@ -81,6 +81,16 @@ class SkillsTestCase(BaseTest, TestCase):
         self.assertEqual(len(response.json()), 46)
         self.assertEqual(len(async_loop(skill_crud.all(self.session))), 46)
 
+        with open('tests/skills.xls', 'rb') as file:
+            response = self.client.post(
+                f'{self.url}/skills/excel',
+                headers=headers,
+                files={'file': ('skills.xls', file, 'application/vnd.ms-excel')}
+            )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(len(response.json()), 0)
+        self.assertEqual(len(async_loop(skill_crud.all(self.session))), 46)
+
         file = UploadFile('skills.png', content_type='image/png')
         response = self.client.post(
             f'{self.url}/skills/excel',
