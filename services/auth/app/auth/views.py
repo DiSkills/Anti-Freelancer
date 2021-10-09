@@ -456,7 +456,7 @@ async def remove_skill(db: AsyncSession, user: User, skill_id: int) -> dict[str,
     return {'msg': 'Skill has been deleted'}
 
 
-async def user_skills(db: AsyncSession, user: User) -> dict[str, list[dict[str, typing.Union[str, int]]]]:
+async def user_skills(db: AsyncSession, user: User) -> dict[str, typing.Any]:
     """
         User skills
         :param db: DB
@@ -469,10 +469,10 @@ async def user_skills(db: AsyncSession, user: User) -> dict[str, list[dict[str, 
 
     user = await user_crud.get(db, id=user.id)
     return {
-        'skills': [skill.__dict__ for skill in user.skills],
-        'other': [
+        'skills': (skill.__dict__ for skill in user.skills),
+        'other': (
             skill.__dict__ for skill in filter(
                 lambda skill: skill not in user.skills, await skill_crud.all(db, limit=1000),
             )
-        ],
+        ),
     }
