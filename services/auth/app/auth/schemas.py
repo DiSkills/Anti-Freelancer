@@ -104,6 +104,7 @@ class UserPublic(UserChangeData):
 
 
 class UserSkills(BaseModel):
+    """ User skills """
 
     skills: list[GetSkill]
     other: list[GetSkill]
