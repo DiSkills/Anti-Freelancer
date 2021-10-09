@@ -11,7 +11,8 @@ from app.auth.schemas import (
     UserChangeData,
     ChangePassword,
     Password,
-    UserSkills, Profile,
+    UserSkills,
+    Profile,
 )
 from app.models import User
 from app.schemas import Message
