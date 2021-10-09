@@ -8,7 +8,7 @@ from pyotp import TOTP
 
 from app.crud import verification_crud, user_crud, github_crud, user_skill_crud
 from app.tokens import ALGORITHM, create_reset_password_token
-from config import SECRET_KEY
+from config import SECRET_KEY, SERVER_BACKEND
 from tests import BaseTest, async_loop
 
 
@@ -298,7 +298,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(os.path.exists(user.avatar), True)
 
         response = self.client.get(self.url + '/change-data', headers=headers)
-        self.assertEqual(response.json()['avatar'], f'http://localhost:8000/{user.avatar}')
+        self.assertEqual(response.json()['avatar'], f'{SERVER_BACKEND}{user.avatar}')
 
         # Media
         avatar = user.avatar.replace('media/tests/', '')
@@ -344,7 +344,8 @@ class AuthTestCase(BaseTest, TestCase):
         change_data_date = async_loop(user_crud.get(self.session, id=1)).last_login
         self.assertEqual(get_data_date < change_data_date, True)
 
-        self.client.post(self.url + '/register', json={**self.user_data, 'username': 'test2', 'email': 'test2@example.com'})
+        self.client.post(self.url + '/register',
+                         json={**self.user_data, 'username': 'test2', 'email': 'test2@example.com'})
 
         response = self.client.put(self.url + '/change-data', headers=headers, json={
             'username': 'test2',
@@ -717,3 +718,130 @@ class AuthTestCase(BaseTest, TestCase):
         response = self.client.post(f'{self.url}/skills/remove?skill_id=143', headers=headers)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Skill not found'})
+
+    def test_profile(self):
+        self.client.post(self.url + '/register', json={**self.user_data, 'freelancer': True})
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(self.url + f'/verify?link={verification.link}')
+        async_loop(user_crud.update(self.session, {'id': 1}, is_superuser=True))
+        async_loop(self.session.commit())
+
+        tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'})
+        headers = {'Authorization': f'Bearer {tokens.json()["access_token"]}'}
+
+        with open('tests/skills.xls', 'rb') as file:
+            self.client.post(
+                f'{self.url}/skills/excel',
+                headers=headers,
+                files={'file': ('skills.xls', file, 'application/vnd.ms-excel')}
+            )
+
+        # Profile don't GitHub and skills
+        response = self.client.get(f'{self.url}/profile/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            'username': 'test',
+            'about': None,
+            'id': 1,
+            'date_joined': response.json()['date_joined'],
+            'last_login': response.json()['last_login'],
+            'avatar': 'https://via.placeholder.com/400x400',
+            'freelancer': True,
+            'skills': [],
+            'github': None
+        })
+
+        # Skill, not GitHub
+        response = self.client.post(f'{self.url}/skills/add?skill_id=1', headers=headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {'msg': 'Skill has been added'})
+
+        response = self.client.get(f'{self.url}/profile/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            'username': 'test',
+            'about': None,
+            'id': 1,
+            'date_joined': response.json()['date_joined'],
+            'last_login': response.json()['last_login'],
+            'avatar': 'https://via.placeholder.com/400x400',
+            'freelancer': True,
+            'skills': [
+                {
+                    'id': 1,
+                    'name': 'GitHub',
+                    'image': 'https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white'
+                }
+            ],
+            'github': None
+        })
+
+        # GitHub and skills
+        with mock.patch('app.auth.views.github_data', return_value={'id': 25, 'login': 'Counter021'}) as _:
+            response = self.client.get(f'{self.url}/github/bind?user_id=1')
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(response.json(), {'msg': 'GitHub account has been bind'})
+
+        response = self.client.get(f'{self.url}/profile/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            'username': 'test',
+            'about': None,
+            'id': 1,
+            'date_joined': response.json()['date_joined'],
+            'last_login': response.json()['last_login'],
+            'avatar': 'https://via.placeholder.com/400x400',
+            'freelancer': True,
+            'skills': [
+                {
+                    'id': 1,
+                    'name': 'GitHub',
+                    'image': 'https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white'
+                }
+            ],
+            'github': 'Counter021'
+        })
+
+        # GitHub, not skills
+        response = self.client.post(f'{self.url}/skills/remove?skill_id=1', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Skill has been deleted'})
+
+        response = self.client.get(f'{self.url}/profile/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            'username': 'test',
+            'about': None,
+            'id': 1,
+            'date_joined': response.json()['date_joined'],
+            'last_login': response.json()['last_login'],
+            'avatar': 'https://via.placeholder.com/400x400',
+            'freelancer': True,
+            'skills': [],
+            'github': 'Counter021'
+        })
+
+        # Avatar
+        file = UploadFile('image.png', content_type='image/png')
+        response = self.client.post(
+            f'{self.url}/avatar', headers=headers, files={'file': ('image.png', async_loop(file.read()), 'image/png')}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Avatar has been saved'})
+        async_loop(self.session.commit())
+
+        user = async_loop(user_crud.get(self.session, id=1))
+
+        response = self.client.get(f'{self.url}/profile/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            'username': 'test',
+            'about': None,
+            'id': 1,
+            'date_joined': response.json()['date_joined'],
+            'last_login': response.json()['last_login'],
+            'avatar': f'{SERVER_BACKEND}{user.avatar}',
+            'freelancer': True,
+            'skills': [],
+            'github': 'Counter021'
+        })

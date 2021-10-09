@@ -11,7 +11,7 @@ from app.auth.schemas import (
     UserChangeData,
     ChangePassword,
     Password,
-    UserSkills,
+    UserSkills, Profile,
 )
 from app.models import User
 from app.schemas import Message
@@ -88,6 +88,20 @@ async def get_username(email: str, db: AsyncSession = Depends(get_db)):
 )
 async def refresh(token: str, db: AsyncSession = Depends(get_db)):
     return await views.refresh(db, token)
+
+
+@auth_router.get(
+    '/profile/{user_id}',
+    name='Profile',
+    description='User profile',
+    response_description='Profile',
+    status_code=status.HTTP_200_OK,
+    response_model=Profile,
+    tags=['auth'],
+    response_model_exclude={'email'},
+)
+async def profile(user_id: int, db: AsyncSession = Depends(get_db)):
+    return await views.profile(db, user_id)
 
 
 @auth_router.post(

@@ -108,3 +108,10 @@ class UserSkills(BaseModel):
 
     skills: list[GetSkill]
     other: list[GetSkill]
+
+
+class Profile(UserPublic):
+    """ Profile """
+
+    skills: list[GetSkill]
+    github: typing.Optional[str]

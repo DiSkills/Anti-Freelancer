@@ -128,6 +128,28 @@ async def refresh(db: AsyncSession, token: str) -> dict[str, str]:
     return create_access_token(user_id)
 
 
+async def profile(db: AsyncSession, user_id: int) -> dict[str, typing.Any]:
+    """
+        Profile
+        :param db: DB
+        :type db: AsyncSession
+        :param user_id: User ID
+        :type user_id: int
+        :return: Profile data
+        :rtype: dict
+        :raise HTTPException 400: User not found
+    """
+
+    if not await user_crud.exist(db, id=user_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
+    user = await user_crud.get(db, id=user_id)
+    return {
+        **user.__dict__,
+        'skills': [skill.__dict__ for skill in user.skills],
+        'github': user.github.git_username if user.github else None,
+    }
+
+
 async def avatar(db: AsyncSession, user: User, file: UploadFile) -> dict[str, str]:
     """
         Avatar

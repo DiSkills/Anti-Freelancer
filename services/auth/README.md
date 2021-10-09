@@ -25,7 +25,7 @@
     - [x] Add user skills
     - [x] Get user skills
     - [x] Remove user skills
-    - [ ] Profile
+    - [x] Profile
     - [ ] Resend email for activation account if user request
 - [x] Skills
   - [x] Import skills from excel
@@ -77,3 +77,4 @@
     - [x] Test add user skills
     - [x] Test get user skills
     - [x] Test remove user skills
+    - [x] Test profile

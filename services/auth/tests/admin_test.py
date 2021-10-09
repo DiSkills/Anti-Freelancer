@@ -176,7 +176,7 @@ class AdminTestCase(BaseTest, TestCase):
         response = self.client.get(f'{self.url}/admin/users?page=1&page_size=2', headers=headers)
         self.assertEqual(response.status_code, 200)
         page_1 = {
-            'next': 'http://localhost:8000/api/v1/admin/users?page=2&page_size=2',
+            'next': f'{SERVER_BACKEND}{self.url[1:]}/admin/users?page=2&page_size=2',
             'previous': None,
             'page': 1,
             'results': [
@@ -202,7 +202,7 @@ class AdminTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 200)
         page_2 = {
             'next': None,
-            'previous': 'http://localhost:8000/api/v1/admin/users?page=1&page_size=2',
+            'previous': f'{SERVER_BACKEND}{self.url[1:]}/admin/users?page=1&page_size=2',
             'page': 2,
             'results': [
                 {
