@@ -3,7 +3,8 @@ from fastapi.responses import StreamingResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import views
-from app.auth.schemas import Register, Tokens, AccessToken, UserPublic, UserChangeData, ChangePassword, Password
+from app.auth.schemas import Register, Tokens, AccessToken, UserPublic, UserChangeData, ChangePassword, Password, \
+    UserSkills
 from app.models import User
 from app.schemas import Message
 from app.views import is_active
@@ -246,3 +247,42 @@ async def otp_login(
         db: AsyncSession = Depends(get_db),
 ):
     return await views.otp_login(db, username, password, code)
+
+
+@auth_router.post(
+    '/skills/add',
+    name='Skill add',
+    description='Skill add',
+    response_description='Message',
+    status_code=status.HTTP_201_CREATED,
+    response_model=Message,
+    tags=['user-skills'],
+)
+async def add_skill(skill_id: int, user: User = Depends(is_active), db: AsyncSession = Depends(get_db)):
+    return await views.add_skill(db, user, skill_id)
+
+
+@auth_router.post(
+    '/skills/remove',
+    name='Skill remove',
+    description='Skill remove',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['user-skills'],
+)
+async def remove_skill(skill_id: int, user: User = Depends(is_active), db: AsyncSession = Depends(get_db)):
+    return await views.remove_skill(db, user, skill_id)
+
+
+@auth_router.get(
+    '/skills/user',
+    name='User skills',
+    description='User skills',
+    response_description='Skills',
+    status_code=status.HTTP_200_OK,
+    response_model=UserSkills,
+    tags=['user-skills'],
+)
+async def user_skills(user: User = Depends(is_active), db: AsyncSession = Depends(get_db)):
+    return await views.user_skills(db, user)

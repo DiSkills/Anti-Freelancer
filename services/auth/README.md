@@ -22,6 +22,9 @@
     - [x] OTP on and off
     - [x] OTP login
     - [x] Off OTP in reset password
+    - [x] Add user skills
+    - [x] Get user skills
+    - [x] Remove user skills
     - [ ] Profile
     - [ ] Resend email for activation account if user request
 - [ ] Skills
@@ -67,3 +70,6 @@
     - [x] Test create skill
     - [x] Test update skill
     - [x] Test delete skill
+    - [x] Test add user skills
+    - [x] Test get user skills
+    - [x] Test remove user skills

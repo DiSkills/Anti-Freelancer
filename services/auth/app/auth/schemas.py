@@ -4,6 +4,7 @@ import typing
 
 from pydantic import BaseModel, validator, EmailStr
 
+from app.skills.schemas import GetSkill
 from config import SERVER_BACKEND
 
 
@@ -100,3 +101,9 @@ class UserPublic(UserChangeData):
     @validator('avatar')
     def set_avatar(cls, avatar):
         return SERVER_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'
+
+
+class UserSkills(BaseModel):
+
+    skills: list[GetSkill]
+    other: list[GetSkill]

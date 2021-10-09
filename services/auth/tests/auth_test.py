@@ -6,7 +6,7 @@ import jwt
 from fastapi import UploadFile
 from pyotp import TOTP
 
-from app.crud import verification_crud, user_crud, github_crud
+from app.crud import verification_crud, user_crud, github_crud, user_skill_crud
 from app.tokens import ALGORITHM, create_reset_password_token
 from config import SECRET_KEY
 from tests import BaseTest, async_loop
@@ -616,3 +616,104 @@ class AuthTestCase(BaseTest, TestCase):
 
         response = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!!'})
         self.assertEqual(response.status_code, 200)
+
+    def test_user_skills(self):
+        self.client.post(self.url + '/register', json={**self.user_data, 'freelancer': True})
+        verification = async_loop(verification_crud.get(self.session, id=1))
+        self.client.get(self.url + f'/verify?link={verification.link}')
+        async_loop(user_crud.update(self.session, {'id': 1}, is_superuser=True))
+        async_loop(self.session.commit())
+
+        tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'})
+        headers = {'Authorization': f'Bearer {tokens.json()["access_token"]}'}
+
+        with open('tests/skills.xls', 'rb') as file:
+            self.client.post(
+                f'{self.url}/skills/excel',
+                headers=headers,
+                files={'file': ('skills.xls', file, 'application/vnd.ms-excel')}
+            )
+
+        self.assertEqual(len(async_loop(user_skill_crud.all(self.session))), 0)
+
+        # Get user skills
+        response = self.client.get(f'{self.url}/skills/user', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['skills']), 0)
+        self.assertEqual(len(response.json()['other']), 46)
+
+        # Add
+        response = self.client.post(f'{self.url}/skills/add?skill_id=1', headers=headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {'msg': 'Skill has been added'})
+        self.assertEqual(len(async_loop(user_skill_crud.all(self.session))), 1)
+
+        response = self.client.post(f'{self.url}/skills/add?skill_id=2', headers=headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {'msg': 'Skill has been added'})
+
+        response = self.client.post(f'{self.url}/skills/add?skill_id=3', headers=headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {'msg': 'Skill has been added'})
+
+        self.assertEqual(len(async_loop(user_skill_crud.all(self.session))), 3)
+
+        response = self.client.post(f'{self.url}/skills/add?skill_id=1', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'You already have this skill'})
+
+        response = self.client.post(f'{self.url}/skills/add?skill_id=143', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Skill not found'})
+
+        # New user
+        self.client.post(
+            self.url + '/register', json={**self.user_data, 'username': 'test2', 'email': 'test2@example.com'},
+        )
+        verification = async_loop(verification_crud.get(self.session, id=2))
+        self.client.get(self.url + f'/verify?link={verification.link}')
+        tokens_2 = self.client.post(f'{self.url}/login', data={'username': 'test2', 'password': 'Test1234!'})
+        headers_2 = {'Authorization': f'Bearer {tokens_2.json()["access_token"]}'}
+
+        response = self.client.post(f'{self.url}/skills/add?skill_id=2', headers=headers_2)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {'msg': 'Skill has been added'})
+
+        response = self.client.get(f'{self.url}/skills/user', headers=headers_2)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['skills']), 1)
+        self.assertEqual(len(response.json()['other']), 45)
+
+        response = self.client.post(f'{self.url}/skills/remove?skill_id=2', headers=headers_2)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Skill has been deleted'})
+
+        # Get user skills
+        response = self.client.get(f'{self.url}/skills/user', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['skills']), 3)
+        self.assertEqual(len(response.json()['other']), 43)
+
+        # Remove
+        response = self.client.post(f'{self.url}/skills/remove?skill_id=1', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Skill has been deleted'})
+        self.assertEqual(len(async_loop(user_skill_crud.all(self.session))), 2)
+
+        response = self.client.post(f'{self.url}/skills/remove?skill_id=2', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Skill has been deleted'})
+
+        response = self.client.post(f'{self.url}/skills/remove?skill_id=3', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Skill has been deleted'})
+
+        self.assertEqual(len(async_loop(user_skill_crud.all(self.session))), 0)
+
+        response = self.client.post(f'{self.url}/skills/remove?skill_id=1', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': "You already haven't this skill"})
+
+        response = self.client.post(f'{self.url}/skills/remove?skill_id=143', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Skill not found'})

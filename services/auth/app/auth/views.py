@@ -1,5 +1,6 @@
 import io
 import os
+import typing
 from datetime import datetime
 from uuid import uuid4
 
@@ -11,7 +12,7 @@ from qrcode.image.pil import PilImage
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import Register, UserChangeData, ChangePassword, Password, VerificationCreate
-from app.crud import user_crud, verification_crud, github_crud
+from app.crud import user_crud, verification_crud, github_crud, skill_crud, user_skill_crud
 from app.models import User
 from app.security import get_password_hash, verify_password_hash
 from app.send_email import send_register_email, send_reset_password_email, send_username_email
@@ -403,3 +404,75 @@ async def otp_login(db: AsyncSession, username: str, password: str, code: str) -
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Bad code')
 
     return create_login_tokens(user.id)
+
+
+async def add_skill(db: AsyncSession, user: User, skill_id: int) -> dict[str, str]:
+    """
+        Add skill
+        :param db: DB
+        :type db: AsyncSession
+        :param user: User
+        :type user: User
+        :param skill_id: Skill ID
+        :type skill_id: int
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Skill not found
+        :raise HTTPException 400: User already have this skill
+    """
+
+    if not await skill_crud.exist(db, id=skill_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Skill not found')
+
+    if await user_skill_crud.exist(db, user_id=user.id, skill_id=skill_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You already have this skill')
+
+    await user_skill_crud.create(db, user_id=user.id, skill_id=skill_id)
+    return {'msg': 'Skill has been added'}
+
+
+async def remove_skill(db: AsyncSession, user: User, skill_id: int) -> dict[str, str]:
+    """
+        Remove skill
+        :param db: DB
+        :type db: AsyncSession
+        :param user: User
+        :type user: User
+        :param skill_id: Skill ID
+        :type skill_id: int
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Skill not found
+        :raise HTTPException 400: User already haven't this skill
+    """
+
+    if not await skill_crud.exist(db, id=skill_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Skill not found')
+
+    if not await user_skill_crud.exist(db, user_id=user.id, skill_id=skill_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You already haven\'t this skill')
+
+    await user_skill_crud.remove(db, user_id=user.id, skill_id=skill_id)
+    return {'msg': 'Skill has been deleted'}
+
+
+async def user_skills(db: AsyncSession, user: User) -> dict[str, list[dict[str, typing.Union[str, int]]]]:
+    """
+        User skills
+        :param db: DB
+        :type db: AsyncSession
+        :param user: User
+        :type user: User
+        :return: Skills user
+        :rtype: dict
+    """
+
+    user = await user_crud.get(db, id=user.id)
+    return {
+        'skills': [skill.__dict__ for skill in user.skills],
+        'other': [
+            skill.__dict__ for skill in filter(
+                lambda skill: skill not in user.skills, await skill_crud.all(db, limit=1000),
+            )
+        ],
+    }
