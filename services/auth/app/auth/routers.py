@@ -3,8 +3,16 @@ from fastapi.responses import StreamingResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import views
-from app.auth.schemas import Register, Tokens, AccessToken, UserPublic, UserChangeData, ChangePassword, Password, \
-    UserSkills
+from app.auth.schemas import (
+    Register,
+    Tokens,
+    AccessToken,
+    UserPublic,
+    UserChangeData,
+    ChangePassword,
+    Password,
+    UserSkills,
+)
 from app.models import User
 from app.schemas import Message
 from app.views import is_active
