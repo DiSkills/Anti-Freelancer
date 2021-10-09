@@ -23,7 +23,17 @@ class GitHubCRUD(CRUD[GitHub, GitHub, GitHub]):
 class SkillCRUD(CRUD[Skill, Skill, Skill]):
     """ Skill CRUD """
 
-    async def create_from_file(self, db: AsyncSession, data_list: list[list], **kwargs) -> list[Skill]:
+    async def create_from_file(self, db: AsyncSession, data_list: list[list[str]], **kwargs) -> list[Skill]:
+        """
+            Create from file
+            :param db: DB
+            :type db: AsyncSession
+            :param data_list: Skills data
+            :type data_list: list
+            :param kwargs: Kwargs
+            :return: New skills
+            :rtype: list
+        """
         instances = []
         for data in data_list:
             if (await self.exist(db, image=data[0])) or (await self.exist(db, name=data[1])):
