@@ -7,7 +7,7 @@
 - [x] Create superuser
 - [x] Get media
 - [ ] Docker
-- [ ] Auth
+- [x] Auth
     - [x] Registration
     - [x] Login
     - [x] Activation account
@@ -26,7 +26,7 @@
     - [x] Get user skills
     - [x] Remove user skills
     - [x] Profile
-    - [ ] Resend email for activation account if user request
+    - [x] Resend email for activation account if user login
 - [x] Skills
   - [x] Import skills from excel
   - [x] Get skills
@@ -44,7 +44,7 @@
     - [x] Is authenticated
     - [x] Is active
     - [x] Is superuser
-- [ ] Tests
+- [x] Tests
     - [x] Test registration
     - [x] Test login
     - [x] Test activation account

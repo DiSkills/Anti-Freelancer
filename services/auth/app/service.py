@@ -1,15 +1,18 @@
 import datetime
 import os
 import typing
+from uuid import uuid4
 
 import aiofiles
 from fastapi import HTTPException, status, UploadFile, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud import user_crud
+from app.auth.schemas import VerificationCreate
+from app.crud import user_crud, verification_crud
 from app.models import User
 from app.security import verify_password_hash
-from config import social_auth
+from app.send_email import send_register_email
+from config import social_auth, SERVER_BACKEND, API
 from crud import CRUD
 
 
@@ -56,6 +59,16 @@ async def validate_login(db: AsyncSession, username: str, password: str) -> User
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Password mismatch')
 
     if not user.is_active:
+
+        if not await verification_crud.exist(db, user_id=user.id):
+            verification = await verification_crud.create(
+                db, **VerificationCreate(user_id=user.id, link=str(uuid4())).dict(),
+            )
+        else:
+            verification = await verification_crud.get(db, user_id=user.id)
+
+        send_register_email(user.email, user.username, f'{SERVER_BACKEND}{API}/verify?link={verification.link}')
+
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You not activated')
 
     await user_crud.update(db, {'id': user.id}, last_login=datetime.datetime.utcnow())
