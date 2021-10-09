@@ -48,6 +48,7 @@ class GitHub(Base):
 
 
 class Skill(Base):
+    """ Skill """
 
     __tablename__ = 'skill'
 
@@ -63,6 +64,7 @@ class Skill(Base):
 
 
 class UserSkill(Base):
+    """ User skills """
 
     __tablename__ = 'user_skill'
 
