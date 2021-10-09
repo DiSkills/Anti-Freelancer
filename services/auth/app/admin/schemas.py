@@ -3,6 +3,7 @@ import typing
 
 from pydantic import validator, BaseModel, EmailStr
 
+from app.auth.schemas import Register
 from app.schemas import Paginate
 from config import SERVER_BACKEND
 
@@ -36,3 +37,9 @@ class UsersPaginate(Paginate):
     """ Users paginate """
 
     results: list[UserMinimal]
+
+
+class RegisterAdmin(Register):
+
+    is_superuser: bool = True
+    is_active: bool = True

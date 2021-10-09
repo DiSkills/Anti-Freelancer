@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.admin import views
-from app.admin.schemas import UsersPaginate, UserMaximal
+from app.admin.schemas import UsersPaginate, UserMaximal, RegisterAdmin
+from app.schemas import Message
 from app.views import is_superuser
 from db import get_db
 
@@ -39,3 +40,17 @@ async def get_all_users(
 )
 async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
     return await views.get_user(db, user_id)
+
+
+@admin_router.post(
+    '/user',
+    name='Create user',
+    description='Create user',
+    response_description='New user',
+    status_code=status.HTTP_201_CREATED,
+    response_model=Message,
+    tags=['admin'],
+    dependencies=[Depends(is_superuser)],
+)
+async def create_user(schema: RegisterAdmin, db: AsyncSession = Depends(get_db)):
+    return await views.create_user(db, schema)

@@ -27,7 +27,7 @@
     - [x] Remove user skills
     - [ ] Profile
     - [ ] Resend email for activation account if user request
-- [ ] Skills
+- [x] Skills
   - [x] Import skills from excel
   - [x] Get skills
   - [x] Get skill
@@ -37,8 +37,9 @@
 - [ ] Admin
     - [x] Get all users
     - [x] Get user
-    - [ ] Create user admin
+    - [x] Create user
     - [ ] Update user
+    - [ ] Delete git account
 - [x] Permission
     - [x] Is authenticated
     - [x] Is active
