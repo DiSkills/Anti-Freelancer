@@ -44,6 +44,8 @@
     - [x] Is authenticated
     - [x] Is active
     - [x] Is superuser
+    - [x] Is freelancer
+    - [x] Is customer
 - [x] Tests
     - [x] Test registration
     - [x] Test login
@@ -53,6 +55,8 @@
     - [x] Test is authenticated
     - [x] Test is active
     - [x] Test is superuser
+    - [x] Test is freelancer
+    - [x] Test is customer
     - [x] Test get media
     - [x] Test change data
     - [x] Test change password

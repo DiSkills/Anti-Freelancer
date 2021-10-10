@@ -244,6 +244,30 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json(), {'detail': 'Not authenticated'})
 
+        # Is freelancer
+        response = self.client.post(f'{self.url}/is-freelancer', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'User not freelancer'})
+
+        async_loop(user_crud.update(self.session, {'id': 1}, freelancer=True))
+        async_loop(self.session.commit())
+
+        response = self.client.post(f'{self.url}/is-freelancer', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'user_id': 1})
+
+        # Is customer
+        response = self.client.post(f'{self.url}/is-customer', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'User not customer'})
+
+        async_loop(user_crud.update(self.session, {'id': 1}, freelancer=False))
+        async_loop(self.session.commit())
+
+        response = self.client.post(f'{self.url}/is-customer', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'user_id': 1})
+
     def test_avatar(self):
         self.client.post(f'{self.url}/register', json=self.user_data)
         verification = async_loop(verification_crud.get(self.session, id=1))

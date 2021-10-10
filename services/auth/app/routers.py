@@ -44,3 +44,29 @@ async def is_active(user: User = Depends(views.is_active)):
 )
 async def is_superuser(user: User = Depends(views.is_superuser)):
     return {'user_id': user.id}
+
+
+@permission_router.post(
+    '/is-freelancer',
+    name='Is freelancer user',
+    description='Is freelancer user',
+    response_description='User ID',
+    status_code=status.HTTP_200_OK,
+    response_model=PermissionResponse,
+    tags=['permission'],
+)
+async def is_freelancer(user: User = Depends(views.is_freelancer)):
+    return {'user_id': user.id}
+
+
+@permission_router.post(
+    '/is-customer',
+    name='Is customer user',
+    description='Is customer user',
+    response_description='User ID',
+    status_code=status.HTTP_200_OK,
+    response_model=PermissionResponse,
+    tags=['permission'],
+)
+async def is_customer(user: User = Depends(views.is_customer)):
+    return {'user_id': user.id}
