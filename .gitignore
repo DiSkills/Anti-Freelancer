@@ -3,3 +3,4 @@
 /.idea/
 /services/auth/config.env
 /services/auth/media/
+*.log
