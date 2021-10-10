@@ -296,6 +296,7 @@ async def github_request(db: AsyncSession, request: Request, user_id: int) -> Re
         :return: Redirect
         :rtype: RedirectResponse
         :raise HTTPException 400: User not found
+        :raise HTTPException 403: User is customer
     """
 
     if not await user_crud.exist(db, id=user_id):
@@ -321,6 +322,7 @@ async def github_bind(db: AsyncSession, request: Request, user_id: int) -> dict[
         :rtype: dict
         :raise HTTPException 400: User not found
         :raise HTTPException 400: GitHub account exist
+        :raise HTTPException 403: User is customer
     """
 
     if not await user_crud.exist(db, id=user_id):
