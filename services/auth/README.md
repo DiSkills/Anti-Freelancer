@@ -3,10 +3,11 @@
 ## Tasks
 
 - [x] Last login
-- [ ] Celery email send
+- [x] Celery email send
+- [ ] Logger errors
 - [x] Create superuser
 - [x] Get media
-- [ ] Docker
+- [x] Docker
 - [x] Auth
     - [x] Registration
     - [x] Login

@@ -1,13 +1,5 @@
-import os
-import smtplib
-from email.mime.text import MIMEText
-
-from jinja2 import Template
-
+from tasks import send_email as emails
 from config import TEST
-
-sender = os.environ.get('EMAIL')
-sender_password = os.environ.get('PASSWORD_EMAIL')
 
 
 def send_email(recipient: str, subject: str, template: str, **data) -> None:
@@ -23,24 +15,5 @@ def send_email(recipient: str, subject: str, template: str, **data) -> None:
         :return: None
     """
 
-    if int(TEST):
-        return
-
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-
-    with open(template) as file:
-        html = file.read()
-
-    t = Template(html)
-    message = t.render(**data)
-
-    try:
-        server.login(sender, sender_password)
-        msg = MIMEText(message, 'html')
-        msg['From'] = sender
-        msg['To'] = recipient
-        msg['Subject'] = subject
-        server.sendmail(sender, recipient, msg.as_string())
-    except Exception as _ex:
-        print(_ex)
+    if not int(TEST):
+        emails.delay(recipient, subject, template, **data)

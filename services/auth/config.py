@@ -37,6 +37,9 @@ ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
 
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379')
+
 social_auth = OAuth()
 redirect_url = f'{SERVER_BACKEND}{API}/github/bind'
 

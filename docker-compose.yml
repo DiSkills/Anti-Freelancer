@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  postgres:
+  auth_db:
     build:
       context: ./services/auth/docker/postgres
       dockerfile: Dockerfile
@@ -17,7 +17,7 @@ services:
       context: ./services/auth
       dockerfile: Dockerfile
     depends_on:
-      - postgres
+      - auth_db
     ports:
       - "8000:8000"
     command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000
@@ -25,3 +25,21 @@ services:
       - ./services/auth:/app
     environment:
       - DOCKER=1
+
+  worker:
+    build: ./services/auth
+    command: poetry run celery -A tasks.celery worker -l INFO
+    volumes:
+      - ./services/auth:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DOCKER=1
+      - TESTS=0
+    depends_on:
+      - auth_db
+      - auth
+      - redis
+
+  redis:
+    image: redis
