@@ -246,7 +246,7 @@ class AuthTestCase(BaseTest, TestCase):
 
         # Is freelancer
         response = self.client.post(f'{self.url}/is-freelancer', headers=headers)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json(), {'detail': 'User not freelancer'})
 
         async_loop(user_crud.update(self.session, {'id': 1}, freelancer=True))
@@ -258,7 +258,7 @@ class AuthTestCase(BaseTest, TestCase):
 
         # Is customer
         response = self.client.post(f'{self.url}/is-customer', headers=headers)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json(), {'detail': 'User not customer'})
 
         async_loop(user_crud.update(self.session, {'id': 1}, freelancer=False))
@@ -527,6 +527,18 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'User not found'})
 
+        response = self.client.get(f'{self.url}/github/request?user_id=1')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'User is customer'})
+
+        # User is customer
+        response = self.client.get(f'{self.url}/github/bind?user_id=1')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'User is customer'})
+
+        async_loop(user_crud.update(self.session, {'id': 1}, freelancer=True))
+        async_loop(self.session.commit())
+
         # Bind
         response = self.client.get(f'{self.url}/github/bind?user_id=2')
         self.assertEqual(response.status_code, 400)
@@ -554,6 +566,16 @@ class AuthTestCase(BaseTest, TestCase):
         # Unbind
         tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!'}).json()
         headers = {'Authorization': f'Bearer {tokens["access_token"]}'}
+
+        async_loop(user_crud.update(self.session, {'id': 1}, freelancer=False))
+        async_loop(self.session.commit())
+
+        response = self.client.post(f'{self.url}/github/unbind', headers=headers)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'User not freelancer'})
+
+        async_loop(user_crud.update(self.session, {'id': 1}, freelancer=True))
+        async_loop(self.session.commit())
 
         response = self.client.post(f'{self.url}/github/unbind', headers=headers)
         self.assertEqual(response.status_code, 200)
@@ -701,13 +723,40 @@ class AuthTestCase(BaseTest, TestCase):
         headers_2 = {'Authorization': f'Bearer {tokens_2.json()["access_token"]}'}
 
         response = self.client.post(f'{self.url}/skills/add?skill_id=2', headers=headers_2)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'User not freelancer'})
+
+        async_loop(user_crud.update(self.session, {'id': 2}, freelancer=True))
+        async_loop(self.session.commit())
+
+        response = self.client.post(f'{self.url}/skills/add?skill_id=2', headers=headers_2)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json(), {'msg': 'Skill has been added'})
+
+        async_loop(user_crud.update(self.session, {'id': 2}, freelancer=False))
+        async_loop(self.session.commit())
+
+        response = self.client.get(f'{self.url}/skills/user', headers=headers_2)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'User not freelancer'})
+
+        async_loop(user_crud.update(self.session, {'id': 2}, freelancer=True))
+        async_loop(self.session.commit())
 
         response = self.client.get(f'{self.url}/skills/user', headers=headers_2)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()['skills']), 1)
         self.assertEqual(len(response.json()['other']), 45)
+
+        async_loop(user_crud.update(self.session, {'id': 2}, freelancer=False))
+        async_loop(self.session.commit())
+
+        response = self.client.post(f'{self.url}/skills/remove?skill_id=2', headers=headers_2)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json(), {'detail': 'User not freelancer'})
+
+        async_loop(user_crud.update(self.session, {'id': 2}, freelancer=True))
+        async_loop(self.session.commit())
 
         response = self.client.post(f'{self.url}/skills/remove?skill_id=2', headers=headers_2)
         self.assertEqual(response.status_code, 200)

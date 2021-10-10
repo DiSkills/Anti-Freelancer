@@ -301,6 +301,9 @@ async def github_request(db: AsyncSession, request: Request, user_id: int) -> Re
     if not await user_crud.exist(db, id=user_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
 
+    if not await user_crud.exist(db, id=user_id, freelancer=True):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User is customer')
+
     github = social_auth.create_client('github')
     return await github.authorize_redirect(request, redirect_url + f'?user_id={user_id}')
 
@@ -322,6 +325,9 @@ async def github_bind(db: AsyncSession, request: Request, user_id: int) -> dict[
 
     if not await user_crud.exist(db, id=user_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
+
+    if not await user_crud.exist(db, id=user_id, freelancer=True):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User is customer')
 
     github_profile = await github_data(request)
 

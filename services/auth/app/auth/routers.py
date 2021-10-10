@@ -16,7 +16,7 @@ from app.auth.schemas import (
 )
 from app.models import User
 from app.schemas import Message
-from app.views import is_active
+from app.views import is_active, is_freelancer
 from db import get_db
 
 auth_router = APIRouter()
@@ -224,7 +224,7 @@ async def github_bind(request: Request, user_id: int, db: AsyncSession = Depends
     response_model=Message,
     tags=['github'],
 )
-async def github_unbind(user: User = Depends(is_active), db: AsyncSession = Depends(get_db)):
+async def github_unbind(user: User = Depends(is_freelancer), db: AsyncSession = Depends(get_db)):
     return await views.github_unbind(db, user)
 
 
@@ -281,7 +281,7 @@ async def otp_login(
     response_model=Message,
     tags=['user-skills'],
 )
-async def add_skill(skill_id: int, user: User = Depends(is_active), db: AsyncSession = Depends(get_db)):
+async def add_skill(skill_id: int, user: User = Depends(is_freelancer), db: AsyncSession = Depends(get_db)):
     return await views.add_skill(db, user, skill_id)
 
 
@@ -294,7 +294,7 @@ async def add_skill(skill_id: int, user: User = Depends(is_active), db: AsyncSes
     response_model=Message,
     tags=['user-skills'],
 )
-async def remove_skill(skill_id: int, user: User = Depends(is_active), db: AsyncSession = Depends(get_db)):
+async def remove_skill(skill_id: int, user: User = Depends(is_freelancer), db: AsyncSession = Depends(get_db)):
     return await views.remove_skill(db, user, skill_id)
 
 
@@ -307,5 +307,5 @@ async def remove_skill(skill_id: int, user: User = Depends(is_active), db: Async
     response_model=UserSkills,
     tags=['user-skills'],
 )
-async def user_skills(user: User = Depends(is_active), db: AsyncSession = Depends(get_db)):
+async def user_skills(user: User = Depends(is_freelancer), db: AsyncSession = Depends(get_db)):
     return await views.user_skills(db, user)

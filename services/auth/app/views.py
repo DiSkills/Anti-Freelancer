@@ -65,7 +65,7 @@ async def is_freelancer(user: User = Depends(is_active)) -> User:
     """
 
     if not user.freelancer:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not freelancer')
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User not freelancer')
     return user
 
 
@@ -80,5 +80,5 @@ async def is_customer(user: User = Depends(is_active)) -> User:
     """
 
     if user.freelancer:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not customer')
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User not customer')
     return user
