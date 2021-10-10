@@ -4,7 +4,7 @@
 
 - [x] Last login
 - [x] Celery email send
-- [ ] Logger errors
+- [x] Logger errors in file
 - [x] Create superuser
 - [x] Get media
 - [x] Docker
