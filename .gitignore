@@ -4,3 +4,6 @@
 /services/auth/config.env
 /services/auth/media/
 *.log
+/services/main/.idea/
+/services/main/venv/
+/services/main/config.env
