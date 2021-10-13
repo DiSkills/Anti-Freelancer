@@ -45,3 +45,46 @@ async def get_categories(db: AsyncSession):
             ),
         } for category in await super_category_crud.all(db, limit=1000)
     )
+
+
+async def get_super_category(db: AsyncSession, pk: int) -> dict[str, typing.Any]:
+    """
+        Get super category
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Super category ID
+        :type pk: int
+        :return: Super category
+        :rtype: dict
+        :raise HTTPException 400: Super category not found
+    """
+
+    if not await super_category_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Super category not found')
+
+    category = await super_category_crud.get(db, id=pk)
+    return {
+        **category.__dict__,
+        'sub_categories': (
+            sub_category.__dict__ for sub_category in category.sub_categories
+        ),
+    }
+
+
+async def get_sub_category(db: AsyncSession, pk: int) -> dict[str, typing.Union[str, int]]:
+    """
+        Get sub category
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Sub category ID
+        :type pk: int
+        :return: Sub category
+        :rtype: dict
+        :raise HTTPException 400: Sub category not found
+    """
+
+    if not await sub_category_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Sub category not found')
+
+    category = await sub_category_crud.get(db, id=pk)
+    return category.__dict__

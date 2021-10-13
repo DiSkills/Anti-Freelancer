@@ -92,3 +92,49 @@ class CategoriesTestCase(BaseTest, TestCase):
                     ]
                 },
             ])
+
+        # Get super category
+        response = self.client.get(f'{self.url}/categories/sup/2')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            'id': 2,
+            'name': 'Design',
+            'super_category_id': None,
+            'sub_categories': [
+                {'id': 4, 'name': 'Web', 'super_category_id': 2},
+            ]
+        })
+
+        response = self.client.get(f'{self.url}/categories/sup/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            'id': 1,
+            'name': 'Programming',
+            'super_category_id': None,
+            'sub_categories': [
+                {'id': 2, 'name': 'C++', 'super_category_id': 1},
+                {'id': 3, 'name': 'JavaScript', 'super_category_id': 1},
+                {'id': 1, 'name': 'Python', 'super_category_id': 1},
+            ]
+        })
+
+        response = self.client.get(f'{self.url}/categories/sup/143')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Super category not found'})
+
+        # Get sub category
+        response = self.client.get(f'{self.url}/categories/sub/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'id': 1, 'name': 'Python', 'super_category_id': 1})
+
+        response = self.client.get(f'{self.url}/categories/sub/2')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'id': 2, 'name': 'C++', 'super_category_id': 1})
+
+        response = self.client.get(f'{self.url}/categories/sub/4')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'id': 4, 'name': 'Web', 'super_category_id': 2})
+
+        response = self.client.get(f'{self.url}/categories/sub/143')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Sub category not found'})
