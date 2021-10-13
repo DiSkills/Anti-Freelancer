@@ -7,6 +7,7 @@ from db import Base
 
 
 class SubCategory(Base):
+    """ Sub category """
 
     __tablename__ = 'subcategory'
 
@@ -25,6 +26,7 @@ class SubCategory(Base):
 
 
 class SuperCategory(Base):
+    """ Super category """
 
     __tablename__ = 'supercategory'
 

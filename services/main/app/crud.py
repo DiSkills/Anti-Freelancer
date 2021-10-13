@@ -4,10 +4,12 @@ from crud import CRUD
 
 
 class SuperCategoryCRUD(CRUD[SuperCategory, CreateCategory, SuperCategory]):
+    """ Super category CRUD """
     pass
 
 
 class SubCategoryCRUD(CRUD[SubCategory, CreateCategory, SubCategory]):
+    """ Sub category CRUD """
     pass
 
 
