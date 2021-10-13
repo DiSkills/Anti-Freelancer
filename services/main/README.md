@@ -9,23 +9,25 @@
   - [x] Is superuser
   - [x] Is customer
   - [x] Is freelancer
-- [ ] Categories
+- [x] Categories
   - [x] Get all categories
-  - [ ] Super categories
+  - [x] Super categories
     - [x] Create
     - [x] Get
     - [x] Update
-    - [ ] Delete
-  - [ ] Sub categories
+    - [x] Delete
+  - [x] Sub categories
     - [x] Create
     - [x] Get
     - [x] Update
-    - [ ] Delete
+    - [x] Delete
 - [ ] Tests
   - [x] Test get all categories
   - [x] Test create Super categories
   - [x] Test get Super categories
   - [x] Test update Super categories
+  - [x] Test delete Super categories
   - [x] Test create Sub categories
   - [x] Test get Sub categories
   - [x] Test update Sub categories
+  - [x] Test delete Sub categories
