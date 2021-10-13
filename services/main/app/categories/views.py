@@ -8,6 +8,16 @@ from app.crud import super_category_crud, sub_category_crud
 
 
 async def create_category(db: AsyncSession, schema: CreateCategory) -> dict[str, typing.Union[str, int]]:
+    """
+        Create category (super and sub)
+        :param db: DB
+        :type db: AsyncSession
+        :param schema: Category data
+        :type schema: CreateCategory
+        :return: New category data
+        :rtype: dict
+        :raise HTTPException 400: Super category not found
+    """
 
     if schema.super_category_id:
         if not await super_category_crud.exist(db, id=schema.super_category_id):
@@ -20,6 +30,12 @@ async def create_category(db: AsyncSession, schema: CreateCategory) -> dict[str,
 
 
 async def get_categories(db: AsyncSession):
+    """
+        Get all categories
+        :param db: DB
+        :type db: AsyncSession
+        :return: Categories
+    """
 
     return (
         {
