@@ -1,16 +1,17 @@
 [tool.poetry]
-name = "MainService"
+name = "Main Service Anti-Freelancer"
 version = "0.1.0"
 description = ""
-authors = ["_Counter021_"]
+authors = ["_Coutner021_"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-fastapi = {extras = ["all"], version = "^0.70.0"}
+fastapi = {version = "0.68.1", extras = ["all"]}
 psycopg2-binary = "^2.9.1"
-SQLAlchemy = {extras = ["asyncio"], version = "^1.4.25"}
+SQLAlchemy = {extras = ["asyncion"], version = "^1.4.25"}
 asyncpg = "^0.24.0"
 alembic = "^1.7.4"
+aiohttp = "^3.7.4"
 
 [tool.poetry.dev-dependencies]
 
