@@ -16,6 +16,12 @@ class GetCategory(CreateCategory):
     id: int
 
 
+class UpdateCategory(BaseModel):
+    """ Update category """
+
+    name: str
+
+
 class GetSuperCategory(GetCategory):
     """ Get super category """
 

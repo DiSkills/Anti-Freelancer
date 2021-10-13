@@ -14,16 +14,18 @@
   - [ ] Super categories
     - [x] Create
     - [x] Get
-    - [ ] Update
+    - [x] Update
     - [ ] Delete
   - [ ] Sub categories
     - [x] Create
     - [x] Get
-    - [ ] Update
+    - [x] Update
     - [ ] Delete
 - [ ] Tests
-  - [x] Get all categories
-  - [x] Create Super categories
-  - [x] Get Super categories
-  - [x] Create Sub categories
-  - [x] Get Sub categories
+  - [x] Test get all categories
+  - [x] Test create Super categories
+  - [x] Test get Super categories
+  - [x] Test update Super categories
+  - [x] Test create Sub categories
+  - [x] Test get Sub categories
+  - [x] Test update Sub categories

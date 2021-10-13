@@ -3,7 +3,7 @@ import typing
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.categories.schemas import CreateCategory
+from app.categories.schemas import CreateCategory, UpdateCategory
 from app.crud import super_category_crud, sub_category_crud
 
 
@@ -71,6 +71,32 @@ async def get_super_category(db: AsyncSession, pk: int) -> dict[str, typing.Any]
     }
 
 
+async def update_super_category(db: AsyncSession, schema: UpdateCategory, pk: int) -> dict[str, typing.Any]:
+    """
+        Update super category
+        :param db: DB
+        :type db: AsyncSession
+        :param schema: New data
+        :type schema: UpdateCategory
+        :param pk: Super category ID
+        :type pk: int
+        :return: Super category
+        :rtype: dict
+        :raise HTTPException 400: Super category not found
+    """
+
+    if not await super_category_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Super category not found')
+
+    category = await super_category_crud.update(db, {'id': pk}, **schema.dict())
+    return {
+        **category.__dict__,
+        'sub_categories': (
+            sub_category.__dict__ for sub_category in category.sub_categories
+        ),
+    }
+
+
 async def get_sub_category(db: AsyncSession, pk: int) -> dict[str, typing.Union[str, int]]:
     """
         Get sub category
@@ -87,4 +113,25 @@ async def get_sub_category(db: AsyncSession, pk: int) -> dict[str, typing.Union[
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Sub category not found')
 
     category = await sub_category_crud.get(db, id=pk)
+    return category.__dict__
+
+
+async def update_sub_category(db: AsyncSession, schema: UpdateCategory, pk: int) -> dict[str, typing.Union[str, int]]:
+    """
+        Update sub category
+        :param db: DB
+        :type db: AsyncSession
+        :param schema: Schema
+        :type schema: UpdateCategory
+        :param pk: Sub category ID
+        :type pk: int
+        :return: Sub category
+        :rtype: dict
+        :raise HTTPException 400: Sub category not found
+    """
+
+    if not await sub_category_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Sub category not found')
+
+    category = await sub_category_crud.update(db, {'id': pk}, **schema.dict())
     return category.__dict__
