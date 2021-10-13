@@ -2,7 +2,7 @@
 name = "Main Service Anti-Freelancer"
 version = "0.1.0"
 description = ""
-authors = ["_Coutner021_"]
+authors = ["_Counter021_"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
