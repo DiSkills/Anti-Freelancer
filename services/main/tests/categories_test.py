@@ -165,3 +165,32 @@ class CategoriesTestCase(BaseTest, TestCase):
         response = self.client.put(f'{self.url}/categories/sub/143', headers=headers, json={'name': 'Unity'})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Sub category not found'})
+
+        # Delete super category
+        self.assertEqual(len(async_loop(super_category_crud.all(self.session))), 2)
+        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 4)
+
+        response = self.client.delete(f'{self.url}/categories/sup/2', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Super category has been deleted'})
+        self.assertEqual(len(async_loop(super_category_crud.all(self.session))), 1)
+        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 3)
+
+        response = self.client.delete(f'{self.url}/categories/sup/143', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Super category not found'})
+        self.assertEqual(len(async_loop(super_category_crud.all(self.session))), 1)
+        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 3)
+
+        # Delete sub category
+        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 3)
+
+        response = self.client.delete(f'{self.url}/categories/sub/3', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {'msg': 'Sub category has been deleted'})
+        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 2)
+
+        response = self.client.delete(f'{self.url}/categories/sub/143', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Sub category not found'})
+        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 2)

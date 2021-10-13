@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.categories import views
 from app.categories.schemas import CreateCategory, GetCategory, GetSuperCategory, UpdateCategory
 from app.permission import is_superuser
+from app.schemas import Message
 from db import get_db
 
 categories_router = APIRouter()
@@ -63,6 +64,20 @@ async def update_super_category(pk: int, schema: UpdateCategory, db: AsyncSessio
     return await views.update_super_category(db, schema, pk)
 
 
+@categories_router.delete(
+    '/sup/{pk}',
+    name='Delete super category',
+    description='Delete super category',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['super-categories'],
+    dependencies=[Depends(is_superuser)],
+)
+async def delete_super_category(pk: int, db: AsyncSession = Depends(get_db)):
+    return await views.delete_super_category(db, pk)
+
+
 @categories_router.get(
     '/sub/{pk}',
     name='Get sub category',
@@ -88,3 +103,17 @@ async def get_sub_category(pk: int, db: AsyncSession = Depends(get_db)):
 )
 async def update_sub_category(pk: int, schema: UpdateCategory, db: AsyncSession = Depends(get_db)):
     return await views.update_sub_category(db, schema, pk)
+
+
+@categories_router.delete(
+    '/sub/{pk}',
+    name='Delete sub category',
+    description='Delete sub category',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['sub-categories'],
+    dependencies=[Depends(is_superuser)],
+)
+async def delete_sub_category(pk: int, db: AsyncSession = Depends(get_db)):
+    return await views.delete_sub_category(db, pk)

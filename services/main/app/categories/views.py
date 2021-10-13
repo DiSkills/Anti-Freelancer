@@ -97,6 +97,15 @@ async def update_super_category(db: AsyncSession, schema: UpdateCategory, pk: in
     }
 
 
+async def delete_super_category(db: AsyncSession, pk: int) -> dict[str, str]:
+
+    if not await super_category_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Super category not found')
+
+    await super_category_crud.remove(db, id=pk)
+    return {'msg': 'Super category has been deleted'}
+
+
 async def get_sub_category(db: AsyncSession, pk: int) -> dict[str, typing.Union[str, int]]:
     """
         Get sub category
@@ -135,3 +144,12 @@ async def update_sub_category(db: AsyncSession, schema: UpdateCategory, pk: int)
 
     category = await sub_category_crud.update(db, {'id': pk}, **schema.dict())
     return category.__dict__
+
+
+async def delete_sub_category(db: AsyncSession, pk: int) -> dict[str, str]:
+
+    if not await sub_category_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Sub category not found')
+
+    await sub_category_crud.remove(db, id=pk)
+    return {'msg': 'Sub category has been deleted'}
