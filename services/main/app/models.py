@@ -1,3 +1,4 @@
+import datetime
 import typing
 
 import sqlalchemy
@@ -42,3 +43,21 @@ class SuperCategory(Base):
 
     def __repr__(self):
         return f'<SuperCategory {self.name}>'
+
+
+class Job(Base):
+    """ Job """
+
+    __tablename__ = 'job'
+
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    title: str = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    description: str = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    price: int = sqlalchemy.Column(sqlalchemy.Integer, default=0, nullable=False)
+    order_date: datetime.datetime = sqlalchemy.Column(
+        sqlalchemy.DateTime, default=datetime.datetime.utcnow, nullable=False,
+    )
+
+    category_id: int = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('subcategory.id', ondelete='CASCADE'), nullable=False,
+    )

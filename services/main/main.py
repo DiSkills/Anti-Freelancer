@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.categories.routers import categories_router
+from app.jobs.routers import jobs_router
 from config import PROJECT_NAME, API
 
 app = FastAPI(
@@ -19,3 +20,4 @@ app.add_middleware(
 )
 
 app.include_router(categories_router, prefix=f'/{API}/categories')
+app.include_router(jobs_router, prefix=f'/{API}/jobs')

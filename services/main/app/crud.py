@@ -1,5 +1,5 @@
 from app.categories.schemas import CreateCategory, UpdateCategory
-from app.models import SuperCategory, SubCategory
+from app.models import SuperCategory, SubCategory, Job
 from crud import CRUD
 
 
@@ -13,5 +13,11 @@ class SubCategoryCRUD(CRUD[SubCategory, CreateCategory, UpdateCategory]):
     pass
 
 
+class JobCRUD(CRUD[Job, Job, Job]):
+    """ Job CRUD """
+    pass
+
+
 super_category_crud = SuperCategoryCRUD(SuperCategory)
 sub_category_crud = SubCategoryCRUD(SubCategory)
+job_crud = JobCRUD(Job)
