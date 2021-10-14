@@ -16,6 +16,7 @@ async def permission(url: str, token: str) -> dict:
         :type token: str
         :return: Json
         :rtype: dict
+        :raise HTTPException: Bad response
     """
 
     async with aiohttp.ClientSession() as session:
