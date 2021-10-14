@@ -21,6 +21,8 @@
     - [x] Get
     - [x] Update
     - [x] Delete
+  - [ ] Jobs
+    - [x] Create
 - [ ] Tests
   - [x] Test get all categories
   - [x] Test create Super categories
@@ -31,3 +33,4 @@
   - [x] Test get Sub categories
   - [x] Test update Sub categories
   - [x] Test delete Sub categories
+  - [x] Test create jobs
