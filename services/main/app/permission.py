@@ -1,5 +1,5 @@
 import aiohttp
-from fastapi import Security
+from fastapi import Security, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
 from config import SERVER_AUTH_BACKEND, API
@@ -22,7 +22,12 @@ async def permission(url: str, token: str) -> dict:
         response = await session.post(
             url=url, headers={'Authorization': f'Bearer {token}'},
         )
-    return await response.json()
+
+        json = await response.json()
+        if not response.ok:
+            raise HTTPException(status_code=response.status, detail=json['detail'])
+
+    return json
 
 
 async def is_authenticated(token: str = Security(reusable_oauth2)) -> dict:
