@@ -21,8 +21,15 @@
     - [x] Get
     - [x] Update
     - [x] Delete
-  - [ ] Jobs
-    - [x] Create
+- [ ] Jobs
+  - [x] Create
+  - [ ] Get all
+  - [ ] Get for categories
+  - [ ] Get
+  - [ ] Select executor
+  - [ ] Completed
+  - [ ] Update
+  - [ ] Delete
 - [ ] Tests
   - [x] Test get all categories
   - [x] Test create Super categories
