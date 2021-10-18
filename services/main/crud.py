@@ -112,7 +112,9 @@ class CRUD(typing.Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         query = await db.execute(
             sqlalchemy.exists(
-                sqlalchemy.select(self.__model.id).filter_by(**kwargs).order_by(self.__model.id.desc()).offset(skip).limit(limit)
+                sqlalchemy.select(self.__model.id).filter_by(**kwargs).order_by(
+                    self.__model.id.desc()
+                ).offset(skip).limit(limit)
             ).select()
         )
         return query.scalar()
