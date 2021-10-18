@@ -25,6 +25,7 @@
   - [x] Create
   - [ ] Get all
   - [ ] Get for categories
+  - [ ] Get for keywords
   - [ ] Get
   - [ ] Select executor
   - [ ] Completed

@@ -93,104 +93,104 @@ class CategoriesTestCase(BaseTest, TestCase):
                 },
             ])
 
-        # Get super category
-        response = self.client.get(f'{self.url}/categories/sup/2')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
-            'id': 2,
-            'name': 'Design',
-            'super_category_id': None,
-            'sub_categories': [
-                {'id': 4, 'name': 'Web', 'super_category_id': 2},
-            ]
-        })
+            # Get super category
+            response = self.client.get(f'{self.url}/categories/sup/2')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {
+                'id': 2,
+                'name': 'Design',
+                'super_category_id': None,
+                'sub_categories': [
+                    {'id': 4, 'name': 'Web', 'super_category_id': 2},
+                ]
+            })
 
-        response = self.client.get(f'{self.url}/categories/sup/1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
-            'id': 1,
-            'name': 'Programming',
-            'super_category_id': None,
-            'sub_categories': [
-                {'id': 2, 'name': 'C++', 'super_category_id': 1},
-                {'id': 3, 'name': 'JavaScript', 'super_category_id': 1},
-                {'id': 1, 'name': 'Python', 'super_category_id': 1},
-            ]
-        })
+            response = self.client.get(f'{self.url}/categories/sup/1')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {
+                'id': 1,
+                'name': 'Programming',
+                'super_category_id': None,
+                'sub_categories': [
+                    {'id': 2, 'name': 'C++', 'super_category_id': 1},
+                    {'id': 3, 'name': 'JavaScript', 'super_category_id': 1},
+                    {'id': 1, 'name': 'Python', 'super_category_id': 1},
+                ]
+            })
 
-        response = self.client.get(f'{self.url}/categories/sup/143')
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {'detail': 'Super category not found'})
+            response = self.client.get(f'{self.url}/categories/sup/143')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Super category not found'})
 
-        # Get sub category
-        response = self.client.get(f'{self.url}/categories/sub/1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'id': 1, 'name': 'Python', 'super_category_id': 1})
+            # Get sub category
+            response = self.client.get(f'{self.url}/categories/sub/1')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'id': 1, 'name': 'Python', 'super_category_id': 1})
 
-        response = self.client.get(f'{self.url}/categories/sub/2')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'id': 2, 'name': 'C++', 'super_category_id': 1})
+            response = self.client.get(f'{self.url}/categories/sub/2')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'id': 2, 'name': 'C++', 'super_category_id': 1})
 
-        response = self.client.get(f'{self.url}/categories/sub/4')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'id': 4, 'name': 'Web', 'super_category_id': 2})
+            response = self.client.get(f'{self.url}/categories/sub/4')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'id': 4, 'name': 'Web', 'super_category_id': 2})
 
-        response = self.client.get(f'{self.url}/categories/sub/143')
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {'detail': 'Sub category not found'})
+            response = self.client.get(f'{self.url}/categories/sub/143')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Sub category not found'})
 
-        # Update super category
-        response = self.client.put(f'{self.url}/categories/sup/2', headers=headers, json={'name': 'Game development'})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
-            'id': 2,
-            'name': 'Game development',
-            'super_category_id': None,
-            'sub_categories': [
-                {'id': 4, 'name': 'Web', 'super_category_id': 2},
-            ]
-        })
-        self.assertEqual(async_loop(super_category_crud.get(self.session, id=2)).name, 'Game development')
+            # Update super category
+            response = self.client.put(f'{self.url}/categories/sup/2', headers=headers, json={'name': 'Game development'})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {
+                'id': 2,
+                'name': 'Game development',
+                'super_category_id': None,
+                'sub_categories': [
+                    {'id': 4, 'name': 'Web', 'super_category_id': 2},
+                ]
+            })
+            self.assertEqual(async_loop(super_category_crud.get(self.session, id=2)).name, 'Game development')
 
-        response = self.client.put(f'{self.url}/categories/sup/143', headers=headers, json={'name': 'Game development'})
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {'detail': 'Super category not found'})
+            response = self.client.put(f'{self.url}/categories/sup/143', headers=headers, json={'name': 'Game development'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Super category not found'})
 
-        # Update sub category
-        response = self.client.put(f'{self.url}/categories/sub/4', headers=headers, json={'name': 'Unity'})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'id': 4, 'name': 'Unity', 'super_category_id': 2})
-        self.assertEqual(async_loop(sub_category_crud.get(self.session, id=4)).name, 'Unity')
+            # Update sub category
+            response = self.client.put(f'{self.url}/categories/sub/4', headers=headers, json={'name': 'Unity'})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'id': 4, 'name': 'Unity', 'super_category_id': 2})
+            self.assertEqual(async_loop(sub_category_crud.get(self.session, id=4)).name, 'Unity')
 
-        response = self.client.put(f'{self.url}/categories/sub/143', headers=headers, json={'name': 'Unity'})
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {'detail': 'Sub category not found'})
+            response = self.client.put(f'{self.url}/categories/sub/143', headers=headers, json={'name': 'Unity'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Sub category not found'})
 
-        # Delete super category
-        self.assertEqual(len(async_loop(super_category_crud.all(self.session))), 2)
-        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 4)
+            # Delete super category
+            self.assertEqual(len(async_loop(super_category_crud.all(self.session))), 2)
+            self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 4)
 
-        response = self.client.delete(f'{self.url}/categories/sup/2', headers=headers)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'msg': 'Super category has been deleted'})
-        self.assertEqual(len(async_loop(super_category_crud.all(self.session))), 1)
-        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 3)
+            response = self.client.delete(f'{self.url}/categories/sup/2', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Super category has been deleted'})
+            self.assertEqual(len(async_loop(super_category_crud.all(self.session))), 1)
+            self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 3)
 
-        response = self.client.delete(f'{self.url}/categories/sup/143', headers=headers)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {'detail': 'Super category not found'})
-        self.assertEqual(len(async_loop(super_category_crud.all(self.session))), 1)
-        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 3)
+            response = self.client.delete(f'{self.url}/categories/sup/143', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Super category not found'})
+            self.assertEqual(len(async_loop(super_category_crud.all(self.session))), 1)
+            self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 3)
 
-        # Delete sub category
-        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 3)
+            # Delete sub category
+            self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 3)
 
-        response = self.client.delete(f'{self.url}/categories/sub/3', headers=headers)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {'msg': 'Sub category has been deleted'})
-        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 2)
+            response = self.client.delete(f'{self.url}/categories/sub/3', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Sub category has been deleted'})
+            self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 2)
 
-        response = self.client.delete(f'{self.url}/categories/sub/143', headers=headers)
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {'detail': 'Sub category not found'})
-        self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 2)
+            response = self.client.delete(f'{self.url}/categories/sub/143', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Sub category not found'})
+            self.assertEqual(len(async_loop(sub_category_crud.all(self.session))), 2)
