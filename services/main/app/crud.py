@@ -22,7 +22,7 @@ class JobCRUD(CRUD[Job, Job, Job]):
     @staticmethod
     async def all_for_category(db: AsyncSession, category_id: int, skip: int = 0, limit: int = 100) -> list[Job]:
         """
-            All
+            All for category
             :param db: DB
             :type db: AsyncSession
             :param category_id: ID category

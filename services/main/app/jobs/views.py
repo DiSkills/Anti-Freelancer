@@ -53,7 +53,7 @@ async def get_all_jobs(*, db: AsyncSession, page: int, page_size: int, queryset:
 @paginate(job_crud.all_for_category, job_crud.exist_page, f'{SERVER_MAIN_BACKEND}{API}/jobs/category', 'category_id')
 async def get_all_jobs_for_category(*, db: AsyncSession, queryset: list[Job], page: int, page_size: int, category_id: int):
     """
-        Get all from category
+        Get all for category
         :param db: DB
         :type db: AsyncSession
         :param queryset: Queryset
