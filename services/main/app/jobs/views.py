@@ -51,12 +51,14 @@ async def get_all_jobs(*, db: AsyncSession, page: int, page_size: int, queryset:
 
 
 @paginate(job_crud.all_for_category, job_crud.exist_page, f'{SERVER_MAIN_BACKEND}{API}/jobs/category', 'category_id')
-async def get_all_jobs_for_category(*, db: AsyncSession, queryset: list[Job], page: int, page_size: int, category_id: int):
+async def get_all_jobs_for_category(
+        *, db: AsyncSession, queryset: list[Job], page: int, page_size: int, category_id: int,
+):
     """
         Get all for category
         :param db: DB
         :type db: AsyncSession
-        :param queryset: Queryset
+        :param queryset: Jobs
         :type queryset: list
         :param page: Page
         :type page: int
@@ -64,6 +66,25 @@ async def get_all_jobs_for_category(*, db: AsyncSession, queryset: list[Job], pa
         :type page_size: int
         :param category_id: Category ID
         :type category_id: int
+        :return: Jobs
+    """
+    return (job.__dict__ for job in queryset)
+
+
+@paginate(job_crud.search, job_crud.search_exist, f'{SERVER_MAIN_BACKEND}{API}/jobs/search', 'search')
+async def search_jobs(*, db: AsyncSession, page: int, page_size: int, search: str, queryset: list[Job]):
+    """
+        Search jobs
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param search: Search
+        :type search: str
+        :param queryset: Jobs
+        :type queryset: list
         :return: Jobs
     """
     return (job.__dict__ for job in queryset)

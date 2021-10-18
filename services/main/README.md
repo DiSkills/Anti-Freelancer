@@ -25,7 +25,7 @@
   - [x] Create
   - [x] Get all
   - [x] Get for categories
-  - [ ] Get for keywords
+  - [x] Search
   - [ ] Get
   - [ ] Select executor
   - [ ] Completed
@@ -44,3 +44,4 @@
   - [x] Test create jobs
   - [x] Test get all jobs
   - [x] Test get for categories
+  - [x] Test search

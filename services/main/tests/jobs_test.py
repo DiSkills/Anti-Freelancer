@@ -86,21 +86,21 @@ class JobsTestCase(BaseTest, TestCase):
 
             # Get all
             self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'Web site',
+                'title': 'Django',
                 'description': 'Web site',
                 'price': 5000,
                 'order_date': f'{now}Z',
                 'category_id': 2,
             })
             self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'Web site',
+                'title': 'Python',
                 'description': 'Web site',
                 'price': 5000,
                 'order_date': f'{now}Z',
                 'category_id': 2,
             })
             self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'Web site',
+                'title': 'FastAPI',
                 'description': 'Web site',
                 'price': 5000,
                 'order_date': f'{now}Z',
@@ -218,5 +218,82 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.json(), {'detail': 'Results not found'})
 
             response = self.client.get(f'{self.url}/jobs/category?page=2&page_size=2&category_id=143')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+            # Search
+            response = self.client.get(f'{self.url}/jobs/search?page=1&page_size=1&search=web')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json()['next'],
+                f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/search?page=2&page_size=1&search=web'
+            )
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(response.json()['results'][0]['id'], 4)
+            self.assertEqual(len(response.json()['results']), 1)
+
+            response = self.client.get(f'{self.url}/jobs/search?page=2&page_size=1&search=web')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json()['next'],
+                f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/search?page=3&page_size=1&search=web'
+            )
+            self.assertEqual(
+                response.json()['previous'],
+                f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/search?page=1&page_size=1&search=web'
+            )
+            self.assertEqual(response.json()['page'], 2)
+            self.assertEqual(response.json()['results'][0]['id'], 3)
+            self.assertEqual(len(response.json()['results']), 1)
+
+            response = self.client.get(f'{self.url}/jobs/search?page=4&page_size=1&search=web')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['next'], None)
+            self.assertEqual(
+                response.json()['previous'],
+                f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/search?page=3&page_size=1&search=web'
+            )
+            self.assertEqual(response.json()['page'], 4)
+            self.assertEqual(response.json()['results'][0]['id'], 1)
+            self.assertEqual(len(response.json()['results']), 1)
+
+            response = self.client.get(f'{self.url}/jobs/search?page=1&page_size=4&search=web')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['next'], None)
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(response.json()['results'][0]['id'], 4)
+            self.assertEqual(len(response.json()['results']), 4)
+
+            response = self.client.get(f'{self.url}/jobs/search?page=1&page_size=1&search=FastApi')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['next'], None)
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(response.json()['results'][0]['id'], 4)
+            self.assertEqual(len(response.json()['results']), 1)
+
+            response = self.client.get(f'{self.url}/jobs/search?page=1&page_size=1&search=Python')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['next'], None)
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(response.json()['results'][0]['id'], 3)
+            self.assertEqual(len(response.json()['results']), 1)
+
+            response = self.client.get(f'{self.url}/jobs/search?page=2&page_size=1&search=Python')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+            response = self.client.get(f'{self.url}/jobs/search?page=1&page_size=1&search=djangO')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['next'], None)
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(response.json()['results'][0]['id'], 2)
+            self.assertEqual(len(response.json()['results']), 1)
+
+            response = self.client.get(f'{self.url}/jobs/search?page=1&page_size=1&search=Hello World!')
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Results not found'})
