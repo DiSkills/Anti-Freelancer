@@ -23,7 +23,7 @@
     - [x] Delete
 - [ ] Jobs
   - [x] Create
-  - [ ] Get all
+  - [x] Get all
   - [ ] Get for categories
   - [ ] Get for keywords
   - [ ] Get
@@ -42,3 +42,4 @@
   - [x] Test update Sub categories
   - [x] Test delete Sub categories
   - [x] Test create jobs
+  - [x] Test get all jobs

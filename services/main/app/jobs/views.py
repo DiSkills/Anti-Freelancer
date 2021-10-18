@@ -6,6 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import sub_category_crud, job_crud
 from app.jobs.schemas import CreateJob
+from app.models import Job
+from app.service import paginate
+from config import SERVER_MAIN_BACKEND, API
 
 
 async def create_job(db: AsyncSession, schema: CreateJob) -> dict[str, typing.Any]:
@@ -28,3 +31,20 @@ async def create_job(db: AsyncSession, schema: CreateJob) -> dict[str, typing.An
         **{**schema.dict(), 'order_date': datetime.datetime.utcfromtimestamp(schema.order_date.timestamp())},
     )
     return job.__dict__
+
+
+@paginate(job_crud, f'{SERVER_MAIN_BACKEND}{API}/jobs/')
+async def get_all_jobs(*, db: AsyncSession, page: int, page_size: int, queryset: list[Job]):
+    """
+        Get all jobs
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param queryset: Jobs
+        :type queryset: list
+        :return: Jobs
+    """
+    return (job.__dict__ for job in queryset)

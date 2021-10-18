@@ -2,6 +2,8 @@ import datetime
 
 from pydantic import BaseModel, Field, validator
 
+from app.schemas import Paginate
+
 
 class CreateJob(BaseModel):
 
@@ -42,3 +44,9 @@ class GetJob(BaseModel):
     def validate_order_date(cls, order_date: datetime.datetime):
         """ Validate order date """
         return f'{order_date}Z'.replace(' ', 'T')
+
+
+class JobsPaginate(Paginate):
+    """ Jobs paginate """
+
+    results: list[GetJob]

@@ -1,7 +1,8 @@
 import datetime
 from unittest import TestCase, mock
 
-from app.crud import super_category_crud, sub_category_crud, job_crud
+from app.crud import job_crud
+from config import SERVER_MAIN_BACKEND
 from tests import BaseTest, async_loop
 
 
@@ -79,3 +80,68 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.json()['detail'][0]['msg'], 'Date can\'t be past')
 
             self.assertEqual(len(async_loop(job_crud.all(self.session))), 1)
+
+            # Get all
+            self.client.post(f'{self.url}/jobs/', headers=headers, json={
+                'title': 'Web site',
+                'description': 'Web site',
+                'price': 5000,
+                'order_date': f'{now}Z',
+                'category_id': 1,
+            })
+            self.client.post(f'{self.url}/jobs/', headers=headers, json={
+                'title': 'Web site',
+                'description': 'Web site',
+                'price': 5000,
+                'order_date': f'{now}Z',
+                'category_id': 1,
+            })
+            self.client.post(f'{self.url}/jobs/', headers=headers, json={
+                'title': 'Web site',
+                'description': 'Web site',
+                'price': 5000,
+                'order_date': f'{now}Z',
+                'category_id': 1,
+            })
+
+            response = self.client.get(f'{self.url}/jobs/?page=1&page_size=1')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json()['next'], f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/?page=2&page_size=1'
+            )
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(len(response.json()['results']), 1)
+
+            response = self.client.get(f'{self.url}/jobs/?page=2&page_size=1')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json()['next'], f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/?page=3&page_size=1'
+            )
+            self.assertEqual(
+                response.json()['previous'], f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/?page=1&page_size=1'
+            )
+            self.assertEqual(response.json()['page'], 2)
+            self.assertEqual(len(response.json()['results']), 1)
+
+            response = self.client.get(f'{self.url}/jobs/?page=4&page_size=1')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json()['next'], None
+            )
+            self.assertEqual(
+                response.json()['previous'], f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/?page=3&page_size=1'
+            )
+            self.assertEqual(response.json()['page'], 4)
+            self.assertEqual(len(response.json()['results']), 1)
+
+            response = self.client.get(f'{self.url}/jobs/?page=1&page_size=10')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['next'], None)
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(len(response.json()['results']), 4)
+
+            response = self.client.get(f'{self.url}/jobs/?page=143&page_size=10')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Results not found'})
