@@ -20,7 +20,7 @@ class JobCRUD(CRUD[Job, Job, Job]):
     """ Job CRUD """
 
     @staticmethod
-    async def all_from_category(db: AsyncSession, category_id: int, skip: int = 0, limit: int = 100) -> list[Job]:
+    async def all_for_category(db: AsyncSession, category_id: int, skip: int = 0, limit: int = 100) -> list[Job]:
         """
             All
             :param db: DB
