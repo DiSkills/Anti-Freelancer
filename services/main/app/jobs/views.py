@@ -33,7 +33,7 @@ async def create_job(db: AsyncSession, schema: CreateJob) -> dict[str, typing.An
     return job.__dict__
 
 
-@paginate(job_crud, f'{SERVER_MAIN_BACKEND}{API}/jobs/')
+@paginate(job_crud.all, job_crud.exist_page, f'{SERVER_MAIN_BACKEND}{API}/jobs/')
 async def get_all_jobs(*, db: AsyncSession, page: int, page_size: int, queryset: list[Job]):
     """
         Get all jobs
@@ -45,6 +45,25 @@ async def get_all_jobs(*, db: AsyncSession, page: int, page_size: int, queryset:
         :type page_size: int
         :param queryset: Jobs
         :type queryset: list
+        :return: Jobs
+    """
+    return (job.__dict__ for job in queryset)
+
+
+@paginate(job_crud.all_from_category, job_crud.exist_page, f'{SERVER_MAIN_BACKEND}{API}/jobs/category', 'category_id')
+async def get_all_from_category(*, db: AsyncSession, queryset: list[Job], page: int, page_size: int, category_id: int):
+    """
+        Get all from category
+        :param db: DB
+        :type db: AsyncSession
+        :param queryset: Queryset
+        :type queryset: list
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param category_id: Category ID
+        :type category_id: int
         :return: Jobs
     """
     return (job.__dict__ for job in queryset)

@@ -3,17 +3,16 @@ import typing
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crud import CRUD
 
-
-def paginate(crud: CRUD, url: str):
+def paginate(get_function, exist_function, url: str, *filter_params):
     """
         Paginate
-        :param crud: CRUD
-        :type crud: CRUD
+        :param get_function: Get function
+        :param exist_function: Exist function
         :param url: URL
         :type url: str
-        :return: Generator
+        :param filter_params: Filter params
+        :return: Paginate wrapper
     """
 
     def paginate_wrapper(function):
@@ -40,7 +39,9 @@ def paginate(crud: CRUD, url: str):
             """
 
             skip: int = page_size * (page - 1)
-            queryset = await crud.all(db, skip, page_size)
+            queryset: list = await get_function(
+                db=db, skip=skip, limit=page_size, **{param: kwargs[param] for param in filter_params}
+            )
 
             if not queryset:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Results not found')
@@ -48,11 +49,17 @@ def paginate(crud: CRUD, url: str):
             next_page: typing.Optional[str] = None
             previous_page: typing.Optional[str] = None
 
-            if await crud.exist_page(db, skip + page_size, page_size):
+            if await exist_function(
+                    db=db, skip=skip + page_size, limit=page_size, **{param: kwargs[param] for param in filter_params}
+            ):
                 next_page = f'{url}?page={page + 1}&page_size={page_size}'
+                for param in filter_params:
+                    next_page += f'&{param}={kwargs[param]}'
 
             if (page - 1) > 0:
                 previous_page = f'{url}?page={page - 1}&page_size={page_size}'
+                for param in filter_params:
+                    previous_page += f'&{param}={kwargs[param]}'
 
             return {
                 'next': next_page,

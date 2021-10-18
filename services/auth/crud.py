@@ -87,7 +87,7 @@ class CRUD(typing.Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             :param db: DB
             :type db: AsyncSession
             :param skip: Skip
-            :type self: int
+            :type skip: int
             :param limit: Limit
             :type limit: int
             :return: Instances

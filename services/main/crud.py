@@ -87,7 +87,7 @@ class CRUD(typing.Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             :param db: DB
             :type db: AsyncSession
             :param skip: Skip
-            :type self: int
+            :type skip: int
             :param limit: Limit
             :type limit: int
             :return: Instances
@@ -98,7 +98,7 @@ class CRUD(typing.Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         )
         return query.scalars().all()
 
-    async def exist_page(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> bool:
+    async def exist_page(self, db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> bool:
         """
             Exist page?
             :param db: DB
@@ -112,7 +112,7 @@ class CRUD(typing.Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         query = await db.execute(
             sqlalchemy.exists(
-                sqlalchemy.select(self.__model.id).order_by(self.__model.id.desc()).offset(skip).limit(limit)
+                sqlalchemy.select(self.__model.id).filter_by(**kwargs).order_by(self.__model.id.desc()).offset(skip).limit(limit)
             ).select()
         )
         return query.scalar()
