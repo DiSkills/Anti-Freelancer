@@ -39,6 +39,8 @@ class GetJob(BaseModel):
     price: int
     order_date: datetime.datetime
     category_id: int
+    customer_id: int
+    completed: bool
 
     @validator('order_date')
     def validate_order_date(cls, order_date: datetime.datetime):

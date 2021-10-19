@@ -9,7 +9,7 @@ from tests import BaseTest, async_loop
 class JobsTestCase(BaseTest, TestCase):
 
     def test_jobs(self):
-        with mock.patch('app.permission.permission', return_value={'user_id': 1}) as _:
+        with mock.patch('app.permission.permission', return_value=1) as _:
             headers = {'Authorization': 'Bearer Token'}
 
             self.assertEqual(len(async_loop(job_crud.all(self.session))), 0)
@@ -34,6 +34,8 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.json(), {
                 'id': 1,
+                'customer_id': 1,
+                'completed': False,
                 'title': 'Web site',
                 'description': 'Web site',
                 'price': 5000,
@@ -297,3 +299,43 @@ class JobsTestCase(BaseTest, TestCase):
             response = self.client.get(f'{self.url}/jobs/search?page=1&page_size=1&search=Hello World!')
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+            # Get job
+            with mock.patch('app.permission.permission', return_value=2) as _:
+                headers = {'Authorization': 'Bearer Token'}
+                self.client.post(f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'PyCharm',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 1,
+                })
+            response = self.client.get(f'{self.url}/jobs/1')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {
+                'id': 1,
+                'title': 'Web site',
+                'description': 'Web site',
+                'price': 5000,
+                'order_date': f'{now}Z'.replace(' ', 'T'),
+                'category_id': 1,
+                'customer_id': 1,
+                'completed': False,
+            })
+
+            response = self.client.get(f'{self.url}/jobs/5')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {
+                'id': 5,
+                'title': 'PyCharm',
+                'description': 'Web site',
+                'price': 5000,
+                'order_date': f'{now}Z'.replace(' ', 'T'),
+                'category_id': 1,
+                'customer_id': 2,
+                'completed': False,
+            })
+
+            response = self.client.get(f'{self.url}/jobs/143')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job not found'})

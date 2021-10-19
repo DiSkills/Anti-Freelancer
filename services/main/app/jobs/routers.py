@@ -17,10 +17,9 @@ jobs_router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     response_model=GetJob,
     tags=['jobs'],
-    dependencies=[Depends(is_customer)],
 )
-async def create_job(schema: CreateJob, db: AsyncSession = Depends(get_db)):
-    return await views.create_job(db, schema)
+async def create_job(schema: CreateJob, customer_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)):
+    return await views.create_job(db, schema, customer_id)
 
 
 @jobs_router.get(
@@ -74,3 +73,16 @@ async def search_jobs(
         db: AsyncSession = Depends(get_db),
 ):
     return await views.search_jobs(db=db, page=page, page_size=page_size, search=search)
+
+
+@jobs_router.get(
+    '/{pk}',
+    name='Get job',
+    description='Get job',
+    response_description='Job',
+    status_code=status.HTTP_200_OK,
+    response_model=GetJob,
+    tags=['jobs'],
+)
+async def get_job(pk: int, db: AsyncSession = Depends(get_db)):
+    return await views.get_job(db, pk)

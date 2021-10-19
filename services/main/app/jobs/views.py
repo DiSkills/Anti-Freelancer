@@ -11,13 +11,15 @@ from app.service import paginate
 from config import SERVER_MAIN_BACKEND, API
 
 
-async def create_job(db: AsyncSession, schema: CreateJob) -> dict[str, typing.Any]:
+async def create_job(db: AsyncSession, schema: CreateJob, customer_id: int) -> dict[str, typing.Any]:
     """
         Create job
         :param db: DB
         :type db: AsyncSession
         :param schema: Job data
         :type schema: CreateJob
+        :param customer_id: Customer ID
+        :type customer_id: int
         :return: New job
         :rtype: dict
         :raise HTTPException 400: Category not found
@@ -29,6 +31,7 @@ async def create_job(db: AsyncSession, schema: CreateJob) -> dict[str, typing.An
     job = await job_crud.create(
         db,
         **{**schema.dict(), 'order_date': datetime.datetime.utcfromtimestamp(schema.order_date.timestamp())},
+        customer_id=customer_id,
     )
     return job.__dict__
 
@@ -88,3 +91,22 @@ async def search_jobs(*, db: AsyncSession, page: int, page_size: int, search: st
         :return: Jobs
     """
     return (job.__dict__ for job in queryset)
+
+
+async def get_job(db: AsyncSession, pk: int) -> dict[str, typing.Any]:
+    """
+        Get job
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Job ID
+        :type pk: int
+        :return: Job
+        :rtype: dict
+        :raise HTTPException 400: Job not found
+    """
+
+    if not await job_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job not found')
+
+    job = await job_crud.get(db, id=pk)
+    return job.__dict__

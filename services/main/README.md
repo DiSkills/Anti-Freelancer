@@ -26,7 +26,7 @@
   - [x] Get all
   - [x] Get for categories
   - [x] Search
-  - [ ] Get
+  - [x] Get
   - [ ] Select executor
   - [ ] Completed
   - [ ] Update
@@ -43,5 +43,6 @@
   - [x] Test delete Sub categories
   - [x] Test create jobs
   - [x] Test get all jobs
-  - [x] Test get for categories
-  - [x] Test search
+  - [x] Test get jobs for categories
+  - [x] Test search jobs
+  - [x] Test get jobs

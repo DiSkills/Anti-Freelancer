@@ -7,7 +7,7 @@ from tests import BaseTest, async_loop
 class CategoriesTestCase(BaseTest, TestCase):
 
     def test_categories(self):
-        with mock.patch('app.permission.permission', return_value={'user_id': 1}) as _:
+        with mock.patch('app.permission.permission', return_value=1) as _:
             headers = {'Authorization': 'Bearer Token'}
 
             # Create

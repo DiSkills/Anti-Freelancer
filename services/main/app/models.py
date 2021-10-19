@@ -57,6 +57,8 @@ class Job(Base):
     order_date: datetime.datetime = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.utcnow, nullable=False,
     )
+    customer_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    completed: bool = sqlalchemy.Column(sqlalchemy.Boolean, default=False, nullable=False)
 
     category_id: int = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('subcategory.id', ondelete='CASCADE'), nullable=False,
