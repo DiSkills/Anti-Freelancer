@@ -27,10 +27,13 @@
   - [x] Get for categories
   - [x] Search
   - [x] Get
+  - [ ] Add / remove attachments
   - [ ] Select executor
   - [ ] Completed
-  - [ ] Update
-  - [ ] Delete
+  - [ ] Get completed jobs for user
+  - [ ] Update (owner)
+  - [ ] Update (admin)
+  - [ ] Delete (admin)
 - [ ] Tests
   - [x] Test get all categories
   - [x] Test create Super categories
