@@ -37,6 +37,7 @@ class JobsTestCase(BaseTest, TestCase):
                 'customer_id': 1,
                 'completed': False,
                 'title': 'Web site',
+                'executor_id': None,
                 'description': 'Web site',
                 'price': 5000,
                 'order_date': f'{now}Z'.replace(' ', 'T'),
@@ -313,6 +314,7 @@ class JobsTestCase(BaseTest, TestCase):
             response = self.client.get(f'{self.url}/jobs/1')
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.json(), {
+                'executor_id': None,
                 'id': 1,
                 'title': 'Web site',
                 'description': 'Web site',
@@ -326,6 +328,7 @@ class JobsTestCase(BaseTest, TestCase):
             response = self.client.get(f'{self.url}/jobs/5')
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.json(), {
+                'executor_id': None,
                 'id': 5,
                 'title': 'PyCharm',
                 'description': 'Web site',
@@ -393,6 +396,7 @@ class JobsTestCase(BaseTest, TestCase):
                 response = self.client.put(f'{self.url}/jobs/select-executor/1?user_id=2', headers=headers)
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.json(), {
+                    'executor_id': 1,
                     'id': 1,
                     'title': 'Web site',
                     'description': 'Web site',

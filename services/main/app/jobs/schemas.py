@@ -1,4 +1,5 @@
 import datetime
+import typing
 
 from pydantic import BaseModel, Field, validator
 
@@ -40,6 +41,7 @@ class GetJob(BaseModel):
     order_date: datetime.datetime
     category_id: int
     customer_id: int
+    executor_id: typing.Optional[int]
     completed: bool
 
     @validator('order_date')
