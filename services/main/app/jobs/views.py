@@ -4,6 +4,7 @@ import typing
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import requests
 from app.crud import sub_category_crud, job_crud
 from app.jobs.schemas import CreateJob
 from app.models import Job
@@ -109,4 +110,50 @@ async def get_job(db: AsyncSession, pk: int) -> dict[str, typing.Any]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job not found')
 
     job = await job_crud.get(db, id=pk)
+    return job.__dict__
+
+
+async def select_executor(db: AsyncSession, pk: int, user_id: int, owner_id: int) -> dict:
+    """
+        Select executor
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Job ID
+        :type pk: int
+        :param user_id: Executor ID
+        :type user_id: int
+        :param owner_id: Owner ID
+        :type owner_id: int
+        :return: Job
+        :rtype: dict
+        :raise HTTPException 400: Job not found
+        :raise HTTPException 400: Job is completed
+        :raise HTTPException 400: Executor already appointed
+        :raise HTTPException 400: User not owner this job
+        :raise HTTPException 400: User cannot fulfill your order
+        :raise HTTPException 400: Executor not freelancer
+    """
+
+    if not await job_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job not found')
+    job = await job_crud.get(db, id=pk)
+
+    if job.completed:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job is completed')
+
+    if job.executor_id is not None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Executor already appointed')
+
+    if job.customer_id != owner_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You not owner this job')
+
+    if user_id == job.customer_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You cannot fulfill your order')
+
+    executor_data: dict = await requests.get_user(user_id)
+
+    if not executor_data['freelancer']:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Executor not freelancer')
+
+    job = await job_crud.update(db, {'id': pk}, executor_id=executor_data['id'])
     return job.__dict__

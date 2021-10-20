@@ -339,3 +339,70 @@ class JobsTestCase(BaseTest, TestCase):
             response = self.client.get(f'{self.url}/jobs/143')
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Job not found'})
+
+            # Select executor
+            response = self.client.put(f'{self.url}/jobs/select-executor/143?user_id=2', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job not found'})
+
+            async_loop(job_crud.update(self.session, {'id': 2}, completed=True))
+            async_loop(self.session.commit())
+            response = self.client.put(f'{self.url}/jobs/select-executor/2?user_id=2', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job is completed'})
+
+            with mock.patch('app.permission.permission', return_value=2) as _:
+                response = self.client.put(f'{self.url}/jobs/select-executor/1?user_id=2', headers=headers)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'You not owner this job'})
+
+            response = self.client.put(f'{self.url}/jobs/select-executor/1?user_id=1', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'You cannot fulfill your order'})
+
+            fake_user = {
+                'username': 'string',
+                'email': 'user@example.com',
+                'about': 'string',
+                'id': 1,
+                'date_joined': '2021-10-20T13:16:37.732Z',
+                'last_login': '2021-10-20T13:16:37.732Z',
+                'avatar': '',
+                'freelancer': False,
+                'skills': [],
+                'github': 'string'
+            }
+            with mock.patch('app.requests.get_user', return_value=fake_user) as _:
+                response = self.client.put(f'{self.url}/jobs/select-executor/1?user_id=2', headers=headers)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Executor not freelancer'})
+
+            fake_user = {
+                'username': 'string',
+                'email': 'user@example.com',
+                'about': 'string',
+                'id': 1,
+                'date_joined': '2021-10-20T13:16:37.732Z',
+                'last_login': '2021-10-20T13:16:37.732Z',
+                'avatar': '',
+                'freelancer': True,
+                'skills': [],
+                'github': 'string'
+            }
+            with mock.patch('app.requests.get_user', return_value=fake_user) as _:
+                response = self.client.put(f'{self.url}/jobs/select-executor/1?user_id=2', headers=headers)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json(), {
+                    'id': 1,
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z'.replace(' ', 'T'),
+                    'category_id': 1,
+                    'customer_id': 1,
+                    'completed': False
+                })
+
+                response = self.client.put(f'{self.url}/jobs/select-executor/1?user_id=2', headers=headers)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Executor already appointed'})

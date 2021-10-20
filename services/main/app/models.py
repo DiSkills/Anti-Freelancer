@@ -59,6 +59,7 @@ class Job(Base):
     )
     customer_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     completed: bool = sqlalchemy.Column(sqlalchemy.Boolean, default=False, nullable=False)
+    executor_id: typing.Optional[int] = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
 
     category_id: int = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('subcategory.id', ondelete='CASCADE'), nullable=False,

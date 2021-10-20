@@ -86,3 +86,18 @@ async def search_jobs(
 )
 async def get_job(pk: int, db: AsyncSession = Depends(get_db)):
     return await views.get_job(db, pk)
+
+
+@jobs_router.put(
+    '/select-executor/{pk}',
+    name='Select executor',
+    description='Select executor',
+    response_description='Job',
+    status_code=status.HTTP_200_OK,
+    response_model=GetJob,
+    tags=['jobs'],
+)
+async def select_executor(
+        pk: int, user_id: int, db: AsyncSession = Depends(get_db), owner_id: int = Depends(is_customer)
+):
+    return await views.select_executor(db, pk, user_id, owner_id)
