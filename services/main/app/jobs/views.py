@@ -148,7 +148,7 @@ async def select_executor(db: AsyncSession, pk: int, user_id: int, owner_id: int
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You not owner this job')
 
     if user_id == job.customer_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You cannot fulfill your order')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You cannot fulfill your job')
 
     executor_data: dict = await requests.get_user(user_id)
 
@@ -157,3 +157,37 @@ async def select_executor(db: AsyncSession, pk: int, user_id: int, owner_id: int
 
     job = await job_crud.update(db, {'id': pk}, executor_id=executor_data['id'])
     return job.__dict__
+
+
+async def complete_job(db: AsyncSession, pk: int, user_id: int) -> dict[str, str]:
+    """
+        Complete job
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Job ID
+        :type pk: int
+        :param user_id: Owner ID
+        :type user_id: int
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Job not found
+        :raise HTTPException 400: User not owner this job
+        :raise HTTPException 400: Job already completed
+        :raise HTTPException 400: Job has not executor
+    """
+
+    if not await job_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job not found')
+    job = await job_crud.get(db, id=pk)
+
+    if job.customer_id != user_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You not owner this job')
+
+    if job.completed:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job already completed')
+
+    if not job.executor_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job has not executor')
+
+    await job_crud.update(db, {'id': pk}, completed=True)
+    return {'msg': 'Job has been completed'}

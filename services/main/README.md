@@ -28,8 +28,12 @@
   - [x] Search
   - [x] Get
   - [x] Select executor
-  - [ ] Completed
-  - [ ] Get completed jobs for user
+  - [x] Complete job
+  - [ ] Filter without completed "Get all"
+  - [ ] Filter without completed "Get for categories"
+  - [ ] Filter without completed "Search"
+  - [ ] Get jobs for freelancer
+  - [ ] Get jobs for customer
   - [ ] Update (owner)
   - [ ] Update (admin)
   - [ ] Delete (admin)
@@ -50,3 +54,4 @@
   - [x] Test search jobs
   - [x] Test get jobs
   - [x] Test select executor
+  - [x] Test complete job

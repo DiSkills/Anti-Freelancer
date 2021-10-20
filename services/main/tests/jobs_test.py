@@ -361,7 +361,7 @@ class JobsTestCase(BaseTest, TestCase):
 
             response = self.client.put(f'{self.url}/jobs/select-executor/1?user_id=1', headers=headers)
             self.assertEqual(response.status_code, 400)
-            self.assertEqual(response.json(), {'detail': 'You cannot fulfill your order'})
+            self.assertEqual(response.json(), {'detail': 'You cannot fulfill your job'})
 
             fake_user = {
                 'username': 'string',
@@ -410,3 +410,25 @@ class JobsTestCase(BaseTest, TestCase):
                 response = self.client.put(f'{self.url}/jobs/select-executor/1?user_id=2', headers=headers)
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.json(), {'detail': 'Executor already appointed'})
+
+            # Complete job
+            response = self.client.put(f'{self.url}/jobs/complete/1', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Job has been completed'})
+
+            response = self.client.put(f'{self.url}/jobs/complete/1', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job already completed'})
+
+            response = self.client.put(f'{self.url}/jobs/complete/3', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job has not executor'})
+
+            with mock.patch('app.permission.permission', return_value=2) as _:
+                response = self.client.put(f'{self.url}/jobs/complete/1', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'You not owner this job'})
+
+            response = self.client.put(f'{self.url}/jobs/complete/143', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job not found'})

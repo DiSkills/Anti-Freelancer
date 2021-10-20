@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.jobs import views
 from app.jobs.schemas import CreateJob, GetJob, JobsPaginate
 from app.permission import is_customer
+from app.schemas import Message
 from db import get_db
 
 jobs_router = APIRouter()
@@ -101,3 +102,16 @@ async def select_executor(
         pk: int, user_id: int, db: AsyncSession = Depends(get_db), owner_id: int = Depends(is_customer)
 ):
     return await views.select_executor(db, pk, user_id, owner_id)
+
+
+@jobs_router.put(
+    '/complete/{pk}',
+    name='Complete job',
+    description='Complete job',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['jobs'],
+)
+async def complete_job(pk: int, user_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)):
+    return await views.complete_job(db, pk, user_id)
