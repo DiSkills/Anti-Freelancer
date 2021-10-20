@@ -108,7 +108,7 @@ class CRUD(typing.Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             :param limit: Limit
             :type limit: int
             :return: Exist page?
-            :rtype: dict
+            :rtype: int
         """
         query = await db.execute(
             sqlalchemy.exists(
