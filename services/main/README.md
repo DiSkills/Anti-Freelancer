@@ -29,9 +29,9 @@
   - [x] Get
   - [x] Select executor
   - [x] Complete job
-  - [ ] Filter without completed "Get all"
-  - [ ] Filter without completed "Get for categories"
-  - [ ] Filter without completed "Search"
+  - [x] Filter without completed "Get all"
+  - [x] Filter without completed "Get for categories"
+  - [x] Filter without completed "Search"
   - [ ] Get jobs for freelancer
   - [ ] Get jobs for customer
   - [ ] Update (owner)
@@ -55,3 +55,6 @@
   - [x] Test get jobs
   - [x] Test select executor
   - [x] Test complete job
+  - [x] Test filter without completed "Get all"
+  - [x] Test filter without completed "Get for categories"
+  - [x] Test filter without completed "Search"
