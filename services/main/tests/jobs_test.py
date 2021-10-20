@@ -172,6 +172,7 @@ class JobsTestCase(BaseTest, TestCase):
                 f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/category?page=1&page_size=1&category_id=1'
             )
             self.assertEqual(response.json()['page'], 2)
+            self.assertEqual(len(response.json()['results']), 1)
             self.assertEqual(response.json()['results'][0]['id'], 1)
 
             response = self.client.get(f'{self.url}/jobs/category?page=1&page_size=2&category_id=1')
@@ -179,6 +180,7 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.json()['next'], None)
             self.assertEqual(response.json()['previous'], None)
             self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(len(response.json()['results']), 2)
             self.assertEqual(response.json()['results'][0]['id'], 4)
             self.assertEqual(response.json()['results'][1]['id'], 1)
 
@@ -202,6 +204,7 @@ class JobsTestCase(BaseTest, TestCase):
                 f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/category?page=1&page_size=1&category_id=2'
             )
             self.assertEqual(response.json()['page'], 2)
+            self.assertEqual(len(response.json()['results']), 1)
             self.assertEqual(response.json()['results'][0]['id'], 2)
 
             response = self.client.get(f'{self.url}/jobs/category?page=1&page_size=2&category_id=2')
@@ -209,6 +212,7 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.json()['next'], None)
             self.assertEqual(response.json()['previous'], None)
             self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(len(response.json()['results']), 2)
             self.assertEqual(response.json()['results'][0]['id'], 3)
             self.assertEqual(response.json()['results'][1]['id'], 2)
 

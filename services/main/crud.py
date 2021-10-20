@@ -98,6 +98,26 @@ class CRUD(typing.Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         )
         return query.scalars().all()
 
+    async def filter(self, db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> list[ModelType]:
+        """
+            Filter
+            :param db: DB
+            :type db: AsyncSession
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :param kwargs: Filter params
+            :return: Instances
+            :rtype: list
+        """
+        query = await db.execute(
+            sqlalchemy.select(self.__model).filter_by(
+                **kwargs
+            ).order_by(self.__model.id.desc()).offset(skip).limit(limit)
+        )
+        return query.scalars().all()
+
     async def exist_page(self, db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> bool:
         """
             Exist page?

@@ -2,6 +2,7 @@ import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.categories.schemas import CreateCategory, UpdateCategory
+from app.jobs.schemas import CreateJob
 from app.models import SuperCategory, SubCategory, Job
 from crud import CRUD
 
@@ -16,7 +17,7 @@ class SubCategoryCRUD(CRUD[SubCategory, CreateCategory, UpdateCategory]):
     pass
 
 
-class JobCRUD(CRUD[Job, Job, Job]):
+class JobCRUD(CRUD[Job, CreateJob, CreateJob]):
     """ Job CRUD """
 
     @staticmethod
@@ -35,7 +36,9 @@ class JobCRUD(CRUD[Job, Job, Job]):
             :rtype: list
         """
         query = await db.execute(
-            sqlalchemy.select(Job).filter_by(category_id=category_id).order_by(Job.id.desc()).offset(skip).limit(limit)
+            sqlalchemy.select(Job).filter_by(
+                category_id=category_id, completed=False, executor_id=None
+            ).order_by(Job.id.desc()).offset(skip).limit(limit)
         )
         return query.scalars().all()
 
@@ -56,9 +59,13 @@ class JobCRUD(CRUD[Job, Job, Job]):
         """
         query = await db.execute(
             sqlalchemy.select(Job).filter(
-                sqlalchemy.or_(
-                    Job.title.ilike(f'%{search}%'),
-                    Job.description.ilike(f'%{search}%'),
+                sqlalchemy.and_(
+                    sqlalchemy.or_(
+                        Job.title.ilike(f'%{search}%'),
+                        Job.description.ilike(f'%{search}%'),
+                    ),
+                    Job.completed == False,
+                    Job.executor_id == None
                 )
             ).order_by(Job.id.desc()).offset(skip).limit(limit)
         )
@@ -82,14 +89,24 @@ class JobCRUD(CRUD[Job, Job, Job]):
         query = await db.execute(
             sqlalchemy.exists(
                 sqlalchemy.select(Job.id).filter(
-                    sqlalchemy.or_(
-                        Job.title.ilike(f'%{search}%'),
-                        Job.description.ilike(f'%{search}%'),
+                    sqlalchemy.and_(
+                        sqlalchemy.or_(
+                            Job.title.ilike(f'%{search}%'),
+                            Job.description.ilike(f'%{search}%'),
+                        ),
+                        Job.completed == False,
+                        Job.executor_id == None
                     )
                 ).order_by(Job.id.desc()).offset(skip).limit(limit)
             ).select()
         )
         return query.scalar()
+
+    async def get_all_active_jobs(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> list[Job]:
+        return await super().filter(db, skip, limit, completed=False, executor_id=None)
+
+    async def exist_page_active_jobs(self, db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> bool:
+        return await super().exist_page(db, skip, limit, completed=False, executor_id=None, **kwargs)
 
 
 super_category_crud = SuperCategoryCRUD(SuperCategory)
