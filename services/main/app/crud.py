@@ -103,9 +103,31 @@ class JobCRUD(CRUD[Job, CreateJob, CreateJob]):
         return query.scalar()
 
     async def get_all_active_jobs(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> list[Job]:
+        """
+            Get all active jobs
+            :param db: DB
+            :type db: AsyncSession
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Jobs
+            :rtype: list
+        """
         return await super().filter(db, skip, limit, completed=False, executor_id=None)
 
     async def exist_page_active_jobs(self, db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> bool:
+        """
+            Page with active jobs exist?
+            :param db: DB
+            :type db: AsyncSession
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Page with active jobs exist?
+            :rtype: bool
+        """
         return await super().exist_page(db, skip, limit, completed=False, executor_id=None, **kwargs)
 
 
