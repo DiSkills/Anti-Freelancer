@@ -60,6 +60,23 @@ async def create_job(schema: CreateJob, customer_id: int = Depends(is_customer),
 
 
 @jobs_router.get(
+    '/all',
+    name='Get all jobs',
+    description='Get all jobs',
+    response_description='Jobs',
+    status_code=status.HTTP_200_OK,
+    # response_model=JobsPaginate,
+    tags=['jobs'],
+)
+async def get_all_jobs(
+        page: int = Query(default=1, gt=0),
+        page_size: int = Query(default=1, gt=0),
+        db: AsyncSession = Depends(get_db)
+):
+    return await views.get_all_jobs(db=db, page=page, page_size=page_size)
+
+
+@jobs_router.get(
     '/',
     name='Get all without completed jobs',
     description='Get all without completed jobs',

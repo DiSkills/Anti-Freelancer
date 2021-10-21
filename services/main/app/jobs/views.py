@@ -87,10 +87,27 @@ async def create_job(db: AsyncSession, schema: CreateJob, customer_id: int) -> d
     return job.__dict__
 
 
+@paginate(job_crud.all, job_crud.exist_page, f'{SERVER_MAIN_BACKEND}{API}/jobs/all')
+async def get_all_jobs(*, db: AsyncSession, page: int, page_size: int, queryset: list[Job]):
+    """
+        Get all jobs
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param queryset: Jobs
+        :type queryset: list
+        :return: Jobs
+    """
+    return (job.__dict__ for job in queryset)
+
+
 @paginate(job_crud.get_all_active_jobs, job_crud.exist_page_active_jobs, f'{SERVER_MAIN_BACKEND}{API}/jobs/')
 async def get_all_jobs_without_completed(*, db: AsyncSession, page: int, page_size: int, queryset: list[Job]):
     """
-        Get all jobs
+        Get all jobs without completed
         :param db: DB
         :type db: AsyncSession
         :param page: Page
@@ -113,7 +130,7 @@ async def get_all_jobs_without_completed_for_category(
         *, db: AsyncSession, queryset: list[Job], page: int, page_size: int, category_id: int,
 ):
     """
-        Get all for category
+        Get all for category without completed
         :param db: DB
         :type db: AsyncSession
         :param queryset: Jobs

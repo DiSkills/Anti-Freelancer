@@ -23,7 +23,7 @@
     - [x] Delete
 - [ ] Jobs
   - [x] Create
-  - [ ] Get all
+  - [x] Get all
   - [ ] Get for categories
   - [x] Search
   - [x] Get
@@ -39,24 +39,27 @@
   - [ ] Delete (admin)
   - [ ] Add / remove attachments
 - [ ] Tests
-  - [x] Test get all categories
-  - [x] Test create Super categories
-  - [x] Test get Super categories
-  - [x] Test update Super categories
-  - [x] Test delete Super categories
-  - [x] Test create Sub categories
-  - [x] Test get Sub categories
-  - [x] Test update Sub categories
-  - [x] Test delete Sub categories
-  - [x] Test create jobs
-  - [x] Test get all jobs
-  - [x] Test get jobs for categories
-  - [x] Test search jobs
-  - [x] Test get jobs
-  - [x] Test select executor
-  - [x] Test complete job
-  - [x] Test filter without completed "Get all"
-  - [x] Test filter without completed "Get for categories"
-  - [x] Test filter without completed "Search"
-  - [x] Test get jobs for freelancer
-  - [x] Test get jobs for customers
+  - [x] Categories
+    - [x] Test get all categories
+    - [x] Super
+      - [x] Create
+      - [x] Get
+      - [x] Update
+      - [x] Delete
+    - [x] Sub
+      - [x] Create
+      - [x] Get
+      - [x] Update
+      - [x] Delete
+  - [ ] Jobs
+    - [x] Create
+    - [x] Get all
+    - [ ] Get for categories
+    - [x] Get all without completed
+    - [x] Get for categories without completed
+    - [x] Search without completed
+    - [x] Get
+    - [x] Select executor
+    - [x] Complete
+    - [x] Get for freelancer
+    - [x] Get for customers
