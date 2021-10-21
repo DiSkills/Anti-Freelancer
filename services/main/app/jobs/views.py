@@ -88,7 +88,7 @@ async def create_job(db: AsyncSession, schema: CreateJob, customer_id: int) -> d
 
 
 @paginate(job_crud.get_all_active_jobs, job_crud.exist_page_active_jobs, f'{SERVER_MAIN_BACKEND}{API}/jobs/')
-async def get_all_jobs(*, db: AsyncSession, page: int, page_size: int, queryset: list[Job]):
+async def get_all_jobs_without_completed(*, db: AsyncSession, page: int, page_size: int, queryset: list[Job]):
     """
         Get all jobs
         :param db: DB
@@ -109,7 +109,7 @@ async def get_all_jobs(*, db: AsyncSession, page: int, page_size: int, queryset:
     job_crud.exist_page_active_jobs,
     f'{SERVER_MAIN_BACKEND}{API}/jobs/category', 'category_id'
 )
-async def get_all_jobs_for_category(
+async def get_all_jobs_without_completed_for_category(
         *, db: AsyncSession, queryset: list[Job], page: int, page_size: int, category_id: int,
 ):
     """

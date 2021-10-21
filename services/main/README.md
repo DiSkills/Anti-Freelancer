@@ -23,20 +23,18 @@
     - [x] Delete
 - [ ] Jobs
   - [x] Create
-  - [x] Get all
-  - [x] Get for categories
+  - [ ] Get all
+  - [ ] Get for categories
   - [x] Search
   - [x] Get
   - [x] Select executor
   - [x] Complete job
-  - [x] Filter without completed "Get all"
-  - [x] Filter without completed "Get for categories"
-  - [x] Filter without completed "Search"
+  - [x] Get all without completed
+  - [x] Get for categories without completed
+  - [x] Search without completed
   - [x] Get jobs for freelancer
   - [x] Get jobs for customer
   - [ ] Update (owner)
-  - [ ] Get all (admin)
-  - [ ] Get for categories (admin)
   - [ ] Update (admin)
   - [ ] Delete (admin)
   - [ ] Add / remove attachments
