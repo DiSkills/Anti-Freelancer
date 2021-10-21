@@ -65,7 +65,7 @@ async def create_job(schema: CreateJob, customer_id: int = Depends(is_customer),
     description='Get all jobs',
     response_description='Jobs',
     status_code=status.HTTP_200_OK,
-    # response_model=JobsPaginate,
+    response_model=JobsPaginate,
     tags=['jobs'],
 )
 async def get_all_jobs(
