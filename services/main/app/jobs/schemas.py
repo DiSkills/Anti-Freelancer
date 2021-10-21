@@ -26,11 +26,7 @@ class CreateJob(BaseModel):
     def validate_order_date(cls, order_date):
         """ Validate order date """
 
-        if (
-                order_date.date() < datetime.datetime.utcnow().date()
-        ) or (
-                order_date.time() < datetime.datetime.utcnow().time()
-        ):
+        if order_date.timestamp() < datetime.datetime.utcnow().timestamp():
             raise ValueError('Date can\'t be past')
         return order_date
 
