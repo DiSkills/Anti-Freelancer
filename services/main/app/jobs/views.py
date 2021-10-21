@@ -12,6 +12,31 @@ from app.service import paginate, user_exist
 from config import SERVER_MAIN_BACKEND, API
 
 
+async def create_job(db: AsyncSession, schema: CreateJob, customer_id: int) -> dict[str, typing.Any]:
+    """
+        Create job
+        :param db: DB
+        :type db: AsyncSession
+        :param schema: Job data
+        :type schema: CreateJob
+        :param customer_id: Customer ID
+        :type customer_id: int
+        :return: New job
+        :rtype: dict
+        :raise HTTPException 400: Category not found
+    """
+
+    if not await sub_category_crud.exist(db, id=schema.category_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Category not found')
+
+    job = await job_crud.create(
+        db,
+        **{**schema.dict(), 'order_date': datetime.datetime.utcfromtimestamp(schema.order_date.timestamp())},
+        customer_id=customer_id,
+    )
+    return job.__dict__
+
+
 @user_exist('pk', freelancer=True)
 @paginate(
     job_crud.filter_jobs_for_freelancer,
@@ -60,31 +85,6 @@ async def get_jobs_for_customer(*, db: AsyncSession, page: int, page_size: int, 
         :return: Jobs
     """
     return (job.__dict__ for job in queryset)
-
-
-async def create_job(db: AsyncSession, schema: CreateJob, customer_id: int) -> dict[str, typing.Any]:
-    """
-        Create job
-        :param db: DB
-        :type db: AsyncSession
-        :param schema: Job data
-        :type schema: CreateJob
-        :param customer_id: Customer ID
-        :type customer_id: int
-        :return: New job
-        :rtype: dict
-        :raise HTTPException 400: Category not found
-    """
-
-    if not await sub_category_crud.exist(db, id=schema.category_id):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Category not found')
-
-    job = await job_crud.create(
-        db,
-        **{**schema.dict(), 'order_date': datetime.datetime.utcfromtimestamp(schema.order_date.timestamp())},
-        customer_id=customer_id,
-    )
-    return job.__dict__
 
 
 @paginate(job_crud.all, job_crud.exist_page, f'{SERVER_MAIN_BACKEND}{API}/jobs/all')

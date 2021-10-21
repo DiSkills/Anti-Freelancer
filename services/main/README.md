@@ -37,7 +37,7 @@
   - [ ] Update (owner)
   - [ ] Update (admin)
   - [ ] Delete (admin)
-  - [ ] Add / remove attachments
+  - [ ] Add / remove attachments {maybe}
 - [ ] Tests
   - [x] Categories
     - [x] Get all

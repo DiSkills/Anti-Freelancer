@@ -10,6 +10,19 @@ from db import get_db
 jobs_router = APIRouter()
 
 
+@jobs_router.post(
+    '/',
+    name='Create job',
+    description='Create job',
+    response_description='Job',
+    status_code=status.HTTP_201_CREATED,
+    response_model=GetJob,
+    tags=['jobs'],
+)
+async def create_job(schema: CreateJob, customer_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)):
+    return await views.create_job(db, schema, customer_id)
+
+
 @jobs_router.get(
     '/freelancer',
     name='Get jobs for freelancer',
@@ -44,19 +57,6 @@ async def get_jobs_for_customer(
         db: AsyncSession = Depends(get_db),
 ):
     return await views.get_jobs_for_customer(db=db, page=page, page_size=page_size, pk=pk)
-
-
-@jobs_router.post(
-    '/',
-    name='Create job',
-    description='Create job',
-    response_description='Job',
-    status_code=status.HTTP_201_CREATED,
-    response_model=GetJob,
-    tags=['jobs'],
-)
-async def create_job(schema: CreateJob, customer_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)):
-    return await views.create_job(db, schema, customer_id)
 
 
 @jobs_router.get(
