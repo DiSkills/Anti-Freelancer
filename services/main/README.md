@@ -32,7 +32,7 @@
   - [x] Filter without completed "Get all"
   - [x] Filter without completed "Get for categories"
   - [x] Filter without completed "Search"
-  - [ ] Get jobs for freelancer
+  - [x] Get jobs for freelancer
   - [ ] Get jobs for customer
   - [ ] Update (owner)
   - [ ] Update (admin)
@@ -58,3 +58,4 @@
   - [x] Test filter without completed "Get all"
   - [x] Test filter without completed "Get for categories"
   - [x] Test filter without completed "Search"
+  - [x] Test get jobs for freelancer

@@ -8,8 +8,33 @@ from app import requests
 from app.crud import sub_category_crud, job_crud
 from app.jobs.schemas import CreateJob
 from app.models import Job
-from app.service import paginate
+from app.service import paginate, user_exist
 from config import SERVER_MAIN_BACKEND, API
+
+
+@user_exist('pk', freelancer=True)
+@paginate(
+    job_crud.filter_jobs_for_freelancer,
+    job_crud.exist_page_for_freelancer_jobs,
+    f'{SERVER_MAIN_BACKEND}{API}/jobs/freelancer',
+    'pk'
+)
+async def get_jobs_for_freelancer(*, db: AsyncSession, page: int, page_size: int, pk: int, queryset: list[Job]):
+    """
+        Get jobs for freelancer
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param pk: Freelancer ID
+        :type pk: int
+        :param queryset: Jobs
+        :type queryset: list
+        :return: Jobs
+    """
+    return (job.__dict__ for job in queryset)
 
 
 async def create_job(db: AsyncSession, schema: CreateJob, customer_id: int) -> dict[str, typing.Any]:

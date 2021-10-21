@@ -3,6 +3,8 @@ import typing
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import requests
+
 
 def paginate(get_function, exist_function, url: str, *filter_params):
     """
@@ -71,3 +73,49 @@ def paginate(get_function, exist_function, url: str, *filter_params):
         return wrapper
 
     return paginate_wrapper
+
+
+def user_exist(key: str, *, freelancer: bool = False, customer: bool = False):
+    """
+        User exist
+        :param key: Key
+        :type key: str
+        :param freelancer: Only freelancer
+        :type freelancer: bool
+        :param customer: Only customer
+        :type customer: bool
+        :return: Decorator
+    """
+
+    def user_exist_decorator(function):
+        """
+            User exist decorator
+            :param function: Function
+            :return: Wrapper
+        """
+
+        async def wrapper(*args, **kwargs):
+            """
+                Wrapper
+                :param args: args
+                :param kwargs: kwargs
+                :return: Function
+                :raise ValueError: Freelancer and customer is True
+                :raise HTTPException 400: User is customer
+                :raise HTTPException 400: User is freelancer
+            """
+            user: dict = await requests.get_user(kwargs[key])
+
+            if freelancer and customer:
+                raise ValueError('Only 1 param (freelancer or customer)')
+
+            if freelancer and (not user['freelancer']):
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User is customer')
+
+            if customer and (user['freelancer']):
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User is freelancer')
+
+            return await function(*args, **kwargs)
+
+        return wrapper
+    return user_exist_decorator
