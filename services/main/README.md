@@ -24,7 +24,7 @@
 - [ ] Jobs
   - [x] Create
   - [x] Get all
-  - [ ] Get for categories
+  - [x] Get for categories
   - [x] Search
   - [x] Get
   - [x] Select executor
@@ -54,7 +54,7 @@
   - [ ] Jobs
     - [x] Create
     - [x] Get all
-    - [ ] Get for categories
+    - [x] Get for categories
     - [x] Get all without completed
     - [x] Get for categories without completed
     - [x] Search without completed
