@@ -37,6 +37,31 @@ async def get_jobs_for_freelancer(*, db: AsyncSession, page: int, page_size: int
     return (job.__dict__ for job in queryset)
 
 
+@user_exist('pk', customer=True)
+@paginate(
+    job_crud.filter_jobs_for_customer,
+    job_crud.exist_page_for_customer_jobs,
+    f'{SERVER_MAIN_BACKEND}{API}/jobs/customer',
+    'pk',
+)
+async def get_jobs_for_customer(*, db: AsyncSession, page: int, page_size: int, pk: int, queryset: list[Job]):
+    """
+        Get jobs for customer
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param pk: Customer ID
+        :type pk: int
+        :param queryset: Jobs
+        :type queryset: list
+        :return: Jobs
+    """
+    return (job.__dict__ for job in queryset)
+
+
 async def create_job(db: AsyncSession, schema: CreateJob, customer_id: int) -> dict[str, typing.Any]:
     """
         Create job

@@ -162,6 +162,38 @@ class JobCRUD(CRUD[Job, CreateJob, CreateJob]):
         """
         return await super().exist_page(db, skip, limit, executor_id=pk)
 
+    async def filter_jobs_for_customer(self, db: AsyncSession, pk: int, skip: int = 0, limit: int = 100) -> list[Job]:
+        """
+            Filter jobs for customer
+            :param db: DB
+            :type db: AsyncSession
+            :param pk: Customer ID
+            :type pk: int
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Jobs
+            :rtype: list
+        """
+        return await super().filter(db, skip, limit, customer_id=pk)
+
+    async def exist_page_for_customer_jobs(self, db: AsyncSession, pk: int, skip: int = 0, limit: int = 100) -> bool:
+        """
+            Exist page for customer jobs
+            :param db: DB
+            :type db: AsyncSession
+            :param pk: Customer ID
+            :type pk: int
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Exist page for customer jobs?
+            :rtype: bool
+        """
+        return await super().exist_page(db, skip, limit, customer_id=pk)
+
 
 super_category_crud = SuperCategoryCRUD(SuperCategory)
 sub_category_crud = SubCategoryCRUD(SubCategory)

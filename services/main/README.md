@@ -33,8 +33,10 @@
   - [x] Filter without completed "Get for categories"
   - [x] Filter without completed "Search"
   - [x] Get jobs for freelancer
-  - [ ] Get jobs for customer
+  - [x] Get jobs for customer
   - [ ] Update (owner)
+  - [ ] Get all (admin)
+  - [ ] Get for categories (admin)
   - [ ] Update (admin)
   - [ ] Delete (admin)
   - [ ] Add / remove attachments
@@ -59,3 +61,4 @@
   - [x] Test filter without completed "Get for categories"
   - [x] Test filter without completed "Search"
   - [x] Test get jobs for freelancer
+  - [x] Test get jobs for customers

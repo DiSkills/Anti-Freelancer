@@ -576,6 +576,7 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Results not found'})
 
+            # Get jobs for freelancers
             with mock.patch('app.requests.get_user', return_value=fake_user) as _:
                 response = self.client.get(f'{self.url}/jobs/freelancer?page=1&page_size=1&pk=2')
                 self.assertEqual(response.status_code, 200)
@@ -586,6 +587,7 @@ class JobsTestCase(BaseTest, TestCase):
                 self.assertEqual(response.json()['previous'], None)
                 self.assertEqual(len(response.json()['results']), 1)
                 self.assertEqual(response.json()['results'][0]['id'], 2)
+                self.assertEqual(response.json()['results'][0]['executor_id'], 2)
                 self.assertEqual(response.json()['results'][0]['completed'], False)
 
                 response = self.client.get(f'{self.url}/jobs/freelancer?page=2&page_size=1&pk=2')
@@ -597,6 +599,7 @@ class JobsTestCase(BaseTest, TestCase):
                 )
                 self.assertEqual(len(response.json()['results']), 1)
                 self.assertEqual(response.json()['results'][0]['id'], 1)
+                self.assertEqual(response.json()['results'][0]['executor_id'], 2)
                 self.assertEqual(response.json()['results'][0]['completed'], True)
 
             with mock.patch('app.requests.get_user', return_value={**fake_user, 'id': 1, 'freelancer': False}) as _:
@@ -606,5 +609,47 @@ class JobsTestCase(BaseTest, TestCase):
 
             with mock.patch('app.requests.get_user', return_value={**fake_user, 'id': 1}) as _:
                 response = self.client.get(f'{self.url}/jobs/freelancer?page=1&page_size=1&pk=1')
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+            # Get jobs for customers
+            with mock.patch('app.requests.get_user', return_value={**fake_user, 'id': 1, 'freelancer': False}) as _:
+                response = self.client.get(f'{self.url}/jobs/customer?page=1&page_size=2&pk=1')
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    response.json()['next'],
+                    f'{SERVER_MAIN_BACKEND.strip("/")}{self.url}/jobs/customer?page=2&page_size=2&pk=1'
+                )
+                self.assertEqual(response.json()['previous'], None)
+                self.assertEqual(len(response.json()['results']), 2)
+                self.assertEqual(response.json()['results'][0]['id'], 4)
+                self.assertEqual(response.json()['results'][1]['id'], 3)
+                self.assertEqual(response.json()['results'][0]['completed'], False)
+                self.assertEqual(response.json()['results'][1]['completed'], False)
+                self.assertEqual(response.json()['results'][0]['executor_id'], None)
+                self.assertEqual(response.json()['results'][1]['executor_id'], None)
+
+                response = self.client.get(f'{self.url}/jobs/customer?page=2&page_size=2&pk=1')
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json()['next'], None)
+                self.assertEqual(
+                    response.json()['previous'],
+                    f'{SERVER_MAIN_BACKEND.strip("/")}{self.url}/jobs/customer?page=1&page_size=2&pk=1'
+                )
+                self.assertEqual(len(response.json()['results']), 2)
+                self.assertEqual(response.json()['results'][0]['id'], 2)
+                self.assertEqual(response.json()['results'][1]['id'], 1)
+                self.assertEqual(response.json()['results'][0]['completed'], False)
+                self.assertEqual(response.json()['results'][1]['completed'], True)
+                self.assertEqual(response.json()['results'][0]['executor_id'], 2)
+                self.assertEqual(response.json()['results'][1]['executor_id'], 2)
+
+            with mock.patch('app.requests.get_user', return_value=fake_user) as _:
+                response = self.client.get(f'{self.url}/jobs/customer?page=1&page_size=1&pk=2')
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'User is freelancer'})
+
+            with mock.patch('app.requests.get_user', return_value={**fake_user, 'freelancer': False}) as _:
+                response = self.client.get(f'{self.url}/jobs/customer?page=1&page_size=1&pk=2')
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.json(), {'detail': 'Results not found'})
