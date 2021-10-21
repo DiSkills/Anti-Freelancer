@@ -40,7 +40,7 @@
   - [ ] Add / remove attachments
 - [ ] Tests
   - [x] Categories
-    - [x] Test get all categories
+    - [x] Get all
     - [x] Super
       - [x] Create
       - [x] Get
