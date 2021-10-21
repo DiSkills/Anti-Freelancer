@@ -686,3 +686,95 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.json()['results'][1]['completed'], True)
             self.assertEqual(response.json()['results'][0]['executor_id'], 2)
             self.assertEqual(response.json()['results'][1]['executor_id'], 2)
+
+            # Get from categories
+            response = self.client.get(f'{self.url}/jobs/category/all?page=1&page_size=1&category_id=1')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json()['next'],
+                f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/category/all?page=2&page_size=1&category_id=1'
+            )
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(len(response.json()['results']), 1)
+            self.assertEqual(response.json()['results'][0]['id'], 4)
+            self.assertEqual(response.json()['results'][0]['completed'], False)
+            self.assertEqual(response.json()['results'][0]['executor_id'], None)
+
+            response = self.client.get(f'{self.url}/jobs/category/all?page=2&page_size=1&category_id=1')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['next'], None)
+            self.assertEqual(
+                response.json()['previous'],
+                f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/category/all?page=1&page_size=1&category_id=1'
+            )
+            self.assertEqual(response.json()['page'], 2)
+            self.assertEqual(len(response.json()['results']), 1)
+            self.assertEqual(response.json()['results'][0]['id'], 1)
+            self.assertEqual(response.json()['results'][0]['completed'], True)
+            self.assertEqual(response.json()['results'][0]['executor_id'], 2)
+
+            response = self.client.get(f'{self.url}/jobs/category/all?page=1&page_size=2&category_id=1')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['next'], None)
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(len(response.json()['results']), 2)
+            self.assertEqual(response.json()['results'][0]['id'], 4)
+            self.assertEqual(response.json()['results'][1]['id'], 1)
+            self.assertEqual(response.json()['results'][0]['completed'], False)
+            self.assertEqual(response.json()['results'][0]['executor_id'], None)
+            self.assertEqual(response.json()['results'][1]['completed'], True)
+            self.assertEqual(response.json()['results'][1]['executor_id'], 2)
+
+            # Category 2
+            response = self.client.get(f'{self.url}/jobs/category/all?page=1&page_size=1&category_id=2')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json()['next'],
+                f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/category/all?page=2&page_size=1&category_id=2'
+            )
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(len(response.json()['results']), 1)
+            self.assertEqual(response.json()['results'][0]['id'], 3)
+            self.assertEqual(response.json()['results'][0]['completed'], False)
+            self.assertEqual(response.json()['results'][0]['executor_id'], None)
+
+            response = self.client.get(f'{self.url}/jobs/category/all?page=2&page_size=1&category_id=2')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['next'], None)
+            self.assertEqual(
+                response.json()['previous'],
+                f'{SERVER_MAIN_BACKEND}{self.url.strip("/")}/jobs/category/all?page=1&page_size=1&category_id=2'
+            )
+            self.assertEqual(response.json()['page'], 2)
+            self.assertEqual(len(response.json()['results']), 1)
+            self.assertEqual(response.json()['results'][0]['id'], 2)
+            self.assertEqual(response.json()['results'][0]['completed'], False)
+            self.assertEqual(response.json()['results'][0]['executor_id'], 2)
+
+            response = self.client.get(f'{self.url}/jobs/category/all?page=1&page_size=2&category_id=2')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json()['next'], None)
+            self.assertEqual(response.json()['previous'], None)
+            self.assertEqual(response.json()['page'], 1)
+            self.assertEqual(len(response.json()['results']), 2)
+            self.assertEqual(response.json()['results'][0]['id'], 3)
+            self.assertEqual(response.json()['results'][1]['id'], 2)
+            self.assertEqual(response.json()['results'][0]['completed'], False)
+            self.assertEqual(response.json()['results'][0]['executor_id'], None)
+            self.assertEqual(response.json()['results'][1]['completed'], False)
+            self.assertEqual(response.json()['results'][1]['executor_id'], 2)
+
+            response = self.client.get(f'{self.url}/jobs/category/all?page=2&page_size=2&category_id=1')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+            response = self.client.get(f'{self.url}/jobs/category/all?page=2&page_size=2&category_id=2')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+            response = self.client.get(f'{self.url}/jobs/category/all?page=2&page_size=2&category_id=143')
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Results not found'})

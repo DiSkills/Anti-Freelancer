@@ -36,6 +36,28 @@ class JobCRUD(CRUD[Job, CreateJob, CreateJob]):
             :rtype: list
         """
         query = await db.execute(
+            sqlalchemy.select(Job).filter_by(category_id=category_id).order_by(Job.id.desc()).offset(skip).limit(limit)
+        )
+        return query.scalars().all()
+
+    @staticmethod
+    async def all_for_category_without_completed(
+            db: AsyncSession, category_id: int, skip: int = 0, limit: int = 100
+    ) -> list[Job]:
+        """
+            All for category without completed
+            :param db: DB
+            :type db: AsyncSession
+            :param category_id: ID category
+            :type category_id: int
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Jobs
+            :rtype: list
+        """
+        query = await db.execute(
             sqlalchemy.select(Job).filter_by(
                 category_id=category_id, completed=False, executor_id=None
             ).order_by(Job.id.desc()).offset(skip).limit(limit)
