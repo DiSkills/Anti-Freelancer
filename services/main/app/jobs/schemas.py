@@ -32,11 +32,12 @@ class CreateJob(BaseModel):
 
 
 class UpdateJob(CreateJob):
-    """ Update job """
+    """ Update job (owner) """
     pass
 
 
 class UpdateJobAdmin(UpdateJob):
+    """ Update job (admin) """
     completed: bool = False
 
 
