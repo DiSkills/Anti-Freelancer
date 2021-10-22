@@ -779,7 +779,7 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Results not found'})
 
-            # Update
+            # Update (owner)
             response = self.client.get(f'{self.url}/jobs/3')
             self.assertEqual(
                 response.json(),
@@ -818,7 +818,6 @@ class JobsTestCase(BaseTest, TestCase):
                     'price': 5000,
                     'title': 'Web site'
                 }
-
             )
 
             response = self.client.put(f'{self.url}/jobs/143', json={
@@ -871,3 +870,62 @@ class JobsTestCase(BaseTest, TestCase):
             }, headers=headers)
             self.assertEqual(response.status_code, 422)
             self.assertEqual(response.json()['detail'][0]['msg'], 'Date can\'t be past')
+
+            # Update (admin)
+            with mock.patch('app.requests.get_user', return_value={**fake_user, 'id': 2}) as _:
+                response = self.client.put(f'{self.url}/jobs/admin/3?executor_id=2', json={
+                    'title': 'Web',
+                    'description': 'Web site',
+                    'price': 50000,
+                    'order_date': f'{now}Z',
+                    'category_id': 2,
+                    'completed': True,
+                }, headers=headers)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    response.json(),
+                    {
+                        'category_id': 2,
+                        'completed': True,
+                        'customer_id': 1,
+                        'description': 'Web site',
+                        'executor_id': 2,
+                        'id': 3,
+                        'order_date': f'{now}Z'.replace(' ', 'T'),
+                        'price': 50000,
+                        'title': 'Web'
+                    }
+                )
+
+                response = self.client.put(f'{self.url}/jobs/admin/143?executor_id=2', json={
+                    'title': 'Web',
+                    'description': 'Web site',
+                    'price': 50000,
+                    'order_date': f'{now}Z',
+                    'category_id': 1,
+                    'completed': True,
+                }, headers=headers)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Job not found'})
+
+                response = self.client.put(f'{self.url}/jobs/admin/3?executor_id=2', json={
+                    'title': 'Web',
+                    'description': 'Web site',
+                    'price': 50000,
+                    'order_date': f'{now}Z',
+                    'category_id': 143,
+                    'completed': True,
+                }, headers=headers)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Category not found'})
+
+            response = self.client.put(f'{self.url}/jobs/admin/3?executor_id=2', json={
+                'title': 'Web',
+                'description': 'Web site',
+                'price': 50000,
+                'order_date': f'{now}Z',
+                'category_id': 1,
+                'completed': True,
+            }, headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'User not found'})

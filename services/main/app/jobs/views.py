@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import requests
 from app.crud import sub_category_crud, job_crud
-from app.jobs.schemas import CreateJob, UpdateJob
+from app.jobs.schemas import CreateJob, UpdateJob, UpdateJobAdmin
 from app.models import Job
 from app.service import paginate, user_exist
 from config import SERVER_MAIN_BACKEND, API
@@ -290,9 +290,44 @@ async def complete_job(db: AsyncSession, pk: int, user_id: int) -> dict[str, str
     return {'msg': 'Job has been completed'}
 
 
+@user_exist('executor_id', freelancer=True)
+async def update_job_admin(
+        *, db: AsyncSession, schema: UpdateJobAdmin, executor_id: typing.Optional[int], pk: int
+) -> dict:
+    """
+        Update job (admin)
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Job ID
+        :type pk: int
+        :param schema: Job data
+        :type schema: UpdateJobAdmin
+        :param executor_id: Executor ID
+        :type executor_id: int
+        :return: Job
+        :rtype: dict
+        :raise HTTPException 400: Job not found
+        :raise HTTPException 400: Category not found
+    """
+
+    if not await job_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job not found')
+
+    if not await sub_category_crud.exist(db, id=schema.category_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Category not found')
+
+    job = await job_crud.update(
+        db,
+        {'id': pk},
+        **{**schema.dict(), 'order_date': datetime.datetime.utcfromtimestamp(schema.order_date.timestamp())},
+        executor_id=executor_id,
+    )
+    return job.__dict__
+
+
 async def update_job(db: AsyncSession, pk: int, schema: UpdateJob, user_id: int) -> dict:
     """
-        Update job
+        Update job (owner)
         :param db: DB
         :type db: AsyncSession
         :param pk: Job ID

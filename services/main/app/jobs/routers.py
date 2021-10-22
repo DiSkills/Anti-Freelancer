@@ -1,9 +1,11 @@
+import typing
+
 from fastapi import APIRouter, status, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.jobs import views
-from app.jobs.schemas import CreateJob, GetJob, JobsPaginate, UpdateJob
-from app.permission import is_customer
+from app.jobs.schemas import CreateJob, GetJob, JobsPaginate, UpdateJob, UpdateJobAdmin
+from app.permission import is_customer, is_superuser
 from app.schemas import Message
 from db import get_db
 
@@ -188,6 +190,25 @@ async def select_executor(
 )
 async def complete_job(pk: int, user_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)):
     return await views.complete_job(db, pk, user_id)
+
+
+@jobs_router.put(
+    '/admin/{pk}',
+    name='Update job (admin)',
+    description='Update job (admin)',
+    response_description='Job',
+    response_model=GetJob,
+    status_code=status.HTTP_200_OK,
+    tags=['jobs'],
+    dependencies=[Depends(is_superuser)],
+)
+async def update_job_admin(
+        pk: int,
+        schema: UpdateJobAdmin,
+        executor_id: typing.Optional[int] = Query(default=None),
+        db: AsyncSession = Depends(get_db)
+):
+    return await views.update_job_admin(db=db, schema=schema, executor_id=executor_id, pk=pk)
 
 
 @jobs_router.put(

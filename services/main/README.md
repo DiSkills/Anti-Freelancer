@@ -35,7 +35,7 @@
   - [x] Get jobs for freelancer
   - [x] Get jobs for customer
   - [x] Update (owner)
-  - [ ] Update (admin)
+  - [x] Update (admin)
   - [ ] Delete (admin)
   - [ ] Delete all jobs for user
   - [ ] Add / remove attachments {maybe}
@@ -65,3 +65,4 @@
     - [x] Get for freelancer
     - [x] Get for customers
     - [x] Update (owner)
+    - [x] Update (admin)

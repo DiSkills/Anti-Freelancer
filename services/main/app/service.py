@@ -104,16 +104,18 @@ def user_exist(key: str, *, freelancer: bool = False, customer: bool = False):
                 :raise HTTPException 400: User is customer
                 :raise HTTPException 400: User is freelancer
             """
-            user: dict = await requests.get_user(kwargs[key])
+            user_id: typing.Optional[int] = kwargs[key]
+            if user_id:
+                user: dict = await requests.get_user(user_id)
 
-            if freelancer and customer:
-                raise ValueError('Only 1 param (freelancer or customer)')
+                if freelancer and customer:
+                    raise ValueError('Only 1 param (freelancer or customer)')
 
-            if freelancer and (not user['freelancer']):
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User is customer')
+                if freelancer and (not user['freelancer']):
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User is customer')
 
-            if customer and (user['freelancer']):
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User is freelancer')
+                if customer and (user['freelancer']):
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User is freelancer')
 
             return await function(*args, **kwargs)
 

@@ -36,6 +36,10 @@ class UpdateJob(CreateJob):
     pass
 
 
+class UpdateJobAdmin(UpdateJob):
+    completed: bool = False
+
+
 class GetJob(BaseModel):
     """ Get job """
 
