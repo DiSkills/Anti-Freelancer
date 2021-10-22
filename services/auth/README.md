@@ -21,7 +21,7 @@
 - [x] Create superuser
 - [x] Get media
 - [x] Docker
-- [x] Auth
+- [ ] Auth
     - [x] Registration
     - [x] Login
     - [x] Activation account
@@ -41,6 +41,7 @@
     - [x] Remove user skills
     - [x] Profile
     - [x] Resend email for activation account if user login
+    - [ ] Get freelancers (username and ID)
 - [x] Skills
   - [x] Import skills from excel
   - [x] Get skills
@@ -60,7 +61,7 @@
     - [x] Is superuser
     - [x] Is freelancer
     - [x] Is customer
-- [x] Tests
+- [ ] Tests
     - [x] Test registration
     - [x] Test login
     - [x] Test activation account

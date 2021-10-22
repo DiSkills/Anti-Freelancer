@@ -1,5 +1,11 @@
-# Anti-Freelancer FastAPI
+# Anti-Freelancer: FastAPI
 
-Levels freelancers
-Messenger
-Get freelancers (username and ID)
+## TODO
+- [ ] Services
+  - [ ] Auth
+  - [ ] Main
+- [ ] Docker compose
+
+### Ideas
+- [ ] Levels freelancers 
+- [ ] Messenger
