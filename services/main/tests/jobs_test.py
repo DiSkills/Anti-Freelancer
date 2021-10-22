@@ -778,3 +778,96 @@ class JobsTestCase(BaseTest, TestCase):
             response = self.client.get(f'{self.url}/jobs/category/all?page=2&page_size=2&category_id=143')
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+            # Update
+            response = self.client.get(f'{self.url}/jobs/3')
+            self.assertEqual(
+                response.json(),
+                {
+                    'category_id': 2,
+                    'completed': False,
+                    'customer_id': 1,
+                    'description': 'Web site',
+                    'executor_id': None,
+                    'id': 3,
+                    'order_date': f'{now}Z'.replace(' ', 'T'),
+                    'price': 5000,
+                    'title': 'Python'
+                }
+
+            )
+
+            response = self.client.put(f'{self.url}/jobs/3', json={
+                'title': 'Web site',
+                'description': 'Web site',
+                'price': 5000,
+                'order_date': f'{now + datetime.timedelta(minutes=15)}Z',
+                'category_id': 1,
+            }, headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json(),
+                {
+                    'category_id': 1,
+                    'completed': False,
+                    'customer_id': 1,
+                    'description': 'Web site',
+                    'executor_id': None,
+                    'id': 3,
+                    'order_date': f'{now + datetime.timedelta(minutes=15)}Z'.replace(' ', 'T'),
+                    'price': 5000,
+                    'title': 'Web site'
+                }
+
+            )
+
+            response = self.client.put(f'{self.url}/jobs/143', json={
+                'title': 'Web site',
+                'description': 'Web site',
+                'price': 5000,
+                'order_date': f'{now}Z',
+                'category_id': 1,
+            }, headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job not found'})
+
+            with mock.patch('app.permission.permission', return_value=2) as _:
+                response = self.client.put(f'{self.url}/jobs/3', json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 1,
+                }, headers=headers)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'You not owner this job'})
+
+            response = self.client.put(f'{self.url}/jobs/1', json={
+                'title': 'Web site',
+                'description': 'Web site',
+                'price': 5000,
+                'order_date': f'{now}Z',
+                'category_id': 1,
+            }, headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job is completed'})
+
+            response = self.client.put(f'{self.url}/jobs/3', json={
+                'title': 'Web site',
+                'description': 'Web site',
+                'price': 5000,
+                'order_date': f'{now}Z',
+                'category_id': 143,
+            }, headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Category not found'})
+
+            response = self.client.put(f'{self.url}/jobs/3', json={
+                'title': 'Web site',
+                'description': 'Web site',
+                'price': 5000,
+                'order_date': f'{now - datetime.timedelta(minutes=11)}Z',
+                'category_id': 1,
+            }, headers=headers)
+            self.assertEqual(response.status_code, 422)
+            self.assertEqual(response.json()['detail'][0]['msg'], 'Date can\'t be past')

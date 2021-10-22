@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.jobs import views
-from app.jobs.schemas import CreateJob, GetJob, JobsPaginate
+from app.jobs.schemas import CreateJob, GetJob, JobsPaginate, UpdateJob
 from app.permission import is_customer
 from app.schemas import Message
 from db import get_db
@@ -188,3 +188,18 @@ async def select_executor(
 )
 async def complete_job(pk: int, user_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)):
     return await views.complete_job(db, pk, user_id)
+
+
+@jobs_router.put(
+    '/{pk}',
+    name='Update job',
+    description='Update job before completed',
+    response_description='Job',
+    response_model=GetJob,
+    status_code=status.HTTP_200_OK,
+    tags=['jobs'],
+)
+async def update_job(
+        pk: int, schema: UpdateJob, user_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)
+):
+    return await views.update_job(db, pk, schema, user_id)

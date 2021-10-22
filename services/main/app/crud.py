@@ -2,7 +2,7 @@ import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.categories.schemas import CreateCategory, UpdateCategory
-from app.jobs.schemas import CreateJob
+from app.jobs.schemas import CreateJob, UpdateJob
 from app.models import SuperCategory, SubCategory, Job
 from crud import CRUD
 
@@ -17,7 +17,7 @@ class SubCategoryCRUD(CRUD[SubCategory, CreateCategory, UpdateCategory]):
     pass
 
 
-class JobCRUD(CRUD[Job, CreateJob, CreateJob]):
+class JobCRUD(CRUD[Job, CreateJob, UpdateJob]):
     """ Job CRUD """
 
     @staticmethod

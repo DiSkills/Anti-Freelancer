@@ -34,9 +34,10 @@
   - [x] Search without completed
   - [x] Get jobs for freelancer
   - [x] Get jobs for customer
-  - [ ] Update (owner)
+  - [x] Update (owner)
   - [ ] Update (admin)
   - [ ] Delete (admin)
+  - [ ] Delete all jobs for user
   - [ ] Add / remove attachments {maybe}
 - [ ] Tests
   - [x] Categories
@@ -63,3 +64,4 @@
     - [x] Complete
     - [x] Get for freelancer
     - [x] Get for customers
+    - [x] Update (owner)

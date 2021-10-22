@@ -7,6 +7,7 @@ from app.schemas import Paginate
 
 
 class CreateJob(BaseModel):
+    """ Create job """
 
     title: str
     description: str
@@ -25,10 +26,14 @@ class CreateJob(BaseModel):
     @validator('order_date')
     def validate_order_date(cls, order_date):
         """ Validate order date """
-
-        if order_date.timestamp() < datetime.datetime.utcnow().timestamp():
+        if datetime.datetime.utcfromtimestamp(order_date.timestamp()).timestamp() < datetime.datetime.utcnow().timestamp():
             raise ValueError('Date can\'t be past')
         return order_date
+
+
+class UpdateJob(CreateJob):
+    """ Update job """
+    pass
 
 
 class GetJob(BaseModel):

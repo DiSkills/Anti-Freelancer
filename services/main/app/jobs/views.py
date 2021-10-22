@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import requests
 from app.crud import sub_category_crud, job_crud
-from app.jobs.schemas import CreateJob
+from app.jobs.schemas import CreateJob, UpdateJob
 from app.models import Job
 from app.service import paginate, user_exist
 from config import SERVER_MAIN_BACKEND, API
@@ -288,3 +288,43 @@ async def complete_job(db: AsyncSession, pk: int, user_id: int) -> dict[str, str
 
     await job_crud.update(db, {'id': pk}, completed=True)
     return {'msg': 'Job has been completed'}
+
+
+async def update_job(db: AsyncSession, pk: int, schema: UpdateJob, user_id: int) -> dict:
+    """
+        Update job
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Job ID
+        :type pk: int
+        :param schema: New job data
+        :type schema: UpdateJob
+        :param user_id: User ID
+        :type user_id: int
+        :return: Job
+        :rtype: dict
+        :raise HTTPException 400: Job not found
+        :raise HTTPException 400: User not owner this job
+        :raise HTTPException 400: Job is completed
+        :raise HTTPException 400: Category not found
+    """
+
+    if not await job_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job not found')
+    job = await job_crud.get(db, id=pk)
+
+    if job.customer_id != user_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You not owner this job')
+
+    if job.completed:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job is completed')
+
+    if not await sub_category_crud.exist(db, id=schema.category_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Category not found')
+
+    job = await job_crud.update(
+        db,
+        {'id': pk},
+        **{**schema.dict(), 'order_date': datetime.datetime.utcfromtimestamp(schema.order_date.timestamp())}
+    )
+    return job.__dict__
