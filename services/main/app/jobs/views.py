@@ -365,6 +365,24 @@ async def update_job(db: AsyncSession, pk: int, schema: UpdateJob, user_id: int)
     return job.__dict__
 
 
+async def delete_job_admin(db: AsyncSession, pk: int) -> dict[str, str]:
+    """
+        Delete job (admin)
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Job ID
+        :type pk: int
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Job not found
+    """
+
+    if not await job_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job not found')
+    await job_crud.remove(db, id=pk)
+    return {'msg': 'Job has been deleted'}
+
+
 async def delete_job(db: AsyncSession, pk: int, owner_id: int) -> dict[str, str]:
     """
         Delete job (owner)

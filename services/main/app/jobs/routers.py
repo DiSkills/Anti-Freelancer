@@ -227,6 +227,20 @@ async def update_job(
 
 
 @jobs_router.delete(
+    '/admin/{pk}',
+    name='Delete job (admin)',
+    description='Delete job (admin)',
+    response_description='Message',
+    response_model=Message,
+    status_code=status.HTTP_200_OK,
+    tags=['jobs'],
+    dependencies=[Depends(is_superuser)],
+)
+async def delete_job_admin(pk: int, db: AsyncSession = Depends(get_db)):
+    return await views.delete_job_admin(db, pk)
+
+
+@jobs_router.delete(
     '/{pk}',
     name='Delete job (owner)',
     description='Delete job before completed',
