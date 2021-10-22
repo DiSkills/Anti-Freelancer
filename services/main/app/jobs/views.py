@@ -365,6 +365,21 @@ async def update_job(db: AsyncSession, pk: int, schema: UpdateJob, user_id: int)
     return job.__dict__
 
 
+async def delete_all_jobs_for_user(db: AsyncSession, user_id: int) -> dict[str, str]:
+    """
+        Delete all jobs for user
+        :param db: DB
+        :type db: AsyncSession
+        :param user_id: User ID
+        :type user_id: int
+        :return: Message
+        :rtype: dict
+    """
+
+    await job_crud.remove_all_by_user_id(db, user_id)
+    return {'msg': 'Jobs has been deleted'}
+
+
 async def delete_job_admin(db: AsyncSession, pk: int) -> dict[str, str]:
     """
         Delete job (admin)

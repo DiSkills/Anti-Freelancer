@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.jobs import views
 from app.jobs.schemas import CreateJob, GetJob, JobsPaginate, UpdateJob, UpdateJobAdmin
-from app.permission import is_customer, is_superuser
+from app.permission import is_customer, is_superuser, is_active
 from app.schemas import Message
 from db import get_db
 
@@ -224,6 +224,19 @@ async def update_job(
         pk: int, schema: UpdateJob, user_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)
 ):
     return await views.update_job(db, pk, schema, user_id)
+
+
+@jobs_router.delete(
+    '/all',
+    name='Delete all job for user',
+    description='Delete all job for user',
+    response_description='Message',
+    response_model=Message,
+    status_code=status.HTTP_200_OK,
+    tags=['jobs'],
+)
+async def delete_all_jobs_for_user(user_id: int = Depends(is_active), db: AsyncSession = Depends(get_db)):
+    return await views.delete_all_jobs_for_user(db, user_id)
 
 
 @jobs_router.delete(

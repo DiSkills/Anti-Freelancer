@@ -42,6 +42,7 @@
     - [x] Profile
     - [x] Resend email for activation account if user login
     - [ ] Get freelancers (username and ID)
+    - [ ] Search freelancers by username
 - [x] Skills
   - [x] Import skills from excel
   - [x] Get skills

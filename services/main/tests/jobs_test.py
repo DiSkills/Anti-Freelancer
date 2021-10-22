@@ -962,3 +962,21 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Job not found'})
             self.assertEqual(len(async_loop(job_crud.all(self.session))), 2)
+
+            # Delete all jobs
+            async_loop(job_crud.update(self.session, {'id': 2}, customer_id=2, executor_id=3))
+            async_loop(job_crud.update(self.session, {'id': 3}, customer_id=3, executor_id=2))
+            async_loop(self.session.commit())
+            self.assertEqual(len(async_loop(job_crud.all(self.session))), 2)
+
+            self.assertEqual(async_loop(job_crud.get(self.session, id=2)).customer_id, 2)
+            self.assertEqual(async_loop(job_crud.get(self.session, id=2)).executor_id, 3)
+            self.assertEqual(async_loop(job_crud.get(self.session, id=3)).customer_id, 3)
+            self.assertEqual(async_loop(job_crud.get(self.session, id=3)).executor_id, 2)
+
+            with mock.patch('app.permission.permission', return_value=2) as _:
+                response = self.client.delete(f'{self.url}/jobs/all', headers=headers)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json(), {'msg': 'Jobs has been deleted'})
+
+            self.assertEqual(len(async_loop(job_crud.all(self.session))), 0)

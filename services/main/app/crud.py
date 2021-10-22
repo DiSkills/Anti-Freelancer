@@ -216,6 +216,24 @@ class JobCRUD(CRUD[Job, CreateJob, UpdateJob]):
         """
         return await super().exist_page(db, skip, limit, customer_id=pk)
 
+    @staticmethod
+    async def remove_all_by_user_id(db: AsyncSession, user_id: int) -> None:
+        """
+            Remove all jobs by user ID
+            :param db: DB
+            :type db: AsyncSession
+            :param user_id: User ID
+            :type user_id: int
+            :return: None
+        """
+        await db.execute(sqlalchemy.delete(Job).filter(
+            sqlalchemy.or_(
+                Job.executor_id == user_id,
+                Job.customer_id == user_id,
+            )
+        ))
+        await db.commit()
+
 
 super_category_crud = SuperCategoryCRUD(SuperCategory)
 sub_category_crud = SubCategoryCRUD(SubCategory)
