@@ -363,3 +363,33 @@ async def update_job(db: AsyncSession, pk: int, schema: UpdateJob, user_id: int)
         **{**schema.dict(), 'order_date': datetime.datetime.utcfromtimestamp(schema.order_date.timestamp())}
     )
     return job.__dict__
+
+
+async def delete_job(db: AsyncSession, pk: int, owner_id: int) -> dict[str, str]:
+    """
+        Delete job (owner)
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Job ID
+        :type pk: int
+        :param owner_id: Owner ID
+        :type owner_id: int
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Job not found
+        :raise HTTPException 400: User not owner this job
+        :raise HTTPException 400: Job is completed
+    """
+
+    if not await job_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job not found')
+    job = await job_crud.get(db, id=pk)
+
+    if job.customer_id != owner_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You not owner this job')
+
+    if job.completed:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job is completed')
+
+    await job_crud.remove(db, id=pk)
+    return {'msg': 'Job has been deleted'}

@@ -36,9 +36,10 @@
   - [x] Get jobs for customer
   - [x] Update (owner)
   - [x] Update (admin)
+  - [x] Delete (owner)
   - [ ] Delete (admin)
   - [ ] Delete all jobs for user
-  - [ ] Add / remove attachments {maybe}
+  - [ ] Add / remove attachments
 - [ ] Tests
   - [x] Categories
     - [x] Get all
@@ -66,3 +67,4 @@
     - [x] Get for customers
     - [x] Update (owner)
     - [x] Update (admin)
+    - [x] Delete (owner)

@@ -929,3 +929,21 @@ class JobsTestCase(BaseTest, TestCase):
             }, headers=headers)
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'User not found'})
+
+            # Delete job (owner)
+            self.assertEqual(len(async_loop(job_crud.all(self.session))), 4)
+
+            response = self.client.delete(f'{self.url}/jobs/4', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Job has been deleted'})
+            self.assertEqual(len(async_loop(job_crud.all(self.session))), 3)
+
+            with mock.patch('app.permission.permission', return_value=2) as _:
+                response = self.client.delete(f'{self.url}/jobs/3', headers=headers)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'You not owner this job'})
+
+            response = self.client.delete(f'{self.url}/jobs/143', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job not found'})
+            self.assertEqual(len(async_loop(job_crud.all(self.session))), 3)

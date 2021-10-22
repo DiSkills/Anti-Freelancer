@@ -213,7 +213,7 @@ async def update_job_admin(
 
 @jobs_router.put(
     '/{pk}',
-    name='Update job',
+    name='Update job (owner)',
     description='Update job before completed',
     response_description='Job',
     response_model=GetJob,
@@ -224,3 +224,16 @@ async def update_job(
         pk: int, schema: UpdateJob, user_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)
 ):
     return await views.update_job(db, pk, schema, user_id)
+
+
+@jobs_router.delete(
+    '/{pk}',
+    name='Delete job (owner)',
+    description='Delete job before completed',
+    response_description='Message',
+    response_model=Message,
+    status_code=status.HTTP_200_OK,
+    tags=['jobs'],
+)
+async def delete_job(pk: int, owner_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)):
+    return await views.delete_job(db, pk, owner_id)
