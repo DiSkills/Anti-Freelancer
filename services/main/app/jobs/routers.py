@@ -296,3 +296,16 @@ async def add_attachments(
 )
 async def get_attachments(directory: str, file_name: str):
     return await views.get_attachments(directory, file_name)
+
+
+@jobs_router.delete(
+    '/attachments/remove',
+    name='Remove attachment',
+    description='Remove attachment',
+    response_description='Message',
+    response_model=Message,
+    status_code=status.HTTP_200_OK,
+    tags=['attachments'],
+)
+async def remove_attachment(pk: int, user_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)):
+    return await views.remove_attachment(db, user_id, pk)

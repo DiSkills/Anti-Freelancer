@@ -1188,3 +1188,53 @@ class JobsTestCase(BaseTest, TestCase):
             response = self.client.get(f'{self.url}/jobs/media/1/4343.png')
             self.assertEqual(response.status_code, 404)
             self.assertEqual(response.json(), {'detail': 'File not found'})
+
+            # Remove
+            attachment_6 = async_loop(attachment_crud.get(self.session, id=6))
+            self.assertEqual(os.path.exists(attachment_6.path), True)
+
+            response = self.client.delete(f'{self.url}/jobs/attachments/remove?pk=6', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Attachment has been deleted'})
+
+            self.assertEqual(len(async_loop(attachment_crud.all(self.session))), 5)
+            self.assertEqual(os.path.exists(attachment_6.path), False)
+
+            response = self.client.delete(f'{self.url}/jobs/attachments/remove?pk=143', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Attachment not found'})
+
+            with mock.patch('app.permission.permission', return_value=2) as _:
+                response = self.client.delete(f'{self.url}/jobs/attachments/remove?pk=5', headers=headers)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'You not owner this job'})
+
+            response = self.client.delete(f'{self.url}/jobs/attachments/remove?pk=5', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Attachment has been deleted'})
+
+            self.assertEqual(len(async_loop(attachment_crud.all(self.session))), 4)
+
+            response = self.client.delete(f'{self.url}/jobs/attachments/remove?pk=4', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Attachment has been deleted'})
+
+            self.assertEqual(len(async_loop(attachment_crud.all(self.session))), 3)
+
+            response = self.client.delete(f'{self.url}/jobs/attachments/remove?pk=3', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Attachment has been deleted'})
+
+            self.assertEqual(len(async_loop(attachment_crud.all(self.session))), 2)
+
+            response = self.client.delete(f'{self.url}/jobs/attachments/remove?pk=2', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Attachment has been deleted'})
+
+            self.assertEqual(len(async_loop(attachment_crud.all(self.session))), 1)
+
+            response = self.client.delete(f'{self.url}/jobs/attachments/remove?pk=1', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Attachment has been deleted'})
+
+            self.assertEqual(len(async_loop(attachment_crud.all(self.session))), 0)

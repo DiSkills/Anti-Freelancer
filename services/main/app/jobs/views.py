@@ -10,7 +10,7 @@ from app import requests
 from app.crud import sub_category_crud, job_crud, attachment_crud
 from app.jobs.schemas import CreateJob, UpdateJob, UpdateJobAdmin
 from app.models import Job
-from app.service import paginate, user_exist, write_file
+from app.service import paginate, user_exist, write_file, remove_file
 from config import SERVER_MAIN_BACKEND, API, MEDIA_ROOT
 
 
@@ -484,3 +484,35 @@ async def get_attachments(directory: str, file_name: str) -> FileResponse:
     if not os.path.exists(f'{MEDIA_ROOT}{directory}/{file_name}'):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='File not found')
     return FileResponse(f'{MEDIA_ROOT}{directory}/{file_name}', status_code=status.HTTP_200_OK)
+
+
+async def remove_attachment(db, user_id, pk) -> dict[str, str]:
+    """
+        Remove attachment
+        :param db: DB
+        :type db: AsyncSession
+        :param user_id: User ID
+        :type user_id: int
+        :param pk: Attachment ID
+        :type pk: int
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Attachment not found
+        :raise HTTPException 400: User not owner this attachment
+    """
+
+    if not await attachment_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Attachment not found')
+
+    attachment = await attachment_crud.get(db, id=pk)
+
+    job = await job_crud.get(db, id=attachment.job_id)
+
+    if job.customer_id != user_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You not owner this job')
+
+    await attachment_crud.remove(db, id=pk)
+
+    remove_file(attachment.path)
+
+    return {'msg': 'Attachment has been deleted'}

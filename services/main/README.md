@@ -41,7 +41,7 @@
   - [x] Delete all jobs for user
   - [x] Add attachments
   - [x] Get attachment file
-  - [ ] Remove attachments
+  - [x] Remove attachments
 - [ ] Tests
   - [x] Categories
     - [x] Get all
@@ -74,3 +74,4 @@
     - [x] Delete all jobs for user
     - [x] Add attachments
     - [x] Get attachment file
+    - [x] Remove attachments
