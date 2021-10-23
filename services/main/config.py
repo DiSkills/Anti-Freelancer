@@ -7,9 +7,11 @@ BASE_DIR = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_NAME = 'Anti-Freelancer'
 SERVER_AUTH_BACKEND = 'http://localhost:8000/'
 
+API = 'api/v1'
 SERVER_MAIN_BACKEND = 'http://localhost:8001/'
 
-API = 'api/v1'
+LOGIN_URL = f'{SERVER_AUTH_BACKEND}{API}/login'
+
 TEST = os.environ.get('TEST', 0)
 DOCKER = os.environ.get('DOCKER', 0)
 
@@ -21,6 +23,9 @@ DB_PORT = os.environ.get('DB_PORT')
 DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
 MEDIA_ROOT = 'media/'
+
+if int(DOCKER):
+    SERVER_AUTH_BACKEND = 'http://auth:8000/'
 
 if int(TEST):
     DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}_test'

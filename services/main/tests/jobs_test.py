@@ -969,19 +969,6 @@ class JobsTestCase(BaseTest, TestCase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.json(), {'detail': 'Category not found'})
 
-            response = self.client.put(
-                f'{self.url}/jobs/admin/3?executor_id=2', json={
-                    'title': 'Web',
-                    'description': 'Web site',
-                    'price': 50000,
-                    'order_date': f'{now}Z',
-                    'category_id': 1,
-                    'completed': True,
-                }, headers=headers
-            )
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(response.json(), {'detail': 'User not found'})
-
             # Delete job (owner)
             self.assertEqual(len(async_loop(job_crud.all(self.session))), 4)
 

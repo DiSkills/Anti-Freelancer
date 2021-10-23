@@ -2,9 +2,9 @@ import aiohttp
 from fastapi import Security, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
-from config import SERVER_AUTH_BACKEND, API
+from config import SERVER_AUTH_BACKEND, API, LOGIN_URL
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f'{SERVER_AUTH_BACKEND}{API}/login')
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=LOGIN_URL)
 
 
 async def permission(url: str, token: str) -> int:
