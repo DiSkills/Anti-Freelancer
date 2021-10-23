@@ -4,7 +4,7 @@ import typing
 from pydantic import BaseModel, Field, validator
 
 from app.schemas import Paginate
-from config import SERVER_MAIN_BACKEND
+from config import SERVER_MAIN_BACKEND, API
 
 
 class CreateJob(BaseModel):
@@ -76,7 +76,7 @@ class Attachment(BaseModel):
     @validator('path')
     def validate_path(cls, path: str):
         """ Validate path """
-        return f'{SERVER_MAIN_BACKEND}jobs/{path}'
+        return f'{SERVER_MAIN_BACKEND}{API}/jobs/{path}'
 
 
 class AttachmentsJob(GetJob):

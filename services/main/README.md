@@ -40,6 +40,7 @@
   - [x] Delete (admin)
   - [x] Delete all jobs for user
   - [x] Add attachments
+  - [x] Get attachment file
   - [ ] Remove attachments
 - [ ] Tests
   - [x] Categories
@@ -72,3 +73,4 @@
     - [x] Delete (admin)
     - [x] Delete all jobs for user
     - [x] Add attachments
+    - [x] Get attachment fileg

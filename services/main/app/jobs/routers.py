@@ -1,6 +1,7 @@
 import typing
 
 from fastapi import APIRouter, status, Depends, Query, UploadFile, File
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.jobs import views
@@ -35,10 +36,10 @@ async def create_job(schema: CreateJob, customer_id: int = Depends(is_customer),
     tags=['jobs'],
 )
 async def get_jobs_for_freelancer(
-        pk: int,
-        page: int = Query(default=1, gt=0),
-        page_size: int = Query(default=1, gt=0),
-        db: AsyncSession = Depends(get_db),
+    pk: int,
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db),
 ):
     return await views.get_jobs_for_freelancer(db=db, page=page, page_size=page_size, pk=pk)
 
@@ -53,10 +54,10 @@ async def get_jobs_for_freelancer(
     tags=['jobs'],
 )
 async def get_jobs_for_customer(
-        pk: int,
-        page: int = Query(default=1, gt=0),
-        page_size: int = Query(default=1, gt=0),
-        db: AsyncSession = Depends(get_db),
+    pk: int,
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db),
 ):
     return await views.get_jobs_for_customer(db=db, page=page, page_size=page_size, pk=pk)
 
@@ -71,9 +72,9 @@ async def get_jobs_for_customer(
     tags=['jobs'],
 )
 async def get_all_jobs(
-        page: int = Query(default=1, gt=0),
-        page_size: int = Query(default=1, gt=0),
-        db: AsyncSession = Depends(get_db)
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db)
 ):
     return await views.get_all_jobs(db=db, page=page, page_size=page_size)
 
@@ -88,10 +89,10 @@ async def get_all_jobs(
     tags=['jobs'],
 )
 async def get_all_jobs_for_category(
-        category_id: int = Query(default=1, gt=0),
-        page: int = Query(default=1, gt=0),
-        page_size: int = Query(default=1, gt=0),
-        db: AsyncSession = Depends(get_db),
+    category_id: int = Query(default=1, gt=0),
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db),
 ):
     return await views.get_all_jobs_for_category(db=db, page=page, page_size=page_size, category_id=category_id)
 
@@ -106,9 +107,9 @@ async def get_all_jobs_for_category(
     tags=['jobs'],
 )
 async def get_all_jobs_without_completed(
-        page: int = Query(default=1, gt=0),
-        page_size: int = Query(default=1, gt=0),
-        db: AsyncSession = Depends(get_db)
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db)
 ):
     return await views.get_all_jobs_without_completed(db=db, page=page, page_size=page_size)
 
@@ -123,10 +124,10 @@ async def get_all_jobs_without_completed(
     tags=['jobs'],
 )
 async def get_all_jobs_without_completed_for_category(
-        category_id: int = Query(default=1, gt=0),
-        page: int = Query(default=1, gt=0),
-        page_size: int = Query(default=1, gt=0),
-        db: AsyncSession = Depends(get_db),
+    category_id: int = Query(default=1, gt=0),
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db),
 ):
     return await views.get_all_jobs_without_completed_for_category(
         db=db, page=page, page_size=page_size, category_id=category_id
@@ -143,10 +144,10 @@ async def get_all_jobs_without_completed_for_category(
     tags=['jobs'],
 )
 async def search_jobs(
-        search: str,
-        page: int = Query(default=1, gt=0),
-        page_size: int = Query(default=1, gt=0),
-        db: AsyncSession = Depends(get_db),
+    search: str,
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db),
 ):
     return await views.search_jobs(db=db, page=page, page_size=page_size, search=search)
 
@@ -174,7 +175,7 @@ async def get_job(pk: int, db: AsyncSession = Depends(get_db)):
     tags=['jobs'],
 )
 async def select_executor(
-        pk: int, user_id: int, db: AsyncSession = Depends(get_db), owner_id: int = Depends(is_customer)
+    pk: int, user_id: int, db: AsyncSession = Depends(get_db), owner_id: int = Depends(is_customer)
 ):
     return await views.select_executor(db, pk, user_id, owner_id)
 
@@ -203,10 +204,10 @@ async def complete_job(pk: int, user_id: int = Depends(is_customer), db: AsyncSe
     dependencies=[Depends(is_superuser)],
 )
 async def update_job_admin(
-        pk: int,
-        schema: UpdateJobAdmin,
-        executor_id: typing.Optional[int] = Query(default=None),
-        db: AsyncSession = Depends(get_db)
+    pk: int,
+    schema: UpdateJobAdmin,
+    executor_id: typing.Optional[int] = Query(default=None),
+    db: AsyncSession = Depends(get_db)
 ):
     return await views.update_job_admin(db=db, schema=schema, executor_id=executor_id, pk=pk)
 
@@ -221,7 +222,7 @@ async def update_job_admin(
     tags=['jobs'],
 )
 async def update_job(
-        pk: int, schema: UpdateJob, user_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)
+    pk: int, schema: UpdateJob, user_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)
 ):
     return await views.update_job(db, pk, schema, user_id)
 
@@ -276,9 +277,22 @@ async def delete_job(pk: int, owner_id: int = Depends(is_customer), db: AsyncSes
     tags=['attachments'],
 )
 async def add_attachments(
-        job_id: int,
-        files: list[UploadFile] = File(...),
-        user_id: int = Depends(is_customer),
-        db: AsyncSession = Depends(get_db),
+    job_id: int,
+    files: list[UploadFile] = File(...),
+    user_id: int = Depends(is_customer),
+    db: AsyncSession = Depends(get_db),
 ):
     return await views.add_attachments(db, user_id, job_id, files)
+
+
+@jobs_router.get(
+    '/media/{directory}/{file_name}',
+    name='Get attachment',
+    description='Get attachment',
+    response_description='File',
+    status_code=status.HTTP_200_OK,
+    response_class=FileResponse,
+    tags=['attachments'],
+)
+async def get_attachments(directory: str, file_name: str):
+    return await views.get_attachments(directory, file_name)

@@ -3,6 +3,7 @@ import os
 import typing
 
 from fastapi import HTTPException, status, UploadFile
+from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import requests
@@ -112,7 +113,7 @@ async def get_all_jobs(*, db: AsyncSession, page: int, page_size: int, queryset:
     'category_id',
 )
 async def get_all_jobs_for_category(
-        *, db: AsyncSession, queryset: list[Job], page: int, page_size: int, category_id: int,
+    *, db: AsyncSession, queryset: list[Job], page: int, page_size: int, category_id: int,
 ):
     """
         Get all for category
@@ -154,7 +155,7 @@ async def get_all_jobs_without_completed(*, db: AsyncSession, page: int, page_si
     f'{SERVER_MAIN_BACKEND}{API}/jobs/category', 'category_id'
 )
 async def get_all_jobs_without_completed_for_category(
-        *, db: AsyncSession, queryset: list[Job], page: int, page_size: int, category_id: int,
+    *, db: AsyncSession, queryset: list[Job], page: int, page_size: int, category_id: int,
 ):
     """
         Get all for category without completed
@@ -296,7 +297,7 @@ async def complete_job(db: AsyncSession, pk: int, user_id: int) -> dict[str, str
 
 @user_exist('executor_id', freelancer=True)
 async def update_job_admin(
-        *, db: AsyncSession, schema: UpdateJobAdmin, executor_id: typing.Optional[int], pk: int
+    *, db: AsyncSession, schema: UpdateJobAdmin, executor_id: typing.Optional[int], pk: int
 ) -> dict:
     """
         Update job (admin)
@@ -466,3 +467,20 @@ async def add_attachments(db: AsyncSession, user_id: int, job_id: int, files: li
 
         await attachment_crud.create(db, path=file_name, job_id=job_id)
     return {'msg': 'Attachments has been added'}
+
+
+async def get_attachments(directory: str, file_name: str) -> FileResponse:
+    """
+        Get attachments
+        :param directory: Directory name
+        :type directory: str
+        :param file_name: File name
+        :type file_name: str
+        :return: File
+        :rtype: FileResponse
+        :raise HTTPException 404: File not found
+    """
+
+    if not os.path.exists(f'{MEDIA_ROOT}{directory}/{file_name}'):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='File not found')
+    return FileResponse(f'{MEDIA_ROOT}{directory}/{file_name}', status_code=status.HTTP_200_OK)

@@ -5,7 +5,7 @@ from unittest import TestCase, mock
 from fastapi import UploadFile
 
 from app.crud import job_crud, attachment_crud
-from config import SERVER_MAIN_BACKEND, MEDIA_ROOT
+from config import SERVER_MAIN_BACKEND, MEDIA_ROOT, API
 from tests import BaseTest, async_loop
 
 
@@ -1161,3 +1161,30 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.json()['attachments'][0]['id'], 4)
             self.assertEqual(response.json()['attachments'][1]['id'], 5)
             self.assertEqual(response.json()['attachments'][2]['id'], 6)
+
+            self.assertEqual(
+                f'{SERVER_MAIN_BACKEND.strip("/")}{self.url}/jobs' in response.json()['attachments'][0]['path'], True
+            )
+            attachment_1 = response.json()['attachments'][0]['path'].replace(
+                f'{SERVER_MAIN_BACKEND}', ''
+            ).replace('tests', '')
+            attachment_2 = response.json()['attachments'][1]['path'].replace(
+                f'{SERVER_MAIN_BACKEND}', ''
+            ).replace('tests', '')
+            attachment_3 = response.json()['attachments'][2]['path'].replace(
+                f'{SERVER_MAIN_BACKEND}', ''
+            ).replace('tests', '')
+
+            # Get attachments
+            response_1 = self.client.get(attachment_1)
+            self.assertEqual(response_1.status_code, 200)
+
+            response_2 = self.client.get(attachment_2)
+            self.assertEqual(response_2.status_code, 200)
+
+            response_3 = self.client.get(attachment_3)
+            self.assertEqual(response_3.status_code, 200)
+
+            response = self.client.get(f'{self.url}/jobs/media/1/4343.png')
+            self.assertEqual(response.status_code, 404)
+            self.assertEqual(response.json(), {'detail': 'File not found'})
