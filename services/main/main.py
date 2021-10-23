@@ -5,7 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.categories.routers import categories_router
 from app.jobs.routers import jobs_router
-from config import PROJECT_NAME, API, MEDIA_ROOT
+from config import PROJECT_NAME, API, MEDIA_ROOT, DOCKER
+from db import Base, engine
 
 app = FastAPI(
     title=PROJECT_NAME,
@@ -25,6 +26,10 @@ app.add_middleware(
 @app.on_event('startup')
 async def startup():
     """ Startup """
+
+    if int(DOCKER):
+        async with engine.begin() as connection:
+            await connection.run_sync(Base.metadata.create_all)
 
     if not os.path.exists(MEDIA_ROOT):
         os.makedirs(MEDIA_ROOT)

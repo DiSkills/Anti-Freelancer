@@ -11,6 +11,7 @@ SERVER_MAIN_BACKEND = 'http://localhost:8001/'
 
 API = 'api/v1'
 TEST = os.environ.get('TEST', 0)
+DOCKER = os.environ.get('DOCKER', 0)
 
 DB_USER = os.environ.get('DB_USER')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
