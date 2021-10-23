@@ -24,6 +24,7 @@ app.add_middleware(
 
 @app.on_event('startup')
 async def startup():
+    """ Startup """
 
     if not os.path.exists(MEDIA_ROOT):
         os.makedirs(MEDIA_ROOT)
