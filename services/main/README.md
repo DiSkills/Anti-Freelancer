@@ -73,4 +73,4 @@
     - [x] Delete (admin)
     - [x] Delete all jobs for user
     - [x] Add attachments
-    - [x] Get attachment fileg
+    - [x] Get attachment file
