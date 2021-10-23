@@ -21,7 +21,7 @@
     - [x] Get
     - [x] Update
     - [x] Delete
-- [ ] Jobs
+- [x] Jobs
   - [x] Create
   - [x] Get all
   - [x] Get for categories
@@ -42,7 +42,7 @@
   - [x] Add attachments
   - [x] Get attachment file
   - [x] Remove attachments
-- [ ] Tests
+- [x] Tests
   - [x] Categories
     - [x] Get all
     - [x] Super
@@ -55,7 +55,7 @@
       - [x] Get
       - [x] Update
       - [x] Delete
-  - [ ] Jobs
+  - [x] Jobs
     - [x] Create
     - [x] Get all
     - [x] Get for categories
