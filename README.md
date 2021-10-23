@@ -11,3 +11,5 @@
 - [ ] Advertisement
 - [ ] Referral registration system
 - [ ] Messenger
+- [ ] Reviews freelancers
+- [ ] Feedbacks
