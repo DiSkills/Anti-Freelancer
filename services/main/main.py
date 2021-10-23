@@ -9,7 +9,7 @@ from config import PROJECT_NAME, API, MEDIA_ROOT
 
 app = FastAPI(
     title=PROJECT_NAME,
-    version='0.1.0',
+    version='0.4.0',
     description='Main Service Anti-Freelancer by Counter',
 )
 
