@@ -4,7 +4,7 @@ from fastapi import APIRouter, status, Depends, Query, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.jobs import views
-from app.jobs.schemas import CreateJob, GetJob, JobsPaginate, UpdateJob, UpdateJobAdmin
+from app.jobs.schemas import CreateJob, GetJob, JobsPaginate, UpdateJob, UpdateJobAdmin, AttachmentsJob
 from app.permission import is_customer, is_superuser, is_active
 from app.schemas import Message
 from db import get_db
@@ -157,7 +157,7 @@ async def search_jobs(
     description='Get job',
     response_description='Job',
     status_code=status.HTTP_200_OK,
-    response_model=GetJob,
+    response_model=AttachmentsJob,
     tags=['jobs'],
 )
 async def get_job(pk: int, db: AsyncSession = Depends(get_db)):

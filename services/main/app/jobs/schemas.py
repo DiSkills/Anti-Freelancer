@@ -4,6 +4,7 @@ import typing
 from pydantic import BaseModel, Field, validator
 
 from app.schemas import Paginate
+from config import SERVER_MAIN_BACKEND
 
 
 class CreateJob(BaseModel):
@@ -64,3 +65,21 @@ class JobsPaginate(Paginate):
     """ Jobs paginate """
 
     results: list[GetJob]
+
+
+class Attachment(BaseModel):
+    """ Attachment """
+
+    id: int
+    path: str
+
+    @validator('path')
+    def validate_path(cls, path: str):
+        """ Validate path """
+        return f'{SERVER_MAIN_BACKEND}jobs/{path}'
+
+
+class AttachmentsJob(GetJob):
+    """ Get job with attachments """
+
+    attachments: list[Attachment]

@@ -342,6 +342,7 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(
                 response.json(), {
+                    'attachments': [],
                     'executor_id': None,
                     'id': 1,
                     'title': 'Web site',
@@ -358,6 +359,7 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(
                 response.json(), {
+                    'attachments': [],
                     'executor_id': None,
                     'id': 5,
                     'title': 'PyCharm',
@@ -813,6 +815,7 @@ class JobsTestCase(BaseTest, TestCase):
             self.assertEqual(
                 response.json(),
                 {
+                    'attachments': [],
                     'category_id': 2,
                     'completed': False,
                     'customer_id': 1,
@@ -1143,3 +1146,18 @@ class JobsTestCase(BaseTest, TestCase):
             )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Job not found'})
+
+            response = self.client.get(f'{self.url}/jobs/2')
+            self.assertEqual(response.json()['category_id'], 1)
+            self.assertEqual(response.json()['completed'], False)
+            self.assertEqual(response.json()['customer_id'], 1)
+            self.assertEqual(response.json()['description'], 'Web site')
+            self.assertEqual(response.json()['executor_id'], None)
+            self.assertEqual(response.json()['id'], 2)
+            self.assertEqual(response.json()['order_date'], f'{now}Z'.replace(' ', 'T'))
+            self.assertEqual(response.json()['price'], 5000)
+            self.assertEqual(response.json()['title'], 'Web site')
+            self.assertEqual(len(response.json()['attachments']), 3)
+            self.assertEqual(response.json()['attachments'][0]['id'], 4)
+            self.assertEqual(response.json()['attachments'][1]['id'], 5)
+            self.assertEqual(response.json()['attachments'][2]['id'], 6)

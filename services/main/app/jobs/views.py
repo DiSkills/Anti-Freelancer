@@ -208,7 +208,10 @@ async def get_job(db: AsyncSession, pk: int) -> dict[str, typing.Any]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job not found')
 
     job = await job_crud.get(db, id=pk)
-    return job.__dict__
+    return {
+        **job.__dict__,
+        'attachments': (attachment.__dict__ for attachment in job.attachments),
+    }
 
 
 async def select_executor(db: AsyncSession, pk: int, user_id: int, owner_id: int) -> dict:
