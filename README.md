@@ -7,5 +7,7 @@
 - [ ] Docker compose
 
 ### Ideas
-- [ ] Levels freelancers 
+- [ ] Levels freelancers
+- [ ] Advertisement
+- [ ] Referral registration system
 - [ ] Messenger
