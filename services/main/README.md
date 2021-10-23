@@ -39,7 +39,8 @@
   - [x] Delete (owner)
   - [x] Delete (admin)
   - [x] Delete all jobs for user
-  - [ ] Add / remove attachments
+  - [x] Add attachments
+  - [ ] Remove attachments
 - [ ] Tests
   - [x] Categories
     - [x] Get all
@@ -70,3 +71,4 @@
     - [x] Delete (owner)
     - [x] Delete (admin)
     - [x] Delete all jobs for user
+    - [x] Add attachments
