@@ -1,6 +1,6 @@
 import typing
 
-from fastapi import APIRouter, status, Depends, Query
+from fastapi import APIRouter, status, Depends, Query, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.jobs import views
@@ -264,3 +264,21 @@ async def delete_job_admin(pk: int, db: AsyncSession = Depends(get_db)):
 )
 async def delete_job(pk: int, owner_id: int = Depends(is_customer), db: AsyncSession = Depends(get_db)):
     return await views.delete_job(db, pk, owner_id)
+
+
+@jobs_router.post(
+    '/attachments/add',
+    name='Add attachments',
+    description='Add attachments for job',
+    response_description='Message',
+    response_model=Message,
+    status_code=status.HTTP_201_CREATED,
+    tags=['attachments'],
+)
+async def add_attachments(
+        job_id: int,
+        files: list[UploadFile] = File(...),
+        user_id: int = Depends(is_customer),
+        db: AsyncSession = Depends(get_db),
+):
+    return await views.add_attachments(db, user_id, job_id, files)

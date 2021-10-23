@@ -1,9 +1,11 @@
 import asyncio
+import os
+import shutil
 
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from config import API
+from config import API, MEDIA_ROOT
 from db import engine, Base
 from main import app
 
@@ -33,7 +35,9 @@ class BaseTest:
         self.client = TestClient(app)
         self.url = f'/{API}'
         async_loop(create_all())
+        os.makedirs(MEDIA_ROOT)
 
     def tearDown(self) -> None:
         async_loop(self.session.close())
         async_loop(drop_all())
+        shutil.rmtree(MEDIA_ROOT)

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.categories.schemas import CreateCategory, UpdateCategory
 from app.jobs.schemas import CreateJob, UpdateJob
-from app.models import SuperCategory, SubCategory, Job
+from app.models import SuperCategory, SubCategory, Job, Attachment
 from crud import CRUD
 
 
@@ -235,6 +235,12 @@ class JobCRUD(CRUD[Job, CreateJob, UpdateJob]):
         await db.commit()
 
 
+class AttachmentCRUD(CRUD[Attachment, Attachment, Attachment]):
+    """ Attachment CRUD """
+    pass
+
+
 super_category_crud = SuperCategoryCRUD(SuperCategory)
 sub_category_crud = SubCategoryCRUD(SubCategory)
 job_crud = JobCRUD(Job)
+attachment_crud = AttachmentCRUD(Attachment)

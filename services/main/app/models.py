@@ -45,6 +45,19 @@ class SuperCategory(Base):
         return f'<SuperCategory {self.name}>'
 
 
+class Attachment(Base):
+    """ Attachment """
+
+    __tablename__ = 'attachment'
+
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    path: str = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+
+    job_id: int = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('job.id', ondelete='CASCADE'), nullable=False,
+    )
+
+
 class Job(Base):
     """ Job """
 
@@ -63,4 +76,8 @@ class Job(Base):
 
     category_id: int = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('subcategory.id', ondelete='CASCADE'), nullable=False,
+    )
+
+    attachments: typing.Union[relationship, list[Attachment]] = relationship(
+        Attachment, backref='jobs', lazy='selectin', cascade='all, delete',
     )

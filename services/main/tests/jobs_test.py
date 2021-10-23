@@ -1,8 +1,11 @@
 import datetime
+import os
 from unittest import TestCase, mock
 
-from app.crud import job_crud
-from config import SERVER_MAIN_BACKEND
+from fastapi import UploadFile
+
+from app.crud import job_crud, attachment_crud
+from config import SERVER_MAIN_BACKEND, MEDIA_ROOT
 from tests import BaseTest, async_loop
 
 
@@ -24,91 +27,109 @@ class JobsTestCase(BaseTest, TestCase):
 
             # Create
             now = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
-            response = self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z',
-                'category_id': 1,
-            })
+            response = self.client.post(
+                f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 1,
+                }
+            )
             self.assertEqual(response.status_code, 201)
-            self.assertEqual(response.json(), {
-                'id': 1,
-                'customer_id': 1,
-                'completed': False,
-                'title': 'Web site',
-                'executor_id': None,
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z'.replace(' ', 'T'),
-                'category_id': 1,
-            })
+            self.assertEqual(
+                response.json(), {
+                    'id': 1,
+                    'customer_id': 1,
+                    'completed': False,
+                    'title': 'Web site',
+                    'executor_id': None,
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z'.replace(' ', 'T'),
+                    'category_id': 1,
+                }
+            )
             self.assertEqual(len(async_loop(job_crud.all(self.session))), 1)
 
-            response = self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z',
-                'category_id': 143,
-            })
+            response = self.client.post(
+                f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 143,
+                }
+            )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Category not found'})
 
-            response = self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': 0,
-                'order_date': f'{now}Z',
-                'category_id': 143,
-            })
+            response = self.client.post(
+                f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 0,
+                    'order_date': f'{now}Z',
+                    'category_id': 143,
+                }
+            )
             self.assertEqual(response.status_code, 422)
             self.assertEqual(response.json()['detail'][0]['msg'], 'The price must be at least 0')
 
-            response = self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': -5,
-                'order_date': f'{now}Z',
-                'category_id': 143,
-            })
+            response = self.client.post(
+                f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': -5,
+                    'order_date': f'{now}Z',
+                    'category_id': 143,
+                }
+            )
             self.assertEqual(response.status_code, 422)
             self.assertEqual(response.json()['detail'][0]['msg'], 'The price must be at least 0')
 
-            response = self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now - datetime.timedelta(days=2)}Z',
-                'category_id': 143,
-            })
+            response = self.client.post(
+                f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now - datetime.timedelta(days=2)}Z',
+                    'category_id': 143,
+                }
+            )
             self.assertEqual(response.status_code, 422)
             self.assertEqual(response.json()['detail'][0]['msg'], 'Date can\'t be past')
 
             self.assertEqual(len(async_loop(job_crud.all(self.session))), 1)
 
             # Get all without completed
-            self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'Django',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z',
-                'category_id': 2,
-            })
-            self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'Python',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z',
-                'category_id': 2,
-            })
-            self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                'title': 'FastAPI',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z',
-                'category_id': 1,
-            })
+            self.client.post(
+                f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'Django',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 2,
+                }
+            )
+            self.client.post(
+                f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'Python',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 2,
+                }
+            )
+            self.client.post(
+                f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'FastAPI',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 1,
+                }
+            )
 
             response = self.client.get(f'{self.url}/jobs/?page=1&page_size=1')
             self.assertEqual(response.status_code, 200)
@@ -308,40 +329,46 @@ class JobsTestCase(BaseTest, TestCase):
             # Get job
             with mock.patch('app.permission.permission', return_value=2) as _:
                 headers = {'Authorization': 'Bearer Token'}
-                self.client.post(f'{self.url}/jobs/', headers=headers, json={
-                    'title': 'PyCharm',
-                    'description': 'Web site',
-                    'price': 5000,
-                    'order_date': f'{now}Z',
-                    'category_id': 1,
-                })
+                self.client.post(
+                    f'{self.url}/jobs/', headers=headers, json={
+                        'title': 'PyCharm',
+                        'description': 'Web site',
+                        'price': 5000,
+                        'order_date': f'{now}Z',
+                        'category_id': 1,
+                    }
+                )
             response = self.client.get(f'{self.url}/jobs/1')
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.json(), {
-                'executor_id': None,
-                'id': 1,
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z'.replace(' ', 'T'),
-                'category_id': 1,
-                'customer_id': 1,
-                'completed': False,
-            })
+            self.assertEqual(
+                response.json(), {
+                    'executor_id': None,
+                    'id': 1,
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z'.replace(' ', 'T'),
+                    'category_id': 1,
+                    'customer_id': 1,
+                    'completed': False,
+                }
+            )
 
             response = self.client.get(f'{self.url}/jobs/5')
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.json(), {
-                'executor_id': None,
-                'id': 5,
-                'title': 'PyCharm',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z'.replace(' ', 'T'),
-                'category_id': 1,
-                'customer_id': 2,
-                'completed': False,
-            })
+            self.assertEqual(
+                response.json(), {
+                    'executor_id': None,
+                    'id': 5,
+                    'title': 'PyCharm',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z'.replace(' ', 'T'),
+                    'category_id': 1,
+                    'customer_id': 2,
+                    'completed': False,
+                }
+            )
 
             response = self.client.get(f'{self.url}/jobs/143')
             self.assertEqual(response.status_code, 400)
@@ -399,17 +426,19 @@ class JobsTestCase(BaseTest, TestCase):
             with mock.patch('app.requests.get_user', return_value=fake_user) as _:
                 response = self.client.put(f'{self.url}/jobs/select-executor/1?user_id=2', headers=headers)
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.json(), {
-                    'executor_id': 2,
-                    'id': 1,
-                    'title': 'Web site',
-                    'description': 'Web site',
-                    'price': 5000,
-                    'order_date': f'{now}Z'.replace(' ', 'T'),
-                    'category_id': 1,
-                    'customer_id': 1,
-                    'completed': False
-                })
+                self.assertEqual(
+                    response.json(), {
+                        'executor_id': 2,
+                        'id': 1,
+                        'title': 'Web site',
+                        'description': 'Web site',
+                        'price': 5000,
+                        'order_date': f'{now}Z'.replace(' ', 'T'),
+                        'category_id': 1,
+                        'customer_id': 1,
+                        'completed': False
+                    }
+                )
 
                 response = self.client.put(f'{self.url}/jobs/select-executor/1?user_id=2', headers=headers)
                 self.assertEqual(response.status_code, 400)
@@ -797,13 +826,15 @@ class JobsTestCase(BaseTest, TestCase):
 
             )
 
-            response = self.client.put(f'{self.url}/jobs/3', json={
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now + datetime.timedelta(minutes=15)}Z',
-                'category_id': 1,
-            }, headers=headers)
+            response = self.client.put(
+                f'{self.url}/jobs/3', json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now + datetime.timedelta(minutes=15)}Z',
+                    'category_id': 1,
+                }, headers=headers
+            )
             self.assertEqual(response.status_code, 200)
             self.assertEqual(
                 response.json(),
@@ -820,67 +851,79 @@ class JobsTestCase(BaseTest, TestCase):
                 }
             )
 
-            response = self.client.put(f'{self.url}/jobs/143', json={
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z',
-                'category_id': 1,
-            }, headers=headers)
-            self.assertEqual(response.status_code, 400)
-            self.assertEqual(response.json(), {'detail': 'Job not found'})
-
-            with mock.patch('app.permission.permission', return_value=2) as _:
-                response = self.client.put(f'{self.url}/jobs/3', json={
+            response = self.client.put(
+                f'{self.url}/jobs/143', json={
                     'title': 'Web site',
                     'description': 'Web site',
                     'price': 5000,
                     'order_date': f'{now}Z',
                     'category_id': 1,
-                }, headers=headers)
+                }, headers=headers
+            )
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job not found'})
+
+            with mock.patch('app.permission.permission', return_value=2) as _:
+                response = self.client.put(
+                    f'{self.url}/jobs/3', json={
+                        'title': 'Web site',
+                        'description': 'Web site',
+                        'price': 5000,
+                        'order_date': f'{now}Z',
+                        'category_id': 1,
+                    }, headers=headers
+                )
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.json(), {'detail': 'You not owner this job'})
 
-            response = self.client.put(f'{self.url}/jobs/1', json={
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z',
-                'category_id': 1,
-            }, headers=headers)
+            response = self.client.put(
+                f'{self.url}/jobs/1', json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 1,
+                }, headers=headers
+            )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Job is completed'})
 
-            response = self.client.put(f'{self.url}/jobs/3', json={
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now}Z',
-                'category_id': 143,
-            }, headers=headers)
+            response = self.client.put(
+                f'{self.url}/jobs/3', json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 143,
+                }, headers=headers
+            )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Category not found'})
 
-            response = self.client.put(f'{self.url}/jobs/3', json={
-                'title': 'Web site',
-                'description': 'Web site',
-                'price': 5000,
-                'order_date': f'{now - datetime.timedelta(minutes=11)}Z',
-                'category_id': 1,
-            }, headers=headers)
+            response = self.client.put(
+                f'{self.url}/jobs/3', json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now - datetime.timedelta(minutes=11)}Z',
+                    'category_id': 1,
+                }, headers=headers
+            )
             self.assertEqual(response.status_code, 422)
             self.assertEqual(response.json()['detail'][0]['msg'], 'Date can\'t be past')
 
             # Update (admin)
             with mock.patch('app.requests.get_user', return_value={**fake_user, 'id': 2}) as _:
-                response = self.client.put(f'{self.url}/jobs/admin/3?executor_id=2', json={
-                    'title': 'Web',
-                    'description': 'Web site',
-                    'price': 50000,
-                    'order_date': f'{now}Z',
-                    'category_id': 2,
-                    'completed': True,
-                }, headers=headers)
+                response = self.client.put(
+                    f'{self.url}/jobs/admin/3?executor_id=2', json={
+                        'title': 'Web',
+                        'description': 'Web site',
+                        'price': 50000,
+                        'order_date': f'{now}Z',
+                        'category_id': 2,
+                        'completed': True,
+                    }, headers=headers
+                )
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(
                     response.json(),
@@ -897,36 +940,42 @@ class JobsTestCase(BaseTest, TestCase):
                     }
                 )
 
-                response = self.client.put(f'{self.url}/jobs/admin/143?executor_id=2', json={
+                response = self.client.put(
+                    f'{self.url}/jobs/admin/143?executor_id=2', json={
+                        'title': 'Web',
+                        'description': 'Web site',
+                        'price': 50000,
+                        'order_date': f'{now}Z',
+                        'category_id': 1,
+                        'completed': True,
+                    }, headers=headers
+                )
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Job not found'})
+
+                response = self.client.put(
+                    f'{self.url}/jobs/admin/3?executor_id=2', json={
+                        'title': 'Web',
+                        'description': 'Web site',
+                        'price': 50000,
+                        'order_date': f'{now}Z',
+                        'category_id': 143,
+                        'completed': True,
+                    }, headers=headers
+                )
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Category not found'})
+
+            response = self.client.put(
+                f'{self.url}/jobs/admin/3?executor_id=2', json={
                     'title': 'Web',
                     'description': 'Web site',
                     'price': 50000,
                     'order_date': f'{now}Z',
                     'category_id': 1,
                     'completed': True,
-                }, headers=headers)
-                self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.json(), {'detail': 'Job not found'})
-
-                response = self.client.put(f'{self.url}/jobs/admin/3?executor_id=2', json={
-                    'title': 'Web',
-                    'description': 'Web site',
-                    'price': 50000,
-                    'order_date': f'{now}Z',
-                    'category_id': 143,
-                    'completed': True,
-                }, headers=headers)
-                self.assertEqual(response.status_code, 400)
-                self.assertEqual(response.json(), {'detail': 'Category not found'})
-
-            response = self.client.put(f'{self.url}/jobs/admin/3?executor_id=2', json={
-                'title': 'Web',
-                'description': 'Web site',
-                'price': 50000,
-                'order_date': f'{now}Z',
-                'category_id': 1,
-                'completed': True,
-            }, headers=headers)
+                }, headers=headers
+            )
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'User not found'})
 
@@ -980,3 +1029,117 @@ class JobsTestCase(BaseTest, TestCase):
                 self.assertEqual(response.json(), {'msg': 'Jobs has been deleted'})
 
             self.assertEqual(len(async_loop(job_crud.all(self.session))), 0)
+
+    def test_attachments(self):
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            headers = {'Authorization': 'Bearer Token'}
+
+            self.assertEqual(len(async_loop(job_crud.all(self.session))), 0)
+
+            self.client.post(f'{self.url}/categories/', json={'name': 'Programming'}, headers=headers)
+            self.client.post(
+                f'{self.url}/categories/', json={'name': 'Python', 'super_category_id': 1}, headers=headers,
+            )
+            self.client.post(
+                f'{self.url}/categories/', json={'name': 'FastAPI', 'super_category_id': 1}, headers=headers,
+            )
+
+            # Create
+            now = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
+            self.client.post(
+                f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 1,
+                }
+            )
+
+            self.client.post(
+                f'{self.url}/jobs/', headers=headers, json={
+                    'title': 'Web site',
+                    'description': 'Web site',
+                    'price': 5000,
+                    'order_date': f'{now}Z',
+                    'category_id': 1,
+                }
+            )
+
+            image = UploadFile('image.png', content_type='image/png')
+            doc = UploadFile('doc.doc', content_type='application/msword')
+            xls = UploadFile('xls.xls', content_type='application/vnd.ms-excel')
+
+            job = async_loop(job_crud.get(self.session, id=1))
+            self.assertEqual(len(job.attachments), 0)
+            self.assertEqual(len(async_loop(attachment_crud.all(self.session))), 0)
+
+            # Add
+            response = self.client.post(
+                f'{self.url}/jobs/attachments/add?job_id=1',
+                headers=headers,
+                files=[
+                    ('files', ('image.png', async_loop(image.read()), 'image/png')),
+                    ('files', ('doc.doc', async_loop(doc.read()), 'application/msword'),),
+                    ('files', ('xls.xls', async_loop(xls.read()), 'application/vnd.ms-excel')),
+                ]
+            )
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(response.json(), {'msg': 'Attachments has been added'})
+            async_loop(self.session.commit())
+            job = async_loop(job_crud.get(self.session, id=1))
+            self.assertEqual(len(job.attachments), 3)
+            self.assertEqual(len(async_loop(attachment_crud.all(self.session))), 3)
+
+            file_1, file_2, file_3 = job.attachments
+            self.assertEqual(os.path.exists(file_1.path), True)
+            self.assertEqual(os.path.exists(file_2.path), True)
+            self.assertEqual(os.path.exists(file_3.path), True)
+            self.assertNotEqual(file_2, file_3)
+            self.assertNotEqual(file_1, file_2)
+            self.assertNotEqual(file_1, file_3)
+
+            self.assertEqual(f'{MEDIA_ROOT}{job.id}' in file_2.path, True)
+
+            response = self.client.post(
+                f'{self.url}/jobs/attachments/add?job_id=2',
+                headers=headers,
+                files=[
+                    ('files', ('image.png', async_loop(image.read()), 'image/png')),
+                    ('files', ('doc.doc', async_loop(doc.read()), 'application/msword'),),
+                    ('files', ('xls.xls', async_loop(xls.read()), 'application/vnd.ms-excel')),
+                ]
+            )
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(response.json(), {'msg': 'Attachments has been added'})
+            async_loop(self.session.commit())
+            job = async_loop(job_crud.get(self.session, id=1))
+            job_2 = async_loop(job_crud.get(self.session, id=2))
+            self.assertEqual(len(job.attachments), 3)
+            self.assertEqual(len(job_2.attachments), 3)
+            self.assertEqual(len(async_loop(attachment_crud.all(self.session))), 6)
+
+            with mock.patch('app.permission.permission', return_value=2) as _:
+                response = self.client.post(
+                    f'{self.url}/jobs/attachments/add?job_id=1',
+                    headers=headers,
+                    files=[
+                        ('files', ('image.png', async_loop(image.read()), 'image/png')),
+                        ('files', ('doc.doc', async_loop(doc.read()), 'application/msword'),),
+                        ('files', ('xls.xls', async_loop(xls.read()), 'application/vnd.ms-excel')),
+                    ]
+                )
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'You not owner this job'})
+
+            response = self.client.post(
+                f'{self.url}/jobs/attachments/add?job_id=143',
+                headers=headers,
+                files=[
+                    ('files', ('image.png', async_loop(image.read()), 'image/png')),
+                    ('files', ('doc.doc', async_loop(doc.read()), 'application/msword'),),
+                    ('files', ('xls.xls', async_loop(xls.read()), 'application/vnd.ms-excel')),
+                ]
+            )
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Job not found'})

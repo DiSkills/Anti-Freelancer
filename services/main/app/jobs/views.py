@@ -1,15 +1,16 @@
 import datetime
+import os
 import typing
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import requests
-from app.crud import sub_category_crud, job_crud
+from app.crud import sub_category_crud, job_crud, attachment_crud
 from app.jobs.schemas import CreateJob, UpdateJob, UpdateJobAdmin
 from app.models import Job
-from app.service import paginate, user_exist
-from config import SERVER_MAIN_BACKEND, API
+from app.service import paginate, user_exist, write_file
+from config import SERVER_MAIN_BACKEND, API, MEDIA_ROOT
 
 
 async def create_job(db: AsyncSession, schema: CreateJob, customer_id: int) -> dict[str, typing.Any]:
@@ -426,3 +427,39 @@ async def delete_job(db: AsyncSession, pk: int, owner_id: int) -> dict[str, str]
 
     await job_crud.remove(db, id=pk)
     return {'msg': 'Job has been deleted'}
+
+
+async def add_attachments(db: AsyncSession, user_id: int, job_id: int, files: list[UploadFile]) -> dict[str, str]:
+    """
+        Add attachments
+        :param db: DB
+        :type db: AsyncSession
+        :param user_id: User ID
+        :type user_id: int
+        :param job_id: Job ID
+        :type job_id: int
+        :param files: Attachments
+        :type files: list
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Job not found
+        :raise HTTPException 400: User not owner this job
+    """
+
+    if not await job_crud.exist(db, id=job_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job not found')
+    job = await job_crud.get(db, id=job_id)
+
+    if job.customer_id != user_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You not owner this job')
+
+    if not os.path.exists(f'{MEDIA_ROOT}{job.id}'):
+        os.mkdir(f'{MEDIA_ROOT}{job.id}')
+
+    for file in files:
+        file_name = f'{MEDIA_ROOT}{job.id}/{datetime.datetime.utcnow().timestamp()}{os.path.splitext(file.filename)[1]}'
+
+        await write_file(file_name, file)
+
+        await attachment_crud.create(db, path=file_name, job_id=job_id)
+    return {'msg': 'Attachments has been added'}
