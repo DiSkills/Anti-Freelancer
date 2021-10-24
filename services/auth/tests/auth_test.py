@@ -14,6 +14,53 @@ from tests import BaseTest, async_loop
 
 class AuthTestCase(BaseTest, TestCase):
 
+    def test_get_freelancers(self):
+        self.client.post(f'{self.url}/register', json={**self.user_data, 'freelancer': True})
+        self.client.post(
+            f'{self.url}/register',
+            json={**self.user_data, 'username': 'test2', 'email': 'test2@example.com', 'freelancer': True}
+        )
+        self.client.post(
+            f'{self.url}/register',
+            json={**self.user_data, 'username': 'test3', 'email': 'test3@example.com', 'freelancer': False}
+        )
+
+        self.assertEqual(len(async_loop(user_crud.all(self.session))), 3)
+
+        response = self.client.get(f'{self.url}/freelancers?page=1&page_size=1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'next': 'http://localhost:8000/api/v1/freelancers?page=2&page_size=1',
+                'previous': None,
+                'page': 1,
+                'results': [
+                    {
+                        'id': 2,
+                        'username': 'test2',
+                        'avatar': 'https://via.placeholder.com/400x400'
+                    }
+                ]
+            }
+        )
+
+        response = self.client.get(f'{self.url}/freelancers?page=2&page_size=1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'next': None,
+                'previous': 'http://localhost:8000/api/v1/freelancers?page=1&page_size=1',
+                'page': 2,
+                'results': [
+                    {
+                        'id': 1,
+                        'username': 'test',
+                        'avatar': 'https://via.placeholder.com/400x400'
+                    }
+                ]
+            }
+        )
+
     def test_register(self):
         self.assertEqual(len(async_loop(user_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(verification_crud.all(self.session))), 0)
@@ -355,11 +402,13 @@ class AuthTestCase(BaseTest, TestCase):
 
         current_user_data = response.json()
 
-        response = self.client.put(self.url + '/change-data', headers=headers, json={
-            'username': 'test',
-            'email': 'test@example.com',
-            'about': 'Hello world!',
-        })
+        response = self.client.put(
+            self.url + '/change-data', headers=headers, json={
+                'username': 'test',
+                'email': 'test@example.com',
+                'about': 'Hello world!',
+            }
+        )
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.json(), current_user_data)
         self.assertEqual(response.json()['username'], current_user_data['username'])
@@ -368,39 +417,49 @@ class AuthTestCase(BaseTest, TestCase):
         change_data_date = async_loop(user_crud.get(self.session, id=1)).last_login
         self.assertEqual(get_data_date < change_data_date, True)
 
-        self.client.post(self.url + '/register',
-                         json={**self.user_data, 'username': 'test2', 'email': 'test2@example.com'})
+        self.client.post(
+            self.url + '/register',
+            json={**self.user_data, 'username': 'test2', 'email': 'test2@example.com'}
+        )
 
-        response = self.client.put(self.url + '/change-data', headers=headers, json={
-            'username': 'test2',
-            'email': 'test@example.com',
-            'about': 'Hello world!',
-        })
+        response = self.client.put(
+            self.url + '/change-data', headers=headers, json={
+                'username': 'test2',
+                'email': 'test@example.com',
+                'about': 'Hello world!',
+            }
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Username exist'})
 
-        response = self.client.put(self.url + '/change-data', headers=headers, json={
-            'username': 'test',
-            'email': 'test2@example.com',
-            'about': 'Hello world!',
-        })
+        response = self.client.put(
+            self.url + '/change-data', headers=headers, json={
+                'username': 'test',
+                'email': 'test2@example.com',
+                'about': 'Hello world!',
+            }
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Email exist'})
 
-        response = self.client.put(self.url + '/change-data', headers=headers, json={
-            'username': 'test',
-            'email': 'test@example.com',
-            'about': 'Hello world!',
-        })
+        response = self.client.put(
+            self.url + '/change-data', headers=headers, json={
+                'username': 'test',
+                'email': 'test@example.com',
+                'about': 'Hello world!',
+            }
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['username'], current_user_data['username'])
         self.assertEqual(response.json()['email'], current_user_data['email'])
 
-        response = self.client.put(self.url + '/change-data', headers=headers, json={
-            'username': 'test3',
-            'email': 'test3@example.com',
-            'about': 'Hello world!',
-        })
+        response = self.client.put(
+            self.url + '/change-data', headers=headers, json={
+                'username': 'test3',
+                'email': 'test3@example.com',
+                'about': 'Hello world!',
+            }
+        )
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.json(), current_user_data)
         self.assertNotEqual(response.json()['username'], current_user_data['username'])
@@ -467,17 +526,21 @@ class AuthTestCase(BaseTest, TestCase):
 
         # Reset password
         token = create_reset_password_token(1)
-        response = self.client.post(f'{self.url}/reset-password?token={token}', json={
-            'password': 'Test1234!!',
-            'confirm_password': 'Test1234!!',
-        })
+        response = self.client.post(
+            f'{self.url}/reset-password?token={token}', json={
+                'password': 'Test1234!!',
+                'confirm_password': 'Test1234!!',
+            }
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'msg': 'Password has been reset'})
 
-        response = self.client.post(f'{self.url}/reset-password?token={token}', json={
-            'password': 'Test1234!!',
-            'confirm_password': 'Test1234!!',
-        })
+        response = self.client.post(
+            f'{self.url}/reset-password?token={token}', json={
+                'password': 'Test1234!!',
+                'confirm_password': 'Test1234!!',
+            }
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'The new password cannot be the same as the old one'})
 
@@ -489,18 +552,22 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 200)
 
         token = create_reset_password_token(2)
-        response = self.client.post(f'{self.url}/reset-password?token={token}', json={
-            'password': 'Test1234!!',
-            'confirm_password': 'Test1234!!',
-        })
+        response = self.client.post(
+            f'{self.url}/reset-password?token={token}', json={
+                'password': 'Test1234!!',
+                'confirm_password': 'Test1234!!',
+            }
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'User not found'})
 
         tokens = self.client.post(f'{self.url}/login', data={'username': 'test', 'password': 'Test1234!!'}).json()
-        response = self.client.post(f'{self.url}/reset-password?token={tokens["access_token"]}', json={
-            'password': 'Test1234!!',
-            'confirm_password': 'Test1234!!',
-        })
+        response = self.client.post(
+            f'{self.url}/reset-password?token={tokens["access_token"]}', json={
+                'password': 'Test1234!!',
+                'confirm_password': 'Test1234!!',
+            }
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Reset token not found'})
 
@@ -653,10 +720,12 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 403)
 
         token = create_reset_password_token(1)
-        response = self.client.post(f'{self.url}/reset-password?token={token}', json={
-            'password': 'Test1234!!',
-            'confirm_password': 'Test1234!!',
-        })
+        response = self.client.post(
+            f'{self.url}/reset-password?token={token}', json={
+                'password': 'Test1234!!',
+                'confirm_password': 'Test1234!!',
+            }
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'msg': 'Password has been reset'})
         self.assertEqual(async_loop(user_crud.get(self.session, id=1)).otp, False)
@@ -812,17 +881,19 @@ class AuthTestCase(BaseTest, TestCase):
         # Profile don't GitHub and skills
         response = self.client.get(f'{self.url}/profile/1')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
-            'username': 'test',
-            'about': None,
-            'id': 1,
-            'date_joined': response.json()['date_joined'],
-            'last_login': response.json()['last_login'],
-            'avatar': 'https://via.placeholder.com/400x400',
-            'freelancer': True,
-            'skills': [],
-            'github': None
-        })
+        self.assertEqual(
+            response.json(), {
+                'username': 'test',
+                'about': None,
+                'id': 1,
+                'date_joined': response.json()['date_joined'],
+                'last_login': response.json()['last_login'],
+                'avatar': 'https://via.placeholder.com/400x400',
+                'freelancer': True,
+                'skills': [],
+                'github': None
+            }
+        )
 
         # Skill, not GitHub
         response = self.client.post(f'{self.url}/skills/add?skill_id=1', headers=headers)
@@ -831,23 +902,25 @@ class AuthTestCase(BaseTest, TestCase):
 
         response = self.client.get(f'{self.url}/profile/1')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
-            'username': 'test',
-            'about': None,
-            'id': 1,
-            'date_joined': response.json()['date_joined'],
-            'last_login': response.json()['last_login'],
-            'avatar': 'https://via.placeholder.com/400x400',
-            'freelancer': True,
-            'skills': [
-                {
-                    'id': 1,
-                    'name': 'GitHub',
-                    'image': 'https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white'
-                }
-            ],
-            'github': None
-        })
+        self.assertEqual(
+            response.json(), {
+                'username': 'test',
+                'about': None,
+                'id': 1,
+                'date_joined': response.json()['date_joined'],
+                'last_login': response.json()['last_login'],
+                'avatar': 'https://via.placeholder.com/400x400',
+                'freelancer': True,
+                'skills': [
+                    {
+                        'id': 1,
+                        'name': 'GitHub',
+                        'image': 'https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white'
+                    }
+                ],
+                'github': None
+            }
+        )
 
         # GitHub and skills
         with mock.patch('app.auth.views.github_data', return_value={'id': 25, 'login': 'Counter021'}) as _:
@@ -857,23 +930,25 @@ class AuthTestCase(BaseTest, TestCase):
 
         response = self.client.get(f'{self.url}/profile/1')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
-            'username': 'test',
-            'about': None,
-            'id': 1,
-            'date_joined': response.json()['date_joined'],
-            'last_login': response.json()['last_login'],
-            'avatar': 'https://via.placeholder.com/400x400',
-            'freelancer': True,
-            'skills': [
-                {
-                    'id': 1,
-                    'name': 'GitHub',
-                    'image': 'https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white'
-                }
-            ],
-            'github': 'Counter021'
-        })
+        self.assertEqual(
+            response.json(), {
+                'username': 'test',
+                'about': None,
+                'id': 1,
+                'date_joined': response.json()['date_joined'],
+                'last_login': response.json()['last_login'],
+                'avatar': 'https://via.placeholder.com/400x400',
+                'freelancer': True,
+                'skills': [
+                    {
+                        'id': 1,
+                        'name': 'GitHub',
+                        'image': 'https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white'
+                    }
+                ],
+                'github': 'Counter021'
+            }
+        )
 
         # GitHub, not skills
         response = self.client.post(f'{self.url}/skills/remove?skill_id=1', headers=headers)
@@ -882,17 +957,19 @@ class AuthTestCase(BaseTest, TestCase):
 
         response = self.client.get(f'{self.url}/profile/1')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
-            'username': 'test',
-            'about': None,
-            'id': 1,
-            'date_joined': response.json()['date_joined'],
-            'last_login': response.json()['last_login'],
-            'avatar': 'https://via.placeholder.com/400x400',
-            'freelancer': True,
-            'skills': [],
-            'github': 'Counter021'
-        })
+        self.assertEqual(
+            response.json(), {
+                'username': 'test',
+                'about': None,
+                'id': 1,
+                'date_joined': response.json()['date_joined'],
+                'last_login': response.json()['last_login'],
+                'avatar': 'https://via.placeholder.com/400x400',
+                'freelancer': True,
+                'skills': [],
+                'github': 'Counter021'
+            }
+        )
 
         # Avatar
         file = UploadFile('image.png', content_type='image/png')
@@ -907,14 +984,16 @@ class AuthTestCase(BaseTest, TestCase):
 
         response = self.client.get(f'{self.url}/profile/1')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
-            'username': 'test',
-            'about': None,
-            'id': 1,
-            'date_joined': response.json()['date_joined'],
-            'last_login': response.json()['last_login'],
-            'avatar': f'{SERVER_BACKEND}{user.avatar}',
-            'freelancer': True,
-            'skills': [],
-            'github': 'Counter021'
-        })
+        self.assertEqual(
+            response.json(), {
+                'username': 'test',
+                'about': None,
+                'id': 1,
+                'date_joined': response.json()['date_joined'],
+                'last_login': response.json()['last_login'],
+                'avatar': f'{SERVER_BACKEND}{user.avatar}',
+                'freelancer': True,
+                'skills': [],
+                'github': 'Counter021'
+            }
+        )

@@ -16,7 +16,7 @@ from app.crud import user_crud, verification_crud, github_crud, skill_crud, user
 from app.models import User
 from app.security import get_password_hash, verify_password_hash
 from app.send_email import send_register_email, send_reset_password_email, send_username_email
-from app.service import validate_login, remove_file, write_file, github_data
+from app.service import validate_login, remove_file, write_file, github_data, paginate
 from app.tokens import create_login_tokens, verify_token, create_access_token, create_reset_password_token
 from config import SERVER_BACKEND, API, MEDIA_ROOT, social_auth, redirect_url, PROJECT_NAME
 
@@ -126,6 +126,23 @@ async def refresh(db: AsyncSession, token: str) -> dict[str, str]:
     user_id = await verify_token(db, token, 'refresh', 'Refresh token not found')
 
     return create_access_token(user_id)
+
+
+@paginate(user_crud.freelancers, user_crud.freelancers_exist, f'{SERVER_BACKEND}{API}/freelancers')
+async def get_freelancers(*, db: AsyncSession, page: int, page_size: int, queryset: list[User]):
+    """
+        Get freelancers
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param queryset: Freelancers
+        :type queryset: list
+        :return: Freelancers
+    """
+    return (user.__dict__ for user in queryset)
 
 
 async def profile(db: AsyncSession, user_id: int) -> dict[str, typing.Any]:

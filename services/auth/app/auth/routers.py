@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, Form, Request, UploadFile, File
+from fastapi import APIRouter, Depends, status, Form, Request, UploadFile, File, Query
 from fastapi.responses import StreamingResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,7 +12,7 @@ from app.auth.schemas import (
     ChangePassword,
     Password,
     UserSkills,
-    Profile,
+    Profile, PaginateFreelancers,
 )
 from app.models import User
 from app.schemas import Message
@@ -58,9 +58,9 @@ async def verify(link: str, db: AsyncSession = Depends(get_db)):
     tags=['auth'],
 )
 async def login(
-        username: str = Form(...),
-        password: str = Form(..., min_length=8, max_length=20),
-        db: AsyncSession = Depends(get_db),
+    username: str = Form(...),
+    password: str = Form(..., min_length=8, max_length=20),
+    db: AsyncSession = Depends(get_db),
 ):
     return await views.login(db, username, password)
 
@@ -92,6 +92,23 @@ async def refresh(token: str, db: AsyncSession = Depends(get_db)):
 
 
 @auth_router.get(
+    '/freelancers',
+    name='Freelancers',
+    description='Freelancers',
+    response_description='Freelancers',
+    status_code=status.HTTP_200_OK,
+    response_model=PaginateFreelancers,
+    tags=['auth'],
+)
+async def get_freelancers(
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db),
+):
+    return await views.get_freelancers(db=db, page=page, page_size=page_size)
+
+
+@auth_router.get(
     '/profile/{user_id}',
     name='Profile',
     description='User profile',
@@ -115,7 +132,7 @@ async def profile(user_id: int, db: AsyncSession = Depends(get_db)):
     tags=['change-data'],
 )
 async def avatar(
-        file: UploadFile = File(...), user: User = Depends(is_active), db: AsyncSession = Depends(get_db)
+    file: UploadFile = File(...), user: User = Depends(is_active), db: AsyncSession = Depends(get_db)
 ):
     return await views.avatar(db, user, file)
 
@@ -143,7 +160,7 @@ async def get_data(user: User = Depends(is_active)):
     tags=['change-data'],
 )
 async def change_data(
-        schema: UserChangeData, user: User = Depends(is_active), db: AsyncSession = Depends(get_db)
+    schema: UserChangeData, user: User = Depends(is_active), db: AsyncSession = Depends(get_db)
 ):
     return await views.change_data(db, schema, user)
 
@@ -158,7 +175,7 @@ async def change_data(
     tags=['change-data'],
 )
 async def change_password(
-        schema: ChangePassword, user: User = Depends(is_active), db: AsyncSession = Depends(get_db)
+    schema: ChangePassword, user: User = Depends(is_active), db: AsyncSession = Depends(get_db)
 ):
     return await views.change_password(db, user, schema)
 
@@ -264,10 +281,10 @@ async def otp_off(user: User = Depends(is_active), db: AsyncSession = Depends(ge
     tags=['OTP'],
 )
 async def otp_login(
-        username: str = Form(...),
-        password: str = Form(..., min_length=8, max_length=20),
-        code: str = Form(..., min_length=6, max_length=6),
-        db: AsyncSession = Depends(get_db),
+    username: str = Form(...),
+    password: str = Form(..., min_length=8, max_length=20),
+    code: str = Form(..., min_length=6, max_length=6),
+    db: AsyncSession = Depends(get_db),
 ):
     return await views.otp_login(db, username, password, code)
 

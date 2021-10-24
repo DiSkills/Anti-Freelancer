@@ -7,7 +7,34 @@ from crud import CRUD
 
 class UserCRUD(CRUD[User, Register, Register]):
     """ User CRUD """
-    pass
+
+    async def freelancers(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> list[User]:
+        """
+            Freelancers
+            :param db: DB
+            :type db: AsyncSession
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Freelancers
+            :rtype: list
+        """
+        return await super().filter(db, skip, limit, freelancer=True)
+
+    async def freelancers_exist(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> bool:
+        """
+            Freelancers exist?
+            :param db: DB
+            :type db: AsyncSession
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Freelancers exist?
+            :rtype: bool
+        """
+        return await super().exist_page(db, skip, limit, freelancer=True)
 
 
 class VerificationCRUD(CRUD[Verification, VerificationCreate, VerificationCreate]):

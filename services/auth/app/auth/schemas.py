@@ -4,6 +4,7 @@ import typing
 
 from pydantic import BaseModel, validator, EmailStr
 
+from app.schemas import Paginate
 from app.skills.schemas import GetSkill
 from config import SERVER_BACKEND
 
@@ -89,18 +90,24 @@ class ChangePassword(Password):
         return old_password
 
 
-class UserPublic(UserChangeData):
-    """ User data """
+class GetFreelancer(BaseModel):
+    """ Get freelancer """
 
     id: int
-    date_joined: datetime.datetime
-    last_login: datetime.datetime
+    username: str
     avatar: typing.Optional[str]
-    freelancer: bool
 
     @validator('avatar')
     def set_avatar(cls, avatar):
         return SERVER_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'
+
+
+class UserPublic(UserChangeData, GetFreelancer):
+    """ User data """
+
+    date_joined: datetime.datetime
+    last_login: datetime.datetime
+    freelancer: bool
 
 
 class UserSkills(BaseModel):
@@ -115,3 +122,9 @@ class Profile(UserPublic):
 
     skills: list[GetSkill]
     github: typing.Optional[str]
+
+
+class PaginateFreelancers(Paginate):
+    """ Paginate freelancers """
+
+    results: list[GetFreelancer]
