@@ -1,15 +1,17 @@
 # Anti-Freelancer: FastAPI
 
 ## TODO
+
 - [ ] Services
-  - [x] Auth
-  - [x] Main
+    - [x] Auth
+    - [x] Main
+    - [ ] Advertisement and Feedbacks
+    - [ ] Messenger
 - [ ] Docker compose
 
 ### Ideas
-- [ ] Levels freelancers
-- [ ] Advertisement
-- [ ] Referral registration system
-- [ ] Messenger
-- [ ] Reviews freelancers
-- [ ] Feedbacks
+
+- [ ] Auth Service
+    - [ ] Levels freelancers
+    - [ ] Referral registration system
+    - [ ] Reviews freelancers
