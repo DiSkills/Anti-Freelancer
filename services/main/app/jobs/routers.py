@@ -69,7 +69,7 @@ async def get_jobs_for_customer(
     response_description='Jobs',
     status_code=status.HTTP_200_OK,
     response_model=JobsPaginate,
-    tags=['jobs'],
+    tags=['jobs-all'],
 )
 async def get_all_jobs(
     page: int = Query(default=1, gt=0),
@@ -86,7 +86,7 @@ async def get_all_jobs(
     response_description='Jobs',
     status_code=status.HTTP_200_OK,
     response_model=JobsPaginate,
-    tags=['jobs'],
+    tags=['jobs-all'],
 )
 async def get_all_jobs_for_category(
     category_id: int = Query(default=1, gt=0),
@@ -200,7 +200,7 @@ async def complete_job(pk: int, user_id: int = Depends(is_customer), db: AsyncSe
     response_description='Job',
     response_model=GetJob,
     status_code=status.HTTP_200_OK,
-    tags=['jobs'],
+    tags=['admin'],
     dependencies=[Depends(is_superuser)],
 )
 async def update_job_admin(
@@ -234,7 +234,7 @@ async def update_job(
     response_description='Message',
     response_model=Message,
     status_code=status.HTTP_200_OK,
-    tags=['jobs'],
+    tags=['jobs-all'],
 )
 async def delete_all_jobs_for_user(user_id: int = Depends(is_active), db: AsyncSession = Depends(get_db)):
     return await views.delete_all_jobs_for_user(db, user_id)
@@ -247,7 +247,7 @@ async def delete_all_jobs_for_user(user_id: int = Depends(is_active), db: AsyncS
     response_description='Message',
     response_model=Message,
     status_code=status.HTTP_200_OK,
-    tags=['jobs'],
+    tags=['admin'],
     dependencies=[Depends(is_superuser)],
 )
 async def delete_job_admin(pk: int, db: AsyncSession = Depends(get_db)):
