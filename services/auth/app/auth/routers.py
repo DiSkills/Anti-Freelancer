@@ -110,6 +110,24 @@ async def get_freelancers(
 
 
 @auth_router.get(
+    '/freelancers/search',
+    name='Search freelancers',
+    description='Search freelancers',
+    response_description='Freelancers',
+    status_code=status.HTTP_200_OK,
+    response_model=PaginateFreelancers,
+    tags=['auth'],
+)
+async def search_freelancers(
+    search: str,
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db),
+):
+    return await views.search_freelancers(db=db, page=page, page_size=page_size, search=search)
+
+
+@auth_router.get(
     '/profile/{user_id}',
     name='Profile',
     description='User profile',

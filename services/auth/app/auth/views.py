@@ -145,6 +145,25 @@ async def get_freelancers(*, db: AsyncSession, page: int, page_size: int, querys
     return (user.__dict__ for user in queryset)
 
 
+@paginate(user_crud.search, user_crud.search_exist, f'{SERVER_BACKEND}{API}/freelancers/search', 'search')
+async def search_freelancers(*, db: AsyncSession, page: int, page_size: int, search: str, queryset: list[User]):
+    """
+        Search freelancers
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param search: Search
+        :type search: str
+        :param queryset: Freelancers
+        :type queryset: list
+        :return: Freelancers
+    """
+    return (user.__dict__ for user in queryset)
+
+
 async def profile(db: AsyncSession, user_id: int) -> dict[str, typing.Any]:
     """
         Profile

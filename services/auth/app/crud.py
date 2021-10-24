@@ -1,3 +1,4 @@
+import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import Register, VerificationCreate
@@ -35,6 +36,58 @@ class UserCRUD(CRUD[User, Register, Register]):
             :rtype: bool
         """
         return await super().exist_page(db, skip, limit, freelancer=True)
+
+    @staticmethod
+    async def search(db: AsyncSession, search: str, skip: int = 0, limit: int = 100) -> list[User]:
+        """
+            Search freelancers
+            :param db: DB
+            :type db: AsyncSession
+            :param search: Search
+            :type search: str
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Freelancers
+            :rtype: list
+        """
+        query = await db.execute(
+            sqlalchemy.select(User).filter(
+                sqlalchemy.and_(
+                    User.username.ilike(f'%{search}%'),
+                    User.freelancer == True,
+                ),
+            ).order_by(User.id.desc()).offset(skip).limit(limit)
+        )
+        return query.scalars().all()
+
+    @staticmethod
+    async def search_exist(db: AsyncSession, search: str, skip: int = 0, limit: int = 100) -> bool:
+        """
+            Search freelancers exist?
+            :param db: DB
+            :type db: AsyncSession
+            :param search: Search
+            :type search: str
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Search freelancers exist?
+            :rtype: bool
+        """
+        query = await db.execute(
+            sqlalchemy.exists(
+                sqlalchemy.select(User).filter(
+                    sqlalchemy.and_(
+                        User.username.ilike(f'%{search}%'),
+                        User.freelancer == True,
+                    ),
+                ).order_by(User.id.desc()).offset(skip).limit(limit)
+            ).select()
+        )
+        return query.scalar()
 
 
 class VerificationCRUD(CRUD[Verification, VerificationCreate, VerificationCreate]):
