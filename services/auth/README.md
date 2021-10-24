@@ -41,7 +41,7 @@
     - [x] Remove user skills
     - [x] Profile
     - [x] Resend email for activation account if user login
-    - [ ] Get freelancers (username and ID)
+    - [x] Get freelancers (username and ID)
     - [ ] Search freelancers by username
 - [x] Skills
   - [x] Import skills from excel
@@ -98,3 +98,4 @@
     - [x] Test get user skills
     - [x] Test remove user skills
     - [x] Test profile
+    - [x] Test get freelancers (username and ID)

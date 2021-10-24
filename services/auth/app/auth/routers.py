@@ -12,7 +12,8 @@ from app.auth.schemas import (
     ChangePassword,
     Password,
     UserSkills,
-    Profile, PaginateFreelancers,
+    Profile,
+    PaginateFreelancers,
 )
 from app.models import User
 from app.schemas import Message
