@@ -2,7 +2,7 @@
 
 ## TODO
 - [ ] Services
-  - [ ] Auth
+  - [x] Auth
   - [x] Main
 - [ ] Docker compose
 

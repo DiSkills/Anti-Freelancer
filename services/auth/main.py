@@ -15,7 +15,7 @@ from db import async_session, engine, Base
 
 app = FastAPI(
     title=PROJECT_NAME,
-    version='0.3.0',
+    version='0.4.0',
     description='Auth Service Anti-Freelancer by Counter',
 )
 
