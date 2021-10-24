@@ -22,7 +22,7 @@
 - [x] Create superuser
 - [x] Get media
 - [x] Docker
-- [ ] Auth
+- [x] Auth
     - [x] Registration
     - [x] Login
     - [x] Activation account
@@ -43,7 +43,7 @@
     - [x] Profile
     - [x] Resend email for activation account if user login
     - [x] Get freelancers (username and ID)
-    - [ ] Search freelancers by username
+    - [x] Search freelancers by username
 - [x] Skills
     - [x] Import skills from excel
     - [x] Get skills
@@ -63,9 +63,9 @@
     - [x] Is superuser
     - [x] Is freelancer
     - [x] Is customer
-- [ ] Tests
+- [x] Tests
     - [x] Get media
-    - [ ] Auth
+    - [x] Auth
       - [x] Registration
       - [x] Login
       - [x] Activation account
@@ -82,7 +82,7 @@
       - [x] Off OTP in reset password
       - [x] Profile
       - [x] Get freelancers (username and ID)
-      - [ ] Search freelancers by username
+      - [x] Search freelancers by username
     - [x] Permission
       - [x] Is authenticated
       - [x] Is active
