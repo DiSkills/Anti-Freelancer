@@ -1,5 +1,5 @@
 from app.models import Message
-from app.schemas import CreateMessage
+from app.message.schemas import CreateMessage
 from crud import CRUD
 
 

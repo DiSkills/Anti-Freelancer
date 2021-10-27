@@ -15,8 +15,8 @@ class Message(Base):
     created_at: datetime.datetime = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.utcnow, nullable=False,
     )
-    sender_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-    recipient_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    sender_id: int = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    recipient_id: int = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
     def __str__(self):
         return f'<Message {self.id}>'
