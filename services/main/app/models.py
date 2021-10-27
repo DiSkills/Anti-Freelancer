@@ -57,6 +57,12 @@ class Attachment(Base):
         sqlalchemy.Integer, sqlalchemy.ForeignKey('job.id', ondelete='CASCADE'), nullable=False,
     )
 
+    def __str__(self):
+        return f'<Attachment {self.id}>'
+
+    def __repr__(self):
+        return f'<Attachment {self.id}>'
+
 
 class Job(Base):
     """ Job """
@@ -81,3 +87,9 @@ class Job(Base):
     attachments: typing.Union[relationship, list[Attachment]] = relationship(
         Attachment, backref='jobs', lazy='selectin', cascade='all, delete',
     )
+
+    def __str__(self):
+        return f'<Job {self.id}>'
+
+    def __repr__(self):
+        return f'<Job {self.id}>'
