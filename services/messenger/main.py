@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.message.middleware import WebSocketStateMiddleware
-from config import PROJECT_NAME
+from app.message.routers import message_router
+from config import PROJECT_NAME, API
 
 app = FastAPI(
     title=PROJECT_NAME,
@@ -19,3 +20,6 @@ app.add_middleware(
 )
 
 app.add_middleware(WebSocketStateMiddleware)
+
+
+app.include_router(message_router, prefix=f'/{API}')
