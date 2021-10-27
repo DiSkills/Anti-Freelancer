@@ -9,3 +9,6 @@
 /services/main/config.env
 /services/main/media/
 /venv/
+/services/messenger/.idea/
+/services/messenger/venv/
+/services/messenger/config.env
