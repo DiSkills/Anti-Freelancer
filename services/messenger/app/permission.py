@@ -1,5 +1,5 @@
 import aiohttp
-from fastapi import Security, HTTPException
+from fastapi import Security
 from fastapi.security import OAuth2PasswordBearer
 
 from config import SERVER_AUTH_BACKEND, API, LOGIN_URL
@@ -16,7 +16,7 @@ async def permission(url: str, token: str) -> int:
         :type token: str
         :return: User ID
         :rtype: int
-        :raise HTTPException: Bad response
+        :raise ValueError: Bad response
     """
 
     async with aiohttp.ClientSession() as session:
@@ -26,7 +26,7 @@ async def permission(url: str, token: str) -> int:
 
         json = await response.json()
         if not response.ok:
-            raise HTTPException(status_code=response.status, detail=json['detail'])
+            raise ValueError(json['detail'])
 
     return json['user_id']
 

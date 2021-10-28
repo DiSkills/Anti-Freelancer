@@ -1,4 +1,4 @@
-from fastapi import WebSocket, HTTPException
+from fastapi import WebSocket
 
 from app.crud import message_crud
 from app.message.schemas import CreateMessage
@@ -48,7 +48,7 @@ class WebSocketState:
         if recipient_id not in self._users.keys():
             try:
                 await get_user(recipient_id)
-            except HTTPException:
+            except ValueError:
                 await self.error(websocket, 'Recipient not found')
                 return
         else:
@@ -64,3 +64,9 @@ class WebSocketState:
             await message_crud.create(
                 db, **CreateMessage(sender_id=sender_id, msg=msg, recipient_id=recipient_id).dict()
             )
+        await websocket.send_json(
+            {
+                'type': 'SUCCESS',
+                'data': {'msg': 'Message has been send'}
+            }
+        )

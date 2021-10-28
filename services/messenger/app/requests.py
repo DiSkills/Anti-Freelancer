@@ -1,5 +1,4 @@
 import aiohttp
-from fastapi import HTTPException
 
 from config import SERVER_AUTH_BACKEND, API
 
@@ -11,7 +10,7 @@ async def get_user(user_id: int) -> dict:
         :type user_id: int
         :return: User Data (profile)
         :rtype: dict
-        :raise HTTPException status: Bad response
+        :raise ValueError: Bad response
     """
 
     async with aiohttp.ClientSession() as session:
@@ -19,6 +18,6 @@ async def get_user(user_id: int) -> dict:
 
         json = await response.json()
         if not response.ok:
-            raise HTTPException(status_code=response.status, detail=json['detail'])
+            raise ValueError(json['detail'])
 
     return json
