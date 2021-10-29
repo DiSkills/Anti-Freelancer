@@ -128,6 +128,20 @@ async def search_freelancers(
 
 
 @auth_router.get(
+    '/profile/current',
+    name='Current user profile',
+    description='Current user profile',
+    response_description='Profile',
+    status_code=status.HTTP_200_OK,
+    response_model=Profile,
+    tags=['auth'],
+    response_model_exclude={'email'},
+)
+async def current_profile(user: User = Depends(is_active), db: AsyncSession = Depends(get_db)):
+    return await views.profile(db, user.id)
+
+
+@auth_router.get(
     '/profile/{user_id}',
     name='Profile',
     description='User profile',

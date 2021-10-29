@@ -1086,3 +1086,46 @@ class AuthTestCase(BaseTest, TestCase):
                 'github': 'Counter021'
             }
         )
+
+        # Current profile
+        response = self.client.get(f'{self.url}/profile/current', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'username': 'test',
+                'about': None,
+                'id': 1,
+                'date_joined': response.json()['date_joined'],
+                'last_login': response.json()['last_login'],
+                'avatar': f'{SERVER_BACKEND}{user.avatar}',
+                'freelancer': True,
+                'skills': [],
+                'github': 'Counter021'
+            }
+        )
+
+        self.client.post(
+            self.url + '/register',
+            json={**self.user_data, 'username': 'test2', 'email': 'test2@example.com'}
+        )
+        verification = async_loop(verification_crud.get(self.session, id=2))
+        self.client.get(self.url + f'/verify?link={verification.link}')
+
+        tokens = self.client.post(f'{self.url}/login', data={'username': 'test2', 'password': 'Test1234!'})
+        headers = {'Authorization': f'Bearer {tokens.json()["access_token"]}'}
+
+        response = self.client.get(f'{self.url}/profile/current', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'username': 'test2',
+                'about': None,
+                'id': 2,
+                'date_joined': response.json()['date_joined'],
+                'last_login': response.json()['last_login'],
+                'avatar': 'https://via.placeholder.com/400x400',
+                'freelancer': False,
+                'skills': [],
+                'github': None
+            }
+        )
