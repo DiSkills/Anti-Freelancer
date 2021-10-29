@@ -16,3 +16,5 @@
     - [ ] Referral registration system
     - [ ] Reviews freelancers
     - [ ] Export user data
+- [ ] Messenger
+  - [ ] Notifications

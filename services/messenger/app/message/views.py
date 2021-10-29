@@ -56,12 +56,21 @@ class WebSocketState:
             msg = await message_crud.create(
                 db, **CreateMessage(sender_id=sender_id, msg=msg, recipient_id=recipient_id).dict()
             )
-        await websocket.send_json(
-            {
-                'type': 'SUCCESS',
-                'data': {'msg': 'Message has been send'}
-            }
-        )
+
+        for socket in self._users[sender_id]:
+            await socket.send_json(
+                {
+                    'type': 'SUCCESS',
+                    'data': {'msg': 'Message has been send'}
+                }
+            )
+
+            await socket.send_json(
+                {
+                    'type': 'MESSAGE',
+                    'data': GetMessage(**msg.__dict__).dict(),
+                }
+            )
 
         if recipient_id in self._users.keys():
             for socket in self._users[recipient_id]:

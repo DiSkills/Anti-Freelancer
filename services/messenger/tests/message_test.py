@@ -47,6 +47,65 @@ class MessageTestCase(BaseTest, TestCase):
         socket_1.close()
         socket_2.close()
 
+    def test_send_message_2_sender_connection(self):
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+
+        with mock.patch('app.permission.permission', return_value=2) as _:
+            with self.client.websocket_connect(f'{self.url}/ws/token') as socket_2:
+                with mock.patch('app.permission.permission', return_value=1) as _:
+                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket_3:
+                        with self.client.websocket_connect(f'{self.url}/ws/token') as socket_1:
+                            socket_1.send_json({'msg': 'Hello world!', 'recipient_id': 2})
+                            self.assertEqual(
+                                socket_1.receive_json(), {
+                                    'type': 'SUCCESS',
+                                    'data': {'msg': 'Message has been send'}
+                                }
+                            )
+                            created_at = f'{async_loop(message_crud.get(self.session, id=1)).created_at}Z'.replace(' ', 'T')
+                            self.assertEqual(
+                                socket_1.receive_json(),
+                                {
+                                    'type': 'MESSAGE',
+                                    'data': {
+                                        'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1,
+                                        'created_at': created_at
+                                    }
+                                }
+                            )
+                        self.assertEqual(
+                            socket_3.receive_json(), {
+                                'type': 'SUCCESS',
+                                'data': {'msg': 'Message has been send'}
+                            }
+                        )
+                        created_at = f'{async_loop(message_crud.get(self.session, id=1)).created_at}Z'.replace(' ', 'T')
+                        self.assertEqual(
+                            socket_3.receive_json(),
+                            {
+                                'type': 'MESSAGE',
+                                'data': {
+                                    'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1,
+                                    'created_at': created_at
+                                }
+                            }
+                        )
+
+                self.assertEqual(
+                    socket_2.receive_json(),
+                    {
+                        'type': 'MESSAGE',
+                        'data': {
+                            'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1, 'created_at': created_at
+                        }
+                    }
+                )
+
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
+        socket_1.close()
+        socket_2.close()
+        socket_3.close()
+
     def test_send_message_yourself(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
 
