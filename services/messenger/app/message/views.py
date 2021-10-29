@@ -15,6 +15,14 @@ class WebSocketState:
 
     @staticmethod
     async def error(websocket: WebSocket, msg: str):
+        """
+            Send error
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param msg: Message
+            :type msg: str
+            :return: None
+        """
         await websocket.send_json(
             {
                 'type': 'ERROR',
@@ -23,11 +31,25 @@ class WebSocketState:
         )
 
     def add_user(self, user_id: int, websocket: WebSocket):
+        """
+            Add user
+            :param user_id: User ID
+            :type user_id: int
+            :param websocket: Websocket
+            :type websocket: WebSocket
+        """
         if user_id not in self._users.keys():
             self._users[user_id] = []
         self._users[user_id].append(websocket)
 
     async def leave_user(self, user_id: int, websocket: WebSocket):
+        """
+            Leave user
+            :param user_id: User ID
+            :type user_id: int
+            :param websocket: Websocket
+            :type websocket: WebSocket
+        """
         if user_id not in self._users.keys():
             await self.error(websocket, 'User is not in state')
             return
@@ -46,6 +68,19 @@ class WebSocketState:
         msg: str,
         sender_data: dict[str, typing.Union[int, str]],
     ):
+        """
+            Send message
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param sender_id: Sender ID
+            :type sender_id: int
+            :param recipient_id: Recipient ID
+            :type recipient_id: int
+            :param msg: Message
+            :type msg: str
+            :param sender_data: Sender data
+            :type sender_data: dict
+        """
         if sender_id == recipient_id:
             await self.error(websocket, 'User can\'t send yourself message')
             return

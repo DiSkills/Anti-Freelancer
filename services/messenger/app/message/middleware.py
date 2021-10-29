@@ -4,6 +4,7 @@ from app.message.views import WebSocketState
 
 
 class WebSocketStateMiddleware:
+    """ WebSocket state middleware """
 
     def __init__(self, app: ASGIApp):
         self._app = app

@@ -13,6 +13,7 @@ message_router = APIRouter()
 
 @message_router.websocket_route('/ws/{token}')
 class Messenger(WebSocketEndpoint):
+    """ Messenger route """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
