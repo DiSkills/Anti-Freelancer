@@ -4,6 +4,7 @@ from pydantic import BaseModel, validator
 
 
 class SenderData(BaseModel):
+    """ Sender data """
 
     id: int
     username: str
