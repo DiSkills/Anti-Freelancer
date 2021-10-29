@@ -6,13 +6,47 @@ from tests import BaseTest, async_loop
 
 class MessageTestCase(BaseTest, TestCase):
 
-    def test_send_message(self):
+    def test_bad_type(self):
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+
+        with mock.patch('app.requests.get_user_request', return_value=self.user2) as _:
+            with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
+                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'Hello world!'})
+                    self.assertEqual(
+                        socket.receive_json(), {
+                            'type': 'ERROR',
+                            'data': {'msg': 'Bad request type'}
+                        }
+                    )
+
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+        socket.close()
+
+    def test_not_type(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.get_user_request', return_value=self.user2) as _:
             with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
                     socket.send_json({'msg': 'Hello world!', 'recipient_id': 2})
+                    self.assertEqual(
+                        socket.receive_json(), {
+                            'type': 'ERROR',
+                            'data': {'msg': 'Request type not found'}
+                        }
+                    )
+
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+        socket.close()
+
+    def test_send_message(self):
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+
+        with mock.patch('app.requests.get_user_request', return_value=self.user2) as _:
+            with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
+                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'})
                     self.assertEqual(
                         socket.receive_json(), {
                             'type': 'SUCCESS',
@@ -30,7 +64,7 @@ class MessageTestCase(BaseTest, TestCase):
             recipient.side_effect = ValueError('User not found')
             with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2})
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'})
                     self.assertEqual(
                         socket.receive_json(), {
                             'type': 'ERROR',
@@ -64,7 +98,7 @@ class MessageTestCase(BaseTest, TestCase):
             with self.client.websocket_connect(f'{self.url}/ws/token') as socket_2:
                 with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
                     with self.client.websocket_connect(f'{self.url}/ws/token') as socket_1:
-                        socket_1.send_json({'msg': 'Hello world!', 'recipient_id': 2})
+                        socket_1.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'})
 
                 created_at = f'{async_loop(message_crud.get(self.session, id=1)).created_at}Z'.replace(' ', 'T')
                 self.assertEqual(
@@ -90,7 +124,7 @@ class MessageTestCase(BaseTest, TestCase):
                 with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
                     with self.client.websocket_connect(f'{self.url}/ws/token') as socket_3:
                         with self.client.websocket_connect(f'{self.url}/ws/token') as socket_1:
-                            socket_1.send_json({'msg': 'Hello world!', 'recipient_id': 2})
+                            socket_1.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'})
                             self.assertEqual(
                                 socket_1.receive_json(), {
                                     'type': 'SUCCESS',
@@ -151,7 +185,7 @@ class MessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.user) as _:
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 1})
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 1, 'type': 'SEND'})
                     self.assertEqual(
                         socket.receive_json(), {
                             'type': 'ERROR',
@@ -170,7 +204,7 @@ class MessageTestCase(BaseTest, TestCase):
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket_2:
                     with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
                         with self.client.websocket_connect(f'{self.url}/ws/token') as socket_1:
-                            socket_1.send_json({'msg': 'Hello world!', 'recipient_id': 2})
+                            socket_1.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'})
 
                     created_at = f'{async_loop(message_crud.get(self.session, id=1)).created_at}Z'.replace(' ', 'T')
                     self.assertEqual(
@@ -204,7 +238,7 @@ class MessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
             with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                socket.send_json({'msg': 'Hello world!'})
+                socket.send_json({'msg': 'Hello world!', 'type': 'SEND'})
                 self.assertEqual(
                     socket.receive_json(), {
                         'type': 'ERROR',
@@ -217,7 +251,7 @@ class MessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
             with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                socket.send_json({'recipient_id': 2})
+                socket.send_json({'recipient_id': 2, 'type': 'SEND'})
                 self.assertEqual(
                     socket.receive_json(), {
                         'type': 'ERROR',
@@ -230,7 +264,7 @@ class MessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
             with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                socket.send_json({'data': 'Hello world!'})
+                socket.send_json({'data': 'Hello world!', 'type': 'SEND'})
                 self.assertEqual(
                     socket.receive_json(), {
                         'type': 'ERROR',

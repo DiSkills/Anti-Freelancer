@@ -48,16 +48,28 @@ class Messenger(WebSocketEndpoint):
             return
         await self._state.leave_user(self._user_id, websocket)
 
-    async def on_receive(self, websocket: WebSocket, data: str) -> None:
-        if self._user_id is None:
-            raise RuntimeError('User not found')
-
+    async def send_message(self, websocket: WebSocket, data: dict) -> None:
         try:
             data: dict[str, typing.Union[int, str]] = CreateMessage(
-                **{**json.loads(data), 'sender_id': self._user_id},
+                **{**data, 'sender_id': self._user_id},
             ).dict()
         except ValueError:
             await self._state.error(websocket, 'Invalid data')
             return
 
         await self._state.message(websocket, sender_data=self._user_data, **data)
+
+    async def on_receive(self, websocket: WebSocket, data: str) -> None:
+        if self._user_id is None:
+            raise RuntimeError('User not found')
+
+        data = json.loads(data)
+        if 'type' not in data.keys():
+            await self._state.error(websocket, 'Request type not found')
+            return
+
+        if 'SEND' == data['type']:
+            await self.send_message(websocket, data)
+        else:
+            await self._state.error(websocket, 'Bad request type')
+            return
