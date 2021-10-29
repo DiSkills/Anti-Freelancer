@@ -23,6 +23,40 @@ class MessageTestCase(BaseTest, TestCase):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
         socket.close()
 
+    def test_recipient_not_found(self):
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+
+        with mock.patch('app.requests.get_user_request') as recipient:
+            recipient.side_effect = ValueError('User not found')
+            with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
+                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2})
+                    self.assertEqual(
+                        socket.receive_json(), {
+                            'type': 'ERROR',
+                            'data': {'msg': 'Recipient not found'},
+                        }
+                    )
+
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+        socket.close()
+
+    def test_sender_not_found(self):
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+
+        with mock.patch('app.requests.sender_profile_request') as sender:
+            sender.side_effect = ValueError('User not found')
+            with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                self.assertEqual(
+                    socket.receive_json(), {
+                        'type': 'ERROR',
+                        'data': {'msg': 'User not found'},
+                    }
+                )
+
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+        socket.close()
+
     def test_send_message_2_connection(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
 
