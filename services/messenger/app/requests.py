@@ -4,6 +4,15 @@ from config import SERVER_AUTH_BACKEND, API
 
 
 async def get_user_request(user_id: int) -> dict:
+    """
+        Get user request
+        :param user_id: User ID
+        :type user_id: int
+        :return: User profile
+        :rtype: dict
+        :raise ValueError: Bad response
+    """
+
     async with aiohttp.ClientSession() as session:
         response = await session.get(url=f'{SERVER_AUTH_BACKEND}{API}/profile/{user_id}')
 
@@ -15,10 +24,25 @@ async def get_user_request(user_id: int) -> dict:
 
 
 async def get_user(user_id: int) -> dict:
+    """
+        Get user
+        :param user_id: User ID
+        :type user_id: int
+        :return: User profile
+        :rtype: dict
+    """
     return await get_user_request(user_id)
 
 
 async def sender_profile_request(token: str) -> dict:
+    """
+        Get sender request
+        :param token: Sender token
+        :type token: str
+        :return: Sender profile
+        :rtype: dict
+        :raise ValueError: Bad response
+    """
     async with aiohttp.ClientSession() as session:
         response = await session.get(
             url=f'{SERVER_AUTH_BACKEND}{API}/profile/current',
@@ -33,4 +57,11 @@ async def sender_profile_request(token: str) -> dict:
 
 
 async def sender_profile(token: str) -> dict:
+    """
+        Sender profile
+        :param token: Token
+        :type token: str
+        :return: Sender profile
+        :rtype: dict
+    """
     return await sender_profile_request(token)
