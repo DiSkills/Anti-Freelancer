@@ -49,6 +49,14 @@ class Messenger(WebSocketEndpoint):
         await self._state.leave_user(self._user_id, websocket)
 
     async def send_message(self, websocket: WebSocket, data: dict) -> None:
+        """
+            Send message
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param data: Data
+            :type data: dict
+            :return: None
+        """
         try:
             data: dict[str, typing.Union[int, str]] = CreateMessage(
                 **{**data, 'sender_id': self._user_id},
