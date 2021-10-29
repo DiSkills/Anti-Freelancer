@@ -19,5 +19,5 @@ class GetMessage(CreateMessage):
 
     @validator('created_at')
     def validate_created_at(cls, created_at: datetime.datetime):
-        """ Validate order date """
+        """ Validate created at """
         return f'{created_at}Z'.replace(' ', 'T')
