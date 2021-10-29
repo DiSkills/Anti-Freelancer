@@ -1,7 +1,7 @@
 from fastapi import WebSocket
 
 from app.crud import message_crud
-from app.message.schemas import CreateMessage
+from app.message.schemas import CreateMessage, GetMessage
 from app.requests import get_user
 from db import async_session
 
@@ -51,17 +51,9 @@ class WebSocketState:
             except ValueError:
                 await self.error(websocket, 'Recipient not found')
                 return
-        else:
-            for socket in self._users[recipient_id]:
-                await socket.send_json(
-                    {
-                        'type': 'MESSAGE',
-                        'data': {'sender': sender_id, 'recipient': recipient_id, 'msg': msg}
-                    }
-                )
 
         async with async_session() as db:
-            await message_crud.create(
+            msg = await message_crud.create(
                 db, **CreateMessage(sender_id=sender_id, msg=msg, recipient_id=recipient_id).dict()
             )
         await websocket.send_json(
@@ -70,3 +62,12 @@ class WebSocketState:
                 'data': {'msg': 'Message has been send'}
             }
         )
+
+        if recipient_id in self._users.keys():
+            for socket in self._users[recipient_id]:
+                await socket.send_json(
+                    {
+                        'type': 'MESSAGE',
+                        'data': GetMessage(**msg.__dict__).dict(),
+                    }
+                )

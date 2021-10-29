@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+import datetime
+
+from pydantic import BaseModel, validator
 
 
 class CreateMessage(BaseModel):
@@ -7,3 +9,15 @@ class CreateMessage(BaseModel):
     msg: str
     sender_id: int
     recipient_id: int
+
+
+class GetMessage(CreateMessage):
+    """ Get message """
+
+    id: int
+    created_at: datetime.datetime
+
+    @validator('created_at')
+    def validate_created_at(cls, created_at: datetime.datetime):
+        """ Validate order date """
+        return f'{created_at}Z'.replace(' ', 'T')

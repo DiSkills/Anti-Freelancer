@@ -13,8 +13,8 @@
 - [ ] Message
     - [x] Send message (websockets)
     - [ ] Get messages for user
-    - [ ] Update message
-    - [ ] Delete message
+    - [ ] Update message (websockets)
+    - [ ] Delete message (websockets)
     - [ ] Get all dialogs
 - [ ] Tests
     - [x] Send message (websockets)
