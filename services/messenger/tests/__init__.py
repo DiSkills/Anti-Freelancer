@@ -33,6 +33,8 @@ class BaseTest:
         self.client = TestClient(app)
         self.url = f'/{API}'
         async_loop(create_all())
+        self.user2 = {'username': 'test2', 'id': 2, 'avatar': 'http://localhost:8000/media/test2/lol.png'}
+        self.user = {'username': 'test', 'id': 1, 'avatar': 'http://localhost:8000/media/test/lol.png'}
 
     def tearDown(self) -> None:
         async_loop(self.session.close())

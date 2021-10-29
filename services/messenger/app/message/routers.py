@@ -6,7 +6,7 @@ from starlette.endpoints import WebSocketEndpoint
 
 from app.message.schemas import CreateMessage
 from app.message.views import WebSocketState
-from app.permission import is_active
+from app.requests import sender_profile
 
 message_router = APIRouter()
 
@@ -18,6 +18,7 @@ class Messenger(WebSocketEndpoint):
         super().__init__(*args, **kwargs)
         self._state: typing.Optional[WebSocketState] = None
         self._user_id: typing.Optional[int] = None
+        self._user_data: typing.Optional[dict[str, typing.Union[str, int]]] = None
 
     async def on_connect(self, websocket: WebSocket) -> None:
         state: typing.Optional[WebSocketState] = self.scope.get('websockets')
@@ -28,7 +29,11 @@ class Messenger(WebSocketEndpoint):
         await websocket.accept()
 
         try:
-            user_id: int = await is_active(websocket.path_params['token'])
+            user_data: dict = await sender_profile(websocket.path_params['token'])
+            user_id: int = user_data['id']
+            self._user_data: dict[str, typing.Union[int, str]] = {
+                'id': user_data['id'], 'username': user_data['username'], 'avatar': user_data['avatar'],
+            }
         except ValueError as error:
             await self._state.error(websocket, error.args[0])
             await websocket.close()
@@ -54,4 +59,4 @@ class Messenger(WebSocketEndpoint):
             await self._state.error(websocket, 'Invalid data')
             return
 
-        await self._state.message(websocket, **data)
+        await self._state.message(websocket, sender_data=self._user_data, **data)

@@ -1,7 +1,9 @@
+import typing
+
 from fastapi import WebSocket
 
 from app.crud import message_crud
-from app.message.schemas import CreateMessage, GetMessage
+from app.message.schemas import CreateMessage, GetMessage, SenderData
 from app.requests import get_user
 from db import async_session
 
@@ -36,7 +38,14 @@ class WebSocketState:
                 del self._users[user_id][i]
                 break
 
-    async def message(self, websocket: WebSocket, sender_id: int, recipient_id: int, msg: str):
+    async def message(
+        self,
+        websocket: WebSocket,
+        sender_id: int,
+        recipient_id: int,
+        msg: str,
+        sender_data: dict[str, typing.Union[int, str]],
+    ):
         if sender_id == recipient_id:
             await self.error(websocket, 'User can\'t send yourself message')
             return
@@ -68,7 +77,7 @@ class WebSocketState:
             await socket.send_json(
                 {
                     'type': 'MESSAGE',
-                    'data': GetMessage(**msg.__dict__).dict(),
+                    'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
                 }
             )
 
@@ -77,6 +86,6 @@ class WebSocketState:
                 await socket.send_json(
                     {
                         'type': 'MESSAGE',
-                        'data': GetMessage(**msg.__dict__).dict(),
+                        'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
                     }
                 )

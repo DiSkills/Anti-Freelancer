@@ -3,6 +3,13 @@ import datetime
 from pydantic import BaseModel, validator
 
 
+class SenderData(BaseModel):
+
+    id: int
+    username: str
+    avatar: str
+
+
 class CreateMessage(BaseModel):
     """ Create Message """
 
@@ -16,6 +23,8 @@ class GetMessage(CreateMessage):
 
     id: int
     created_at: datetime.datetime
+
+    sender: SenderData
 
     @validator('created_at')
     def validate_created_at(cls, created_at: datetime.datetime):
