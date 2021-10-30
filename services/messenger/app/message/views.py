@@ -134,6 +134,21 @@ class WebSocketState:
         msg: str,
         sender_data: dict[str, typing.Union[int, str]],
     ):
+        """
+            Update message
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param sender_id: Sender ID
+            :type sender_id: int
+            :param recipient_id: Recipient ID
+            :type recipient_id: int
+            :param msg_id: Message ID
+            :type msg_id: int
+            :param msg: Message text
+            :type msg: str
+            :param sender_data: Sender data
+            :type sender_data: dict
+        """
 
         if sender_id == recipient_id:
             await self.error(websocket, 'User can\'t send yourself message')
