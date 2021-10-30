@@ -58,6 +58,8 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                 )
         socket.close()
 
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).msg, self.start_msg_text)
+
     def test_message_user_not_sender(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
 
@@ -69,6 +71,8 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                     {'type': 'ERROR', 'data': {'msg': 'Message not found'}}
                 )
         socket.close()
+
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).msg, self.start_msg_text)
 
     def test_update_message_2_connection(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -116,6 +120,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                 self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
                 socket_1.close()
                 socket_2.close()
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).msg, 'Python')
 
     def test_update_message_2_sender_connection(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -171,6 +176,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
         socket_1.close()
         socket_2.close()
         socket_3.close()
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).msg, 'Python')
 
     def test_update_message_invalid_data(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -192,6 +198,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                     {'type': 'ERROR', 'data': {'msg': 'Invalid data'}}
                 )
         socket.close()
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).msg, self.start_msg_text)
 
     def test_bad_type(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -204,3 +211,4 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                     {'type': 'ERROR', 'data': {'msg': 'Bad request type'}}
                 )
         socket.close()
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).msg, self.start_msg_text)
