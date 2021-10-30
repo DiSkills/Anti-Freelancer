@@ -76,8 +76,12 @@ class Messenger(WebSocketEndpoint):
             await self._state.error(websocket, 'Request type not found')
             return
 
-        if 'SEND' == data['type']:
-            await self.send_message(websocket, data)
-        else:
+        types = {
+            'SEND': self.send_message
+        }
+
+        try:
+            await types[data['type']](websocket, data)
+        except KeyError:
             await self._state.error(websocket, 'Bad request type')
             return
