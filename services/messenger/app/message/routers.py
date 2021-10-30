@@ -88,6 +88,14 @@ class Messenger(WebSocketEndpoint):
         await self._state.update_message(websocket, sender_data=self._user_data, **data)
 
     async def delete_message(self, websocket: WebSocket, data: dict) -> None:
+        """
+            Delete message
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param data: Data
+            :type data: dict
+            :return: None
+        """
 
         try:
             data: dict[str, int] = DeleteMessage(**{**data, 'sender_id': self._user_id}).dict()
