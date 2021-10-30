@@ -64,7 +64,7 @@ class SendMessageTestCase(BaseTest, TestCase):
             recipient.side_effect = ValueError('User not found')
             with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'})
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 42, 'type': 'SEND'})
                     self.assertEqual(
                         socket.receive_json(), {
                             'type': 'ERROR',

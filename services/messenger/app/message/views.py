@@ -182,3 +182,48 @@ class WebSocketState:
                         'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
                     }
                 )
+
+    async def delete_message(
+        self,
+        websocket: WebSocket,
+        sender_id: int,
+        msg_id: int,
+        sender_data: dict[str, typing.Union[int, str]]
+    ):
+
+        if sender_id not in self._users.keys():
+            await self.error(websocket, 'Sender not found')
+            return
+
+        async with async_session() as db:
+
+            if not await message_crud.exist(db, id=msg_id, sender_id=sender_id):
+                await self.error(websocket, 'Message not found')
+                return
+
+            msg = await message_crud.get(db, id=msg_id)
+            await message_crud.remove(db, id=msg_id)
+
+        for socket in self._users[sender_id]:
+            await socket.send_json(
+                {
+                    'type': 'SUCCESS',
+                    'data': {'msg': 'Message has been deleted'}
+                }
+            )
+
+            await socket.send_json(
+                {
+                    'type': 'DELETE_MESSAGE',
+                    'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
+                }
+            )
+
+        if msg.recipient_id in self._users.keys():
+            for socket in self._users[msg.recipient_id]:
+                await socket.send_json(
+                    {
+                        'type': 'DELETE_MESSAGE',
+                        'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
+                    }
+                )

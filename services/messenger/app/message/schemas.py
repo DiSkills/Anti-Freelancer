@@ -19,12 +19,15 @@ class CreateMessage(BaseModel):
     recipient_id: int
 
 
-class UpdateMessage(BaseModel):
+class DeleteMessage(BaseModel):
+    msg_id: int
+    sender_id: int
+
+
+class UpdateMessage(DeleteMessage):
     """ Update message """
 
-    msg_id: int
     msg: str
-    sender_id: int
 
 
 class GetMessage(CreateMessage):

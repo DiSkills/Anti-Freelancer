@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <div id="main" class="row">
+            <div class="col-md-9">
+                <h4>Chat</h4>
+                <div id="chatbox">
+                    <div id="messages"></div>
+                </div>
+                <form>
+                    <div class="form-group row">
+
+                        <label for="msg_id" class="col-sm-1 mt-1 col-form-label">Msg ID</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="msg_id" placeholder="Enter Msg ID...">
+                        </div>
+
+                        <div class="col-sm-2">
+                            <button type="submit" id="submit" class="btn btn-primary">Delete</button>
+                        </div>
+
+                    </div>
+                </form>
+
+                <div>
+                    <input id="sender">
+                    <button id="btn">Connect</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+    <script>
+        document.querySelector('#btn').addEventListener('click', () => {
+            connect();
+        });
+
+        document.querySelector('#submit').addEventListener('click', (event) => {
+            sendMessage(event);
+        });
+
+        let ws = {};
+        let id;
+
+        const connect = () => {
+            id = document.querySelector('#sender').value;
+            ws = new WebSocket(`ws://localhost:8002/api/v1/ws/${id}`);
+
+            ws.onmessage = (event) => {
+                console.log(event.data);
+            };
+        };
+
+        const sendMessage = (event) => {
+            const msg_id = +document.querySelector('#msg_id').value;
+            ws.send(JSON.stringify({sender_id: id, msg_id, type: 'DELETE'}));
+            event.preventDefault();
+
+            ws.onmessage = (event) => {
+                console.log(event.data);
+            };
+
+        };
+
+    </script>
+
+</body>
+</html>

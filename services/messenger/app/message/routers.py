@@ -4,7 +4,7 @@ import typing
 from fastapi import APIRouter, WebSocket
 from starlette.endpoints import WebSocketEndpoint
 
-from app.message.schemas import CreateMessage, UpdateMessage
+from app.message.schemas import CreateMessage, UpdateMessage, DeleteMessage
 from app.message.views import WebSocketState
 from app.requests import sender_profile
 
@@ -87,6 +87,16 @@ class Messenger(WebSocketEndpoint):
 
         await self._state.update_message(websocket, sender_data=self._user_data, **data)
 
+    async def delete_message(self, websocket: WebSocket, data: dict) -> None:
+
+        try:
+            data: dict[str, int] = DeleteMessage(**{**data, 'sender_id': self._user_id}).dict()
+        except ValueError:
+            await self._state.error(websocket, 'Invalid data')
+            return
+
+        await self._state.delete_message(websocket, sender_data=self._user_data, **data)
+
     async def on_receive(self, websocket: WebSocket, data: str) -> None:
         if self._user_id is None:
             raise RuntimeError('User not found')
@@ -99,6 +109,7 @@ class Messenger(WebSocketEndpoint):
         types = {
             'SEND': self.send_message,
             'UPDATE': self.update_message,
+            'DELETE': self.delete_message,
         }
 
         try:
