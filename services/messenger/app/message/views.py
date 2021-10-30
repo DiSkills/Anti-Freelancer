@@ -129,44 +129,18 @@ class WebSocketState:
         self,
         websocket: WebSocket,
         sender_id: int,
-        recipient_id: int,
         msg_id: int,
         msg: str,
         sender_data: dict[str, typing.Union[int, str]],
     ):
-        """
-            Update message
-            :param websocket: Websocket
-            :type websocket: WebSocket
-            :param sender_id: Sender ID
-            :type sender_id: int
-            :param recipient_id: Recipient ID
-            :type recipient_id: int
-            :param msg_id: Message ID
-            :type msg_id: int
-            :param msg: Message text
-            :type msg: str
-            :param sender_data: Sender data
-            :type sender_data: dict
-        """
-
-        if sender_id == recipient_id:
-            await self.error(websocket, 'User can\'t send yourself message')
-            return
 
         if sender_id not in self._users.keys():
             await self.error(websocket, 'Sender not found')
             return
 
-        if recipient_id not in self._users.keys():
-            try:
-                await get_user(recipient_id)
-            except ValueError:
-                await self.error(websocket, 'Recipient not found')
-                return
         async with async_session() as db:
 
-            if not await message_crud.exist(db, id=msg_id):
+            if not await message_crud.exist(db, id=msg_id, sender_id=sender_id):
                 await self.error(websocket, 'Message not found')
                 return
 
@@ -187,8 +161,8 @@ class WebSocketState:
                 }
             )
 
-        if recipient_id in self._users.keys():
-            for socket in self._users[recipient_id]:
+        if msg.recipient_id in self._users.keys():
+            for socket in self._users[msg.recipient_id]:
                 await socket.send_json(
                     {
                         'type': 'UPDATE_MESSAGE',

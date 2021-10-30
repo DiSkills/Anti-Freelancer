@@ -22,11 +22,6 @@
                             <input type="text" class="form-control" id="chat-input" placeholder="Enter message...">
                         </div>
 
-                        <label for="to_user_id" class="col-sm-1 mt-1 col-form-label">Recipient ID</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" id="to_user_id" placeholder="Enter recipient ID...">
-                        </div>
-
                         <label for="msg_id" class="col-sm-1 mt-1 col-form-label">Msg ID</label>
                         <div class="col-sm-9">
                             <input type="text" class="form-control" id="msg_id" placeholder="Enter Msg ID...">
@@ -73,9 +68,8 @@
 
         const sendMessage = (event) => {
             const msg = document.querySelector('#chat-input').value;
-            const to_user = +document.querySelector('#to_user_id').value;
             const msg_id = +document.querySelector('#msg_id').value;
-            ws.send(JSON.stringify({msg, recipient_id: to_user, sender_id: id, msg_id, type: 'UPDATE'}));
+            ws.send(JSON.stringify({msg, sender_id: id, msg_id, type: 'UPDATE'}));
             event.preventDefault();
 
             ws.onmessage = (event) => {
