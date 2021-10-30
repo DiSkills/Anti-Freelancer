@@ -14,8 +14,9 @@
     - [x] Send message (websockets)
     - [ ] Get messages for user
     - [x] Update message (websockets)
-    - [ ] Delete message (websockets)
+    - [x] Delete message (websockets)
     - [ ] Get all dialogs
 - [ ] Tests
     - [x] Send message (websockets)
     - [x] Update message (websockets)
+    - [x] Delete message (websockets)
