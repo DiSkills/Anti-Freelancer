@@ -4,7 +4,7 @@ from app.crud import message_crud
 from tests import BaseTest, async_loop
 
 
-class MessageTestCase(BaseTest, TestCase):
+class SendMessageTestCase(BaseTest, TestCase):
 
     def test_bad_type(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
