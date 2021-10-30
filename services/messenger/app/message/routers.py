@@ -68,6 +68,15 @@ class Messenger(WebSocketEndpoint):
         await self._state.send_message(websocket, sender_data=self._user_data, **data)
 
     async def update_message(self, websocket: WebSocket, data: dict) -> None:
+        """
+            Update message
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param data: Data
+            :type data: dict
+            :return: None
+        """
+
         try:
             data: dict[str, typing.Union[int, str]] = UpdateMessage(
                 **{**data, 'sender_id': self._user_id},
