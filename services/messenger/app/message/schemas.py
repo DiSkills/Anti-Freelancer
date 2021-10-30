@@ -20,6 +20,8 @@ class CreateMessage(BaseModel):
 
 
 class DeleteMessage(BaseModel):
+    """ Delete message """
+
     msg_id: int
     sender_id: int
 
