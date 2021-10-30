@@ -12,11 +12,17 @@ class SenderData(BaseModel):
 
 
 class CreateMessage(BaseModel):
-    """ Create Message """
+    """ Create message """
 
     msg: str
     sender_id: int
     recipient_id: int
+
+
+class UpdateMessage(CreateMessage):
+    """ Update message """
+
+    msg_id: int
 
 
 class GetMessage(CreateMessage):

@@ -111,7 +111,7 @@ class WebSocketState:
 
             await socket.send_json(
                 {
-                    'type': 'MESSAGE',
+                    'type': 'SEND_MESSAGE',
                     'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
                 }
             )
@@ -120,7 +120,63 @@ class WebSocketState:
             for socket in self._users[recipient_id]:
                 await socket.send_json(
                     {
-                        'type': 'MESSAGE',
+                        'type': 'SEND_MESSAGE',
+                        'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
+                    }
+                )
+
+    async def update_message(
+        self,
+        websocket: WebSocket,
+        sender_id: int,
+        recipient_id: int,
+        msg_id: int,
+        msg: str,
+        sender_data: dict[str, typing.Union[int, str]],
+    ):
+
+        if sender_id == recipient_id:
+            await self.error(websocket, 'User can\'t send yourself message')
+            return
+
+        if sender_id not in self._users.keys():
+            await self.error(websocket, 'Sender not found')
+            return
+
+        if recipient_id not in self._users.keys():
+            try:
+                await get_user(recipient_id)
+            except ValueError:
+                await self.error(websocket, 'Recipient not found')
+                return
+        async with async_session() as db:
+
+            if not await message_crud.exist(db, id=msg_id):
+                await self.error(websocket, 'Message not found')
+                return
+
+            msg = await message_crud.update(db, {'id': msg_id}, msg=msg)
+
+        for socket in self._users[sender_id]:
+            await socket.send_json(
+                {
+                    'type': 'SUCCESS',
+                    'data': {'msg': 'Message has been updated'}
+                }
+            )
+
+            await socket.send_json(
+                {
+                    'type': 'UPDATE_MESSAGE',
+                    'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
+                }
+            )
+
+        if recipient_id in self._users.keys():
+            for socket in self._users[recipient_id]:
+                await socket.send_json(
+                    {
+                        'type': 'UPDATE_MESSAGE',
                         'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
                     }
                 )

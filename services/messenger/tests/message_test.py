@@ -104,7 +104,7 @@ class MessageTestCase(BaseTest, TestCase):
                 self.assertEqual(
                     socket_2.receive_json(),
                     {
-                        'type': 'MESSAGE',
+                        'type': 'SEND_MESSAGE',
                         'data': {
                             'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1, 'created_at': created_at,
                             'sender': self.user
@@ -138,7 +138,7 @@ class MessageTestCase(BaseTest, TestCase):
                             self.assertEqual(
                                 socket_1.receive_json(),
                                 {
-                                    'type': 'MESSAGE',
+                                    'type': 'SEND_MESSAGE',
                                     'data': {
                                         'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1,
                                         'created_at': created_at, 'sender': self.user
@@ -155,7 +155,7 @@ class MessageTestCase(BaseTest, TestCase):
                         self.assertEqual(
                             socket_3.receive_json(),
                             {
-                                'type': 'MESSAGE',
+                                'type': 'SEND_MESSAGE',
                                 'data': {
                                     'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1,
                                     'created_at': created_at, 'sender': self.user
@@ -166,7 +166,7 @@ class MessageTestCase(BaseTest, TestCase):
                 self.assertEqual(
                     socket_2.receive_json(),
                     {
-                        'type': 'MESSAGE',
+                        'type': 'SEND_MESSAGE',
                         'data': {
                             'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1, 'created_at': created_at,
                             'sender': self.user
@@ -210,7 +210,7 @@ class MessageTestCase(BaseTest, TestCase):
                     self.assertEqual(
                         socket_2.receive_json(),
                         {
-                            'type': 'MESSAGE',
+                            'type': 'SEND_MESSAGE',
                             'data': {
                                 'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1,
                                 'created_at': created_at, 'sender': self.user
@@ -220,7 +220,7 @@ class MessageTestCase(BaseTest, TestCase):
                 self.assertEqual(
                     socket_3.receive_json(),
                     {
-                        'type': 'MESSAGE',
+                        'type': 'SEND_MESSAGE',
                         'data': {
                             'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1, 'created_at': created_at,
                             'sender': self.user
