@@ -65,7 +65,7 @@ class Messenger(WebSocketEndpoint):
             await self._state.error(websocket, 'Invalid data')
             return
 
-        await self._state.message(websocket, sender_data=self._user_data, **data)
+        await self._state.send_message(websocket, sender_data=self._user_data, **data)
 
     async def on_receive(self, websocket: WebSocket, data: str) -> None:
         if self._user_id is None:

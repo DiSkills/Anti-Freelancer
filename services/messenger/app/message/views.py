@@ -60,7 +60,7 @@ class WebSocketState:
                 del self._users[user_id][i]
                 break
 
-    async def message(
+    async def send_message(
         self,
         websocket: WebSocket,
         sender_id: int,
