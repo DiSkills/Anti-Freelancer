@@ -1,11 +1,42 @@
 import typing
 
 from fastapi import WebSocket
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import requests
 from app.crud import message_crud
-from app.message.schemas import CreateMessage, GetMessage, SenderData
+from app.message.schemas import CreateMessage, GetMessage, UserData
+from app.models import Message
 from app.requests import get_user
+from app.service import paginate
+from config import SERVER_MESSENGER_BACKEND, API
 from db import async_session
+
+
+@paginate(
+    message_crud.get_all_for_dialog,
+    message_crud.exist_all_for_dialog,
+    f'{SERVER_MESSENGER_BACKEND}{API}/messages',
+    'sender_id', 'recipient_id'
+)
+async def get_messages(
+    *,
+    db: AsyncSession,
+    sender_id: int,
+    recipient_id: int,
+    page: int,
+    page_size: int,
+    queryset: list[Message],
+):
+    sender = await requests.get_user_request(sender_id)
+    recipient = await requests.get_user_request(recipient_id)
+    return (
+        {
+            **message.__dict__,
+            'sender': sender if message.sender_id == sender_id else recipient,
+            'recipient': recipient if message.recipient_id == recipient_id else sender,
+        } for message in queryset
+    )
 
 
 class WebSocketState:
@@ -112,7 +143,7 @@ class WebSocketState:
             await socket.send_json(
                 {
                     'type': 'SEND_MESSAGE',
-                    'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
+                    'data': GetMessage(**msg.__dict__, sender=UserData(**sender_data)).dict(),
                 }
             )
 
@@ -121,7 +152,7 @@ class WebSocketState:
                 await socket.send_json(
                     {
                         'type': 'SEND_MESSAGE',
-                        'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
+                        'data': GetMessage(**msg.__dict__, sender=UserData(**sender_data)).dict(),
                     }
                 )
 
@@ -173,7 +204,7 @@ class WebSocketState:
             await socket.send_json(
                 {
                     'type': 'UPDATE_MESSAGE',
-                    'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
+                    'data': GetMessage(**msg.__dict__, sender=UserData(**sender_data)).dict(),
                 }
             )
 
@@ -182,7 +213,7 @@ class WebSocketState:
                 await socket.send_json(
                     {
                         'type': 'UPDATE_MESSAGE',
-                        'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
+                        'data': GetMessage(**msg.__dict__, sender=UserData(**sender_data)).dict(),
                     }
                 )
 

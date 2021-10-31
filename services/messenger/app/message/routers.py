@@ -1,14 +1,43 @@
 import json
 import typing
 
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, Depends, status, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.endpoints import WebSocketEndpoint
 
-from app.message.schemas import CreateMessage, UpdateMessage, DeleteMessage
+from app.message import views
+from app.message.schemas import CreateMessage, UpdateMessage, DeleteMessage, MessagePaginate
 from app.message.views import WebSocketState
+from app.permission import is_active
 from app.requests import sender_profile
+from db import get_db
 
 message_router = APIRouter()
+
+
+@message_router.get(
+    '/messages',
+    name='Get all messages',
+    description='Get all messages',
+    response_description='Messages',
+    status_code=status.HTTP_200_OK,
+    response_model=MessagePaginate,
+    tags=['messages'],
+)
+async def get_messages(
+    recipient_id: int,
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db),
+    sender_id: int = Depends(is_active),
+):
+    return await views.get_messages(
+        db=db,
+        sender_id=sender_id,
+        recipient_id=recipient_id,
+        page=page,
+        page_size=page_size
+    )
 
 
 @message_router.websocket_route('/ws/{token}')

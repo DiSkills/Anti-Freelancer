@@ -2,8 +2,10 @@ import datetime
 
 from pydantic import BaseModel, validator
 
+from app.schemas import Paginate
 
-class SenderData(BaseModel):
+
+class UserData(BaseModel):
     """ Sender data """
 
     id: int
@@ -39,9 +41,19 @@ class GetMessage(CreateMessage):
     created_at: datetime.datetime
     viewed: bool
 
-    sender: SenderData
+    sender: UserData
 
     @validator('created_at')
     def validate_created_at(cls, created_at: datetime.datetime):
         """ Validate created at """
         return f'{created_at}Z'.replace(' ', 'T')
+
+
+class GetMessageResultPaginate(GetMessage):
+
+    recipient: UserData
+
+
+class MessagePaginate(Paginate):
+
+    results: list[GetMessageResultPaginate]
