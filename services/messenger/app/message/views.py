@@ -226,7 +226,7 @@ class WebSocketState:
             await socket.send_json(
                 {
                     'type': 'DELETE_MESSAGE',
-                    'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
+                    'data': {'id': msg.id},
                 }
             )
 
@@ -235,6 +235,6 @@ class WebSocketState:
                 await socket.send_json(
                     {
                         'type': 'DELETE_MESSAGE',
-                        'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
+                        'data': {'id': msg.id},
                     }
                 )

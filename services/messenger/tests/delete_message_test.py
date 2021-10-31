@@ -26,16 +26,7 @@ class DeleteMessageTestCase(BaseTest, TestCase):
                     {
                         'type': 'DELETE_MESSAGE',
                         'data': {
-                            'msg': 'Hello world!',
-                            'recipient_id': 2,
-                            'id': 1,
-                            'sender_id': 1,
-                            'sender': {
-                                'avatar': 'http://localhost:8000/media/test/lol.png',
-                                'id': 1,
-                                'username': 'test'
-                            },
-                            'created_at': self.created_at,
+                            'id': 1
                         }
                     }
                 )
@@ -88,16 +79,7 @@ class DeleteMessageTestCase(BaseTest, TestCase):
                             {
                                 'type': 'DELETE_MESSAGE',
                                 'data': {
-                                    'msg': 'Hello world!',
-                                    'recipient_id': 2,
-                                    'id': 1,
-                                    'sender_id': 1,
-                                    'sender': {
-                                        'avatar': 'http://localhost:8000/media/test/lol.png',
-                                        'id': 1,
-                                        'username': 'test'
-                                    },
-                                    'created_at': self.created_at,
+                                    'id': 1
                                 }
                             }
                         )
@@ -107,9 +89,7 @@ class DeleteMessageTestCase(BaseTest, TestCase):
                     {
                         'type': 'DELETE_MESSAGE',
                         'data': {
-                            'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1,
-                            'created_at': self.created_at,
-                            'sender': self.user
+                            'id': 1
                         }
                     }
                 )
@@ -137,8 +117,7 @@ class DeleteMessageTestCase(BaseTest, TestCase):
                                 {
                                     'type': 'DELETE_MESSAGE',
                                     'data': {
-                                        'recipient_id': 2, 'msg': 'Hello world!', 'id': 1,
-                                        'created_at': created_at, 'sender': self.user, 'sender_id': 1,
+                                        'id': 1
                                     }
                                 }
                             )
@@ -151,8 +130,7 @@ class DeleteMessageTestCase(BaseTest, TestCase):
                             {
                                 'type': 'DELETE_MESSAGE',
                                 'data': {
-                                    'recipient_id': 2, 'msg': 'Hello world!', 'id': 1, 'sender_id': 1,
-                                    'created_at': created_at, 'sender': self.user
+                                    'id': 1
                                 }
                             }
                         )
@@ -162,8 +140,7 @@ class DeleteMessageTestCase(BaseTest, TestCase):
                     {
                         'type': 'DELETE_MESSAGE',
                         'data': {
-                            'recipient_id': 2, 'msg': 'Hello world!', 'id': 1, 'sender_id': 1,
-                            'created_at': created_at, 'sender': self.user
+                            'id': 1
                         }
                     }
                 )
