@@ -188,7 +188,6 @@ class WebSocketState:
         websocket: WebSocket,
         sender_id: int,
         msg_id: int,
-        sender_data: dict[str, typing.Union[int, str]]
     ):
         """
             Delete message
@@ -198,8 +197,6 @@ class WebSocketState:
             :type sender_id: int
             :param msg_id: Message ID
             :type msg_id: int
-            :param sender_data: Sender data
-            :type sender_data: dict
         """
 
         if sender_id not in self._users.keys():
