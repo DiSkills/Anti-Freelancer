@@ -43,10 +43,10 @@ class SendMessageTestCase(BaseTest, TestCase):
     def test_send_message(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
 
-        with mock.patch('app.requests.get_user_request', return_value=self.user2) as _:
+        with mock.patch('app.requests.get_user_request', return_value={**self.user2, 'id': 4}) as _:
             with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'})
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 4, 'type': 'SEND'})
                     self.assertEqual(
                         socket.receive_json(), {
                             'type': 'SUCCESS',
@@ -56,6 +56,7 @@ class SendMessageTestCase(BaseTest, TestCase):
 
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
         socket.close()
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, False)
 
     def test_recipient_not_found(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
@@ -107,12 +108,13 @@ class SendMessageTestCase(BaseTest, TestCase):
                         'type': 'SEND_MESSAGE',
                         'data': {
                             'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1, 'created_at': created_at,
-                            'sender': self.user
+                            'sender': self.user, 'viewed': False
                         }
                     }
                 )
 
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, True)
         socket_1.close()
         socket_2.close()
 
@@ -141,7 +143,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                     'type': 'SEND_MESSAGE',
                                     'data': {
                                         'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1,
-                                        'created_at': created_at, 'sender': self.user
+                                        'created_at': created_at, 'sender': self.user, 'viewed': False
                                     }
                                 }
                             )
@@ -158,7 +160,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                 'type': 'SEND_MESSAGE',
                                 'data': {
                                     'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1,
-                                    'created_at': created_at, 'sender': self.user
+                                    'created_at': created_at, 'sender': self.user, 'viewed': False
                                 }
                             }
                         )
@@ -169,7 +171,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                         'type': 'SEND_MESSAGE',
                         'data': {
                             'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1, 'created_at': created_at,
-                            'sender': self.user
+                            'sender': self.user, 'viewed': False
                         }
                     }
                 )
@@ -178,6 +180,7 @@ class SendMessageTestCase(BaseTest, TestCase):
         socket_1.close()
         socket_2.close()
         socket_3.close()
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, True)
 
     def test_send_message_yourself(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
@@ -213,7 +216,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                             'type': 'SEND_MESSAGE',
                             'data': {
                                 'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1,
-                                'created_at': created_at, 'sender': self.user
+                                'created_at': created_at, 'sender': self.user, 'viewed': False
                             }
                         }
                     )
@@ -223,7 +226,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                         'type': 'SEND_MESSAGE',
                         'data': {
                             'sender_id': 1, 'recipient_id': 2, 'msg': 'Hello world!', 'id': 1, 'created_at': created_at,
-                            'sender': self.user
+                            'sender': self.user, 'viewed': False
                         }
                     }
                 )
@@ -232,6 +235,7 @@ class SendMessageTestCase(BaseTest, TestCase):
         socket_1.close()
         socket_2.close()
         socket_3.close()
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, True)
 
     def test_invalid_data(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)

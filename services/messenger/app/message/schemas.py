@@ -37,6 +37,7 @@ class GetMessage(CreateMessage):
 
     id: int
     created_at: datetime.datetime
+    viewed: bool
 
     sender: SenderData
 

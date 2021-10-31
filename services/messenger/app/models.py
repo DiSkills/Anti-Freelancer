@@ -17,6 +17,7 @@ class Message(Base):
     )
     sender_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     recipient_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    viewed: bool = sqlalchemy.Column(sqlalchemy.Boolean, default=False, nullable=True)
 
     def __str__(self):
         return f'<Message {self.id}>'

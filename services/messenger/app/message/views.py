@@ -125,6 +125,9 @@ class WebSocketState:
                     }
                 )
 
+            async with async_session() as db:
+                await message_crud.update(db, {'id': msg.id}, viewed=True)
+
     async def update_message(
         self,
         websocket: WebSocket,
@@ -182,6 +185,9 @@ class WebSocketState:
                         'data': GetMessage(**msg.__dict__, sender=SenderData(**sender_data)).dict(),
                     }
                 )
+
+            async with async_session() as db:
+                await message_crud.update(db, {'id': msg.id}, viewed=True)
 
     async def delete_message(
         self,

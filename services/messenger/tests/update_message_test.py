@@ -30,6 +30,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                             'recipient_id': 2,
                             'id': 1,
                             'sender_id': 1,
+                            'viewed': False,
                             'sender': {
                                 'avatar': 'http://localhost:8000/media/test/lol.png',
                                 'id': 1,
@@ -101,6 +102,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                                         'id': 1,
                                         'username': 'test'
                                     },
+                                    'viewed': False,
                                     'created_at': created_at,
                                 }
                             }
@@ -112,7 +114,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                         'type': 'UPDATE_MESSAGE',
                         'data': {
                             'sender_id': 1, 'recipient_id': 2, 'msg': 'Python', 'id': 1, 'created_at': created_at,
-                            'sender': self.user
+                            'sender': self.user, 'viewed': False
                         }
                     }
                 )
@@ -142,7 +144,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                                     'type': 'UPDATE_MESSAGE',
                                     'data': {
                                         'recipient_id': 2, 'msg': 'Python', 'id': 1,
-                                        'created_at': created_at, 'sender': self.user, 'sender_id': 1,
+                                        'created_at': created_at, 'sender': self.user, 'sender_id': 1, 'viewed': False
                                     }
                                 }
                             )
@@ -155,7 +157,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                             {
                                 'type': 'UPDATE_MESSAGE',
                                 'data': {
-                                    'recipient_id': 2, 'msg': 'Python', 'id': 1, 'sender_id': 1,
+                                    'recipient_id': 2, 'msg': 'Python', 'id': 1, 'sender_id': 1, 'viewed': False,
                                     'created_at': created_at, 'sender': self.user
                                 }
                             }
@@ -167,7 +169,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                         'type': 'UPDATE_MESSAGE',
                         'data': {
                             'recipient_id': 2, 'msg': 'Python', 'id': 1, 'sender_id': 1,
-                            'created_at': created_at, 'sender': self.user
+                            'created_at': created_at, 'sender': self.user, 'viewed': False
                         }
                     }
                 )
