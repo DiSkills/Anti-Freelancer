@@ -16,7 +16,7 @@ from db import async_session
 @paginate(
     message_crud.get_all_for_dialog,
     message_crud.exist_all_for_dialog,
-    f'{SERVER_MESSENGER_BACKEND}{API}/messages',
+    f'{SERVER_MESSENGER_BACKEND}{API}/messages/dialog',
     'sender_id', 'recipient_id'
 )
 async def get_messages_for_dialog(

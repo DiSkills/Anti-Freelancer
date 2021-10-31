@@ -104,7 +104,7 @@ class GetMessagesTestCase(BaseTest, TestCase):
                     self.assertEqual(
                         response.json(),
                         {
-                            'next': f'{SERVER_MESSENGER_BACKEND}{API}/messages?page=2&page_size=1&sender_id=1&recipient_id=2',
+                            'next': f'{SERVER_MESSENGER_BACKEND}{API}/messages/dialog?page=2&page_size=1&sender_id=1&recipient_id=2',
                             'page': 1,
                             'previous': None,
                             'results': [{
@@ -141,9 +141,9 @@ class GetMessagesTestCase(BaseTest, TestCase):
                     self.assertEqual(
                         response.json(),
                         {
-                            'next': f'{SERVER_MESSENGER_BACKEND}{API}/messages?page=3&page_size=1&sender_id=1&recipient_id=2',
+                            'next': f'{SERVER_MESSENGER_BACKEND}{API}/messages/dialog?page=3&page_size=1&sender_id=1&recipient_id=2',
                             'page': 2,
-                            'previous': f'{SERVER_MESSENGER_BACKEND}{API}/messages?page=1&page_size=1&sender_id=1&recipient_id=2',
+                            'previous': f'{SERVER_MESSENGER_BACKEND}{API}/messages/dialog?page=1&page_size=1&sender_id=1&recipient_id=2',
                             'results': [{
                                 'created_at': f'{self.message2.created_at}Z'.replace(' ', 'T'),
                                 'id': 2,
@@ -180,7 +180,7 @@ class GetMessagesTestCase(BaseTest, TestCase):
                         {
                             'next': None,
                             'page': 3,
-                            'previous': f'{SERVER_MESSENGER_BACKEND}{API}/messages?page=2&page_size=1&sender_id=1&recipient_id=2',
+                            'previous': f'{SERVER_MESSENGER_BACKEND}{API}/messages/dialog?page=2&page_size=1&sender_id=1&recipient_id=2',
                             'results': [{
                                 'created_at': f'{self.message1.created_at}Z'.replace(' ', 'T'),
                                 'id': 1,
