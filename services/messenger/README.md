@@ -12,11 +12,12 @@
     - [x] Is freelancer
 - [ ] Message
     - [x] Send message (websockets)
-    - [ ] Get messages for user
+    - [x] Get messages for dialog
     - [x] Update message (websockets)
     - [x] Delete message (websockets)
     - [ ] Get all dialogs
 - [ ] Tests
     - [x] Send message (websockets)
+    - [x] Get messages for dialog
     - [x] Update message (websockets)
     - [x] Delete message (websockets)
