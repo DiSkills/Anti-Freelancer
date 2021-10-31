@@ -50,10 +50,12 @@ class GetMessage(CreateMessage):
 
 
 class GetMessageResultPaginate(GetMessage):
+    """ Get message for paginate """
 
     recipient: UserData
 
 
 class MessagePaginate(Paginate):
+    """ Message paginate """
 
     results: list[GetMessageResultPaginate]

@@ -16,7 +16,7 @@ message_router = APIRouter()
 
 
 @message_router.get(
-    '/messages',
+    '/messages/dialog',
     name='Get all messages',
     description='Get all messages',
     response_description='Messages',
@@ -24,14 +24,14 @@ message_router = APIRouter()
     response_model=MessagePaginate,
     tags=['messages'],
 )
-async def get_messages(
+async def get_messages_for_dialog(
     recipient_id: int,
     page: int = Query(default=1, gt=0),
     page_size: int = Query(default=1, gt=0),
     db: AsyncSession = Depends(get_db),
     sender_id: int = Depends(is_active),
 ):
-    return await views.get_messages(
+    return await views.get_messages_for_dialog(
         db=db,
         sender_id=sender_id,
         recipient_id=recipient_id,

@@ -19,7 +19,7 @@ from db import async_session
     f'{SERVER_MESSENGER_BACKEND}{API}/messages',
     'sender_id', 'recipient_id'
 )
-async def get_messages(
+async def get_messages_for_dialog(
     *,
     db: AsyncSession,
     sender_id: int,
@@ -30,13 +30,18 @@ async def get_messages(
 ):
     sender = await requests.get_user_request(sender_id)
     recipient = await requests.get_user_request(recipient_id)
-    return (
+    response = (
         {
             **message.__dict__,
             'sender': sender if message.sender_id == sender_id else recipient,
             'recipient': recipient if message.recipient_id == recipient_id else sender,
         } for message in queryset
     )
+
+    async with async_session() as db:
+        await message_crud.update_viewed(db, sender_id, recipient_id, page_size * (page - 1), page_size)
+
+    return response
 
 
 class WebSocketState:
