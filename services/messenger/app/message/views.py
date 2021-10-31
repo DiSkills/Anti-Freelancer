@@ -28,7 +28,22 @@ async def get_messages_for_dialog(
     page_size: int,
     queryset: list[Message],
 ):
-
+    """
+        Get messages for dialog
+        :param db: DB
+        :type db: AsyncSession
+        :param sender_id: Sender ID
+        :type sender_id: int
+        :param recipient_id: Recipient ID
+        :type recipient_id: int
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param queryset: Messages
+        :type queryset: list
+        :return: Messages
+    """
     sender = await get_sender(sender_id)
     recipient = await get_recipient(recipient_id)
     response = (
