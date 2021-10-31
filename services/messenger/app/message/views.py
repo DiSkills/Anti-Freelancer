@@ -3,9 +3,9 @@ import typing
 from fastapi import WebSocket
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import requests
 from app.crud import message_crud
 from app.message.schemas import CreateMessage, GetMessage, UserData
+from app.message.service import get_sender, get_recipient
 from app.models import Message
 from app.requests import get_user
 from app.service import paginate
@@ -28,8 +28,9 @@ async def get_messages_for_dialog(
     page_size: int,
     queryset: list[Message],
 ):
-    sender = await requests.get_user_request(sender_id)
-    recipient = await requests.get_user_request(recipient_id)
+
+    sender = await get_sender(sender_id)
+    recipient = await get_recipient(recipient_id)
     response = (
         {
             **message.__dict__,
