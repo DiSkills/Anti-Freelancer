@@ -13,6 +13,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
 
     def test_update_message(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
+        async_loop(message_crud.update(self.session, {'id': 1}, recipient_id=5))
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.user) as _:
             with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
@@ -27,7 +28,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                         'type': 'UPDATE_MESSAGE',
                         'data': {
                             'msg': 'Python',
-                            'recipient_id': 2,
+                            'recipient_id': 5,
                             'id': 1,
                             'sender_id': 1,
                             'viewed': False,
@@ -46,6 +47,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
 
         self.assertEqual(async_loop(message_crud.get(self.session, id=1)).msg, 'Python')
         socket.close()
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, False)
 
     def test_update_message_not_found(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -123,6 +125,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                 socket_1.close()
                 socket_2.close()
         self.assertEqual(async_loop(message_crud.get(self.session, id=1)).msg, 'Python')
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, True)
 
     def test_update_message_2_sender_connection(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -179,6 +182,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
         socket_2.close()
         socket_3.close()
         self.assertEqual(async_loop(message_crud.get(self.session, id=1)).msg, 'Python')
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, True)
 
     def test_update_message_invalid_data(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
