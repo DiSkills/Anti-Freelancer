@@ -32,6 +32,7 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=admin
     depends_on:
       - auth_db
+      - main_db
 
   auth:
     build:
