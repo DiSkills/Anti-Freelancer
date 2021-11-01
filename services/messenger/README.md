@@ -11,4 +11,8 @@
     - [x] Is customer
     - [x] Is freelancer
 - [ ] Message
+    - [x] Send
+    - [ ] Docs for send
 - [ ] Tests
+    - [ ] Message
+        - [x] Send

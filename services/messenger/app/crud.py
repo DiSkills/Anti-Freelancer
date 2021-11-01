@@ -1,6 +1,7 @@
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.message.schemas import CreateMessage
 from app.models import Dialogue, Message
 from crud import CRUD
 
@@ -34,7 +35,7 @@ class DialogueCRUD(CRUD[Dialogue, Dialogue, Dialogue]):
         return query.scalars().first()
 
 
-class MessageCRUD(CRUD[Message, Message, Message]):
+class MessageCRUD(CRUD[Message, CreateMessage, CreateMessage]):
     """ Message CRUD """
     pass
 

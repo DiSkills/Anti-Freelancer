@@ -40,9 +40,12 @@ class MessengerView:
         self._state.add(self._user_id, websocket)
 
     async def disconnect(self, websocket: WebSocket):
-        if self._user_id is None:
-            await websocket_error(websocket, {'msg': 'User not found'})
-            await websocket.close()
+        try:
+            if self._user_id is None:
+                await websocket_error(websocket, {'msg': 'User not found'})
+                await websocket.close()
+                return
+        except AttributeError:
             return
         await self._state.leave(self._user_id, websocket)
 
