@@ -18,3 +18,6 @@ class MessengerRouter(WebSocketEndpoint, views.MessengerView):
 
     async def on_disconnect(self, websocket: WebSocket, close_code: int) -> None:
         await self.disconnect(websocket)
+
+    async def on_receive(self, websocket: WebSocket, data: str) -> None:
+        await self.receive_json(websocket, data)

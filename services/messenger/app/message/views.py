@@ -1,3 +1,4 @@
+import json
 import typing
 
 from fastapi import WebSocket
@@ -34,5 +35,35 @@ class MessengerView:
     async def disconnect(self, websocket: WebSocket):
         if self._user_id is None:
             await websocket_error(websocket, {'msg': 'User not found'})
+            await websocket.close()
             return
         await self._state.leave(self._user_id, websocket)
+
+    async def run(self, websocket: WebSocket, data: dict):
+        if 'type' not in data.keys():
+            await websocket_error(websocket, {'msg': 'Request type not found'})
+            return
+
+        types = {
+        }
+
+        try:
+            await types[data['type']](websocket, data)
+        except KeyError:
+            await websocket_error(websocket, {'msg': 'Bad request type'})
+            return
+
+    async def receive_json(self, websocket: WebSocket, data: str):
+        if self._user_id is None:
+            await websocket_error(websocket, {'msg': 'User not found'})
+            await websocket.close()
+            return
+
+        try:
+            data = json.loads(data)
+        except Exception as _ex:
+            print(_ex)
+            await websocket_error(websocket, {'msg': 'Invalid data'})
+            return
+
+        await self.run(websocket, data)
