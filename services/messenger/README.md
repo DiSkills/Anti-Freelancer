@@ -13,6 +13,7 @@
 - [ ] Message
     - [x] Send
     - [ ] Docs for send
+    - [ ] Add sender data for send message
 - [ ] Tests
     - [ ] Message
         - [x] Send
