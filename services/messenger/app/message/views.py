@@ -82,52 +82,40 @@ class MessengerView:
 
     async def send_message(self, websocket: WebSocket, schema: CreateMessage):
 
-        if schema.sender_id not in self._state._websockets.keys():
+        if schema.sender_id not in self._state.get_websockets.keys():
             await websocket_error(websocket, {'msg': 'Sender not found'})
             return
 
-        if schema.recipient_id not in self._state._websockets.keys():
+        viewed = False
+        if schema.recipient_id not in self._state.get_websockets.keys():
             try:
                 await get_user(schema.recipient_id)
             except ValueError:
                 await websocket_error(websocket, {'msg': 'Recipient not found'})
                 return
+        else:
+            viewed = True
 
         async with async_session() as db:
             if schema.dialog_id is None:
-                sender_recipient_dialog_exist = await dialog_crud.exist(db, users_ids=f'{schema.sender_id}_{schema.recipient_id}')
-                recipient_sender_dialog_exist = await dialog_crud.exist(db, users_ids=f'{schema.recipient_id}_{schema.sender_id}')
-                if (
-                    (not sender_recipient_dialog_exist)
-                        and
-                    (not recipient_sender_dialog_exist)
-                ):
-                    dialog = await dialog_crud.create(db, users_ids=f'{schema.sender_id}_{schema.recipient_id}')
-                    dialog_id = dialog.id
-                elif sender_recipient_dialog_exist:
-                    dialog = await dialog_crud.get(db, users_ids=f'{schema.sender_id}_{schema.recipient_id}')
-                    dialog_id = dialog.id
-                elif recipient_sender_dialog_exist:
-                    dialog = await dialog_crud.get(db, users_ids=f'{schema.recipient_id}_{schema.sender_id}')
-                    dialog_id = dialog.id
 
-            elif (
-                (not await dialog_crud.exist(db, users_ids=f'{schema.sender_id}_{schema.recipient_id}', id=schema.dialog_id))
-                    and
-                (not await dialog_crud.exist(db, users_ids=f'{schema.recipient_id}_{schema.sender_id}', id=schema.dialog_id))
-            ):
+                if not await dialog_crud.exist_for_users(db, schema.sender_id, schema.recipient_id):
+                    dialog = await dialog_crud.create(db, users_ids=f'{schema.sender_id}_{schema.recipient_id}')
+
+                elif await dialog_crud.exist_for_users(db, schema.sender_id, schema.recipient_id):
+                    dialog = await dialog_crud.get_for_users(db, schema.sender_id, schema.recipient_id)
+
+            elif not await dialog_crud.exist_for_users(db, schema.sender_id, schema.recipient_id, id=schema.dialog_id):
                 await websocket_error(websocket, {'msg': 'Dialog not found'})
                 return
-            else:
-                dialog_id = schema.dialog_id
-            dialog = await dialog_crud.get(db, id=dialog_id)
 
-            viewed = False
-            if schema.recipient_id in self._state._websockets.keys():
-                viewed = True
+            else:
+                dialog = await dialog_crud.get(db, id=schema.dialog_id)
+
             msg = await message_crud.create(
                 db, sender_id=schema.sender_id, viewed=viewed, msg=schema.msg, dialog_id=dialog.id
             )
+
         await self._state.send(
             sender_id=schema.sender_id,
             recipient_id=schema.recipient_id,

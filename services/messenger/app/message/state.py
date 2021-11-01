@@ -7,6 +7,10 @@ class WebSocketState:
     def __init__(self):
         self._websockets: dict[int, list[WebSocket]] = {}
 
+    @property
+    def get_websockets(self) -> dict[int, list[WebSocket]]:
+        return self._websockets
+
     def add(self, user_id: int, websocket: WebSocket):
         if user_id not in self._websockets.keys():
             self._websockets[user_id] = []
