@@ -1,6 +1,6 @@
 from starlette.types import ASGIApp, Scope, Receive, Send
 
-from app.message.views import WebSocketState
+from app.message.state import WebSocketState
 
 
 class WebSocketStateMiddleware:
