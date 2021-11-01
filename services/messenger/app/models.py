@@ -7,25 +7,6 @@ from sqlalchemy.orm import relationship
 from db import Base
 
 
-class UserDialog(Base):
-    """ User dialog """
-
-    __tablename__ = 'user_dialog'
-
-    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    user_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
-
-    dialog_id: int = sqlalchemy.Column(
-        sqlalchemy.Integer, sqlalchemy.ForeignKey('dialog.id', ondelete='CASCADE'), nullable=False,
-    )
-
-    def __str__(self):
-        return f'<UserDialog {self.id}>'
-
-    def __repr__(self):
-        return f'<UserDialog {self.id}>'
-
-
 class Message(Base):
     """ Message """
 
@@ -56,10 +37,8 @@ class Dialog(Base):
     __tablename__ = 'dialog'
 
     id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    users_ids: str = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
-    users: typing.Union[relationship, list[UserDialog]] = relationship(
-        UserDialog, backref='dialog', lazy='selectin', cascade='all, delete',
-    )
     messages: typing.Union[relationship, list[Message]] = relationship(
         Message, backref='dialog', cascade='all, delete',
     )

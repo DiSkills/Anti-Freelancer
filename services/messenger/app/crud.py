@@ -1,14 +1,9 @@
-from app.models import Dialog, UserDialog, Message
+from app.models import Dialog, Message
 from crud import CRUD
 
 
 class DialogCRUD(CRUD[Dialog, Dialog, Dialog]):
     """ Dialog CRUD """
-    pass
-
-
-class UserDialogCRUD(CRUD[UserDialog, UserDialog, UserDialog]):
-    """ User dialog CRUD """
     pass
 
 
@@ -18,5 +13,4 @@ class MessageCRUD(CRUD[Message, Message, Message]):
 
 
 dialog_crud = DialogCRUD(Dialog)
-user_dialog_crud = UserDialogCRUD(UserDialog)
 message_crud = MessageCRUD(Message)
