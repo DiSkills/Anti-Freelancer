@@ -1,17 +1,17 @@
 [tool.poetry]
 name = "Messenger Service Anti-Freelancer"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["_Counter021_"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+SQLAlchemy = {extras = ["async"], version = "^1.4.26"}
 fastapi = {version = "0.68.1", extras = ["all"]}
-psycopg2-binary = "2.9.1"
-SQLAlchemy = {extras = ["asyncio"], version = "^1.4.26"}
+psycopg2-binary = "^2.9.1"
 asyncpg = "^0.24.0"
 alembic = "^1.7.4"
-aiohttp = "^3.7.4"
+aiohttp = "^3.8.0"
 
 [tool.poetry.dev-dependencies]
 
