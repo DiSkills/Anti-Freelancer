@@ -3,7 +3,7 @@ import typing
 
 from fastapi import WebSocket
 
-from app.crud import dialog_crud, message_crud
+from app.crud import dialogue_crud, message_crud
 from app.message.schemas import CreateMessage, GetMessage
 from app.message.service import websocket_error
 from app.message.state import WebSocketState
@@ -97,23 +97,28 @@ class MessengerView:
             viewed = True
 
         async with async_session() as db:
-            if schema.dialog_id is None:
+            if schema.dialogue_id is None:
 
-                if not await dialog_crud.exist_for_users(db, schema.sender_id, schema.recipient_id):
-                    dialog = await dialog_crud.create(db, users_ids=f'{schema.sender_id}_{schema.recipient_id}')
+                if not await dialogue_crud.exist_by_users(db, schema.sender_id, schema.recipient_id):
+                    dialogue = await dialogue_crud.create(db, users_ids=f'{schema.sender_id}_{schema.recipient_id}')
 
-                elif await dialog_crud.exist_for_users(db, schema.sender_id, schema.recipient_id):
-                    dialog = await dialog_crud.get_for_users(db, schema.sender_id, schema.recipient_id)
+                elif await dialogue_crud.exist_by_users(db, schema.sender_id, schema.recipient_id):
+                    dialogue = await dialogue_crud.get_by_users(db, schema.sender_id, schema.recipient_id)
 
-            elif not await dialog_crud.exist_for_users(db, schema.sender_id, schema.recipient_id, id=schema.dialog_id):
-                await websocket_error(websocket, {'msg': 'Dialog not found'})
+            elif not await dialogue_crud.exist_by_users(
+                    db,
+                    schema.sender_id,
+                    schema.recipient_id,
+                    id=schema.dialogue_id
+            ):
+                await websocket_error(websocket, {'msg': 'Dialogue not found'})
                 return
 
             else:
-                dialog = await dialog_crud.get(db, id=schema.dialog_id)
+                dialogue = await dialogue_crud.get(db, id=schema.dialogue_id)
 
             msg = await message_crud.create(
-                db, sender_id=schema.sender_id, viewed=viewed, msg=schema.msg, dialog_id=dialog.id
+                db, sender_id=schema.sender_id, viewed=viewed, msg=schema.msg, dialogue_id=dialogue.id
             )
 
         await self._state.send(

@@ -20,8 +20,8 @@ class Message(Base):
     )
     viewed: bool = sqlalchemy.Column(sqlalchemy.Boolean, default=False, nullable=False)
 
-    dialog_id: int = sqlalchemy.Column(
-        sqlalchemy.Integer, sqlalchemy.ForeignKey('dialog.id', ondelete='CASCADE'), nullable=False,
+    dialogue_id: int = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('dialogue.id', ondelete='CASCADE'), nullable=False,
     )
 
     def __str__(self):
@@ -31,20 +31,20 @@ class Message(Base):
         return f'<Message {self.id}>'
 
 
-class Dialog(Base):
-    """ Dialog """
+class Dialogue(Base):
+    """ Dialogue """
 
-    __tablename__ = 'dialog'
+    __tablename__ = 'dialogue'
 
     id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     users_ids: str = sqlalchemy.Column(sqlalchemy.String, nullable=False)
 
     messages: typing.Union[relationship, list[Message]] = relationship(
-        Message, backref='dialog', cascade='all, delete',
+        Message, backref='dialogue', cascade='all, delete',
     )
 
     def __str__(self):
-        return f'<Dialog {self.id}>'
+        return f'<Dialogue {self.id}>'
 
     def __repr__(self):
-        return f'<Dialog {self.id}>'
+        return f'<Dialogue {self.id}>'

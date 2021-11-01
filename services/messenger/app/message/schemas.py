@@ -7,7 +7,7 @@ from pydantic import BaseModel, validator
 class CreateMessage(BaseModel):
     sender_id: int
     msg: str
-    dialog_id: typing.Optional[int] = None
+    dialogue_id: typing.Optional[int] = None
     recipient_id: int
 
 
@@ -16,7 +16,7 @@ class GetMessage(BaseModel):
     id: int
     sender_id: int
     msg: str
-    dialog_id: int
+    dialogue_id: int
     created_at: datetime.datetime
     viewed: bool
 
