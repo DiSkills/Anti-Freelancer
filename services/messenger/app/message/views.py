@@ -105,7 +105,7 @@ class MessengerView:
                 if not await dialogue_crud.exist_by_users(db, schema.sender_id, schema.recipient_id):
                     dialogue = await dialogue_crud.create(db, users_ids=f'{schema.sender_id}_{schema.recipient_id}')
 
-                elif await dialogue_crud.exist_by_users(db, schema.sender_id, schema.recipient_id):
+                else:
                     dialogue = await dialogue_crud.get_by_users(db, schema.sender_id, schema.recipient_id)
 
             elif not await dialogue_crud.exist_by_users(
