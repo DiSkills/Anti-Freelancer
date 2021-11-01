@@ -21,6 +21,8 @@ class WebSocketState:
             if self._websockets[user_id][index] == websocket:
                 await self._websockets[user_id][index].close()
                 del self._websockets[user_id][index]
+                if len(self._websockets[user_id]) == 0:
+                    del self._websockets[user_id]
                 break
 
     async def send(self, sender_id: int, recipient_id: int, success_msg: str, response_type: str, data: dict):
@@ -32,7 +34,7 @@ class WebSocketState:
                 }
             )
 
-        sockets = self._websockets[sender_id]
+        sockets = self._websockets[sender_id][:]
         if recipient_id in self._websockets.keys():
             sockets += self._websockets[recipient_id]
 
