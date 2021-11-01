@@ -8,6 +8,7 @@ from db import Base
 
 
 class UserDialog(Base):
+    """ User dialog """
 
     __tablename__ = 'user_dialog'
 
@@ -26,6 +27,7 @@ class UserDialog(Base):
 
 
 class Message(Base):
+    """ Message """
 
     __tablename__ = 'message'
 
@@ -49,6 +51,7 @@ class Message(Base):
 
 
 class Dialog(Base):
+    """ Dialog """
 
     __tablename__ = 'dialog'
 
