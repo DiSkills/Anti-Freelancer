@@ -11,7 +11,6 @@
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/fastapi-109989?style=for-the-badge&logo=FASTAPI&logoColor=white)
 ![SqlAlchemy](https://img.shields.io/badge/-SqlAlchemy-FCA121?style=for-the-badge&logo=SqlAlchemy)
-![Celery](https://img.shields.io/badge/-Celery-%2300C7B7?style=for-the-badge&logo=Celery)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 
 ## TODO
