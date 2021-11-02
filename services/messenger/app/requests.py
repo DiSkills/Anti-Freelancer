@@ -35,6 +35,14 @@ async def get_user(user_id: int) -> dict:
 
 
 async def sender_profile_request(token: str) -> dict:
+    """
+        Sender profile request
+        :param token: Token
+        :type token: str
+        :return: Sender profile
+        :rtype: dict
+        :raise ValueError: Bad response
+    """
 
     async with aiohttp.ClientSession() as session:
         response = await session.get(
@@ -50,4 +58,11 @@ async def sender_profile_request(token: str) -> dict:
 
 
 async def sender_profile(token: str) -> dict:
+    """
+        Sender profile request
+        :param token: Token
+        :type token: str
+        :return: Sender profile
+        :rtype: dict
+    """
     return await sender_profile_request(token)

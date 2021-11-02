@@ -18,7 +18,16 @@ class MessengerView:
         self._user_id: typing.Optional[int] = None
         self._user_data: typing.Optional[dict[str, typing.Union[str, int]]] = None
 
-    async def connect(self, state: typing.Optional[WebSocketState], websocket: WebSocket):
+    async def connect(self, state: typing.Optional[WebSocketState], websocket: WebSocket) -> None:
+        """
+            Connect websocket
+            :param state: Websockets state
+            :type state: WebSocketState
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :return: None
+            :raise RuntimeError: State not found
+        """
         if state is None:
             raise RuntimeError('State not found')
         self._state = state
@@ -39,7 +48,13 @@ class MessengerView:
         }
         self._state.add(self._user_id, websocket)
 
-    async def disconnect(self, websocket: WebSocket):
+    async def disconnect(self, websocket: WebSocket) -> None:
+        """
+            Disconnect websocket
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :return: None
+        """
         try:
             if self._user_id is None:
                 await websocket_error(websocket, {'msg': 'User not found'})
@@ -49,7 +64,15 @@ class MessengerView:
             return
         await self._state.leave(self._user_id, websocket)
 
-    async def run(self, websocket: WebSocket, data: dict):
+    async def run(self, websocket: WebSocket, data: dict) -> None:
+        """
+            Run function on type
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param data: Data
+            :type data: dict
+            :return: None
+        """
         if 'type' not in data.keys():
             await websocket_error(websocket, {'msg': 'Request type not found'})
             return
@@ -68,7 +91,15 @@ class MessengerView:
             await websocket_error(websocket, {'msg': f'Invalid {data["type"]} data'})
             return
 
-    async def receive_json(self, websocket: WebSocket, data: str):
+    async def receive_json(self, websocket: WebSocket, data: str) -> None:
+        """
+            Receive json
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param data: Data
+            :type data: str
+            :return: None
+        """
         if self._user_id is None:
             await websocket_error(websocket, {'msg': 'User not found'})
             await websocket.close()
@@ -83,7 +114,15 @@ class MessengerView:
 
         await self.run(websocket, data)
 
-    async def send_message(self, websocket: WebSocket, schema: CreateMessage):
+    async def send_message(self, websocket: WebSocket, schema: CreateMessage) -> None:
+        """
+            Send message
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param schema: Message data
+            :type schema: CreateMessage
+            :return: None
+        """
 
         if schema.sender_id not in self._state.get_websockets.keys():
             await websocket_error(websocket, {'msg': 'Sender not found'})
