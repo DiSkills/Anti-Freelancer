@@ -5,6 +5,7 @@
 - [ ] Services
     - [x] Auth
     - [x] Main
+    - [x] Email
     - [ ] Advertisement, Feedbacks and Reviews
     - [ ] Messenger
 - [ ] Docker compose
