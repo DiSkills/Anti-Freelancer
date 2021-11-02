@@ -9,5 +9,10 @@ Base = declarative_base()
 
 
 async def get_db() -> AsyncSession:
+    """
+        Get db
+        :return: Session
+        :rtype: AsyncSession
+    """
     async with async_session() as session:
         yield session
