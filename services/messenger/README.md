@@ -11,7 +11,14 @@
     - [x] Is customer
     - [x] Is freelancer
 - [ ] Message
-    - [x] Send
+    - [ ] WebSockets
+        - [x] Send
+        - [ ] Update (by dialogue id **and** message id **and** sender id)
+        - [ ] Delete (by dialogue id **and** message id **and** sender id)
+    - [ ] Get all for dialogue (pagination)
+    - [ ] Get all dialogues
+    - [ ] Get dialogue
 - [ ] Tests
     - [ ] Message
-        - [x] Send
+        - [ ] WebSockets
+            - [x] Send

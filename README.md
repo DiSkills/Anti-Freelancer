@@ -5,7 +5,7 @@
 - [ ] Services
     - [x] Auth
     - [x] Main
-    - [ ] Advertisement and Feedbacks
+    - [ ] Advertisement, Feedbacks and Reviews
     - [ ] Messenger
 - [ ] Docker compose
 
@@ -15,7 +15,9 @@
     - [ ] Levels freelancers
     - [ ] Referral registration system
     - [ ] Reviews freelancers
-    - [ ] Export user data
     - [ ] Add a level purchase for a freelancer
 - [ ] Messenger
-  - [ ] Notifications
+    - [ ] Notifications
+- [ ] Main
+    - [ ] Notification for selected freelancer that he is selected for job
+- [ ] Export user data
