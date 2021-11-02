@@ -8,7 +8,7 @@ from config import PROJECT_NAME, API
 app = FastAPI(
     title=PROJECT_NAME,
     version='0.2.0',
-    description='Messenger Service Anti-Freelancer by Counter021',
+    description='Messenger Service Anti-Freelancer by Counter',
 )
 
 app.add_middleware(
