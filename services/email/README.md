@@ -18,3 +18,5 @@
 - [x] Email
   - [x] Celery email send
   - [x] Checking the token for compliance with the user id
+- [x] Tests
+  - [x] Send email
