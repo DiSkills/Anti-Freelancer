@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.client.routers import client_router
 from app.mail.routers import mail_router
 from config import PROJECT_NAME, API
 
@@ -19,3 +20,4 @@ app.add_middleware(
 )
 
 app.include_router(mail_router, prefix=f'/{API}')
+app.include_router(client_router, prefix=f'/{API}/clients')
