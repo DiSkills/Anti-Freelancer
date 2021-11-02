@@ -19,5 +19,5 @@
 - [ ] Messenger
     - [ ] Notifications
 - [ ] Main
-    - [ ] Notification for selected freelancer that he is selected for job
+    - [ ] Notification for selected freelancer that he is selected for job (email)
 - [ ] Export user data
