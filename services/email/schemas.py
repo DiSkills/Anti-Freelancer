@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class Data(BaseModel):
     """ Data """
 
-    recipient: str
+    recipient: EmailStr
     subject: str
     template: str
     data: dict

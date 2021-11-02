@@ -84,3 +84,14 @@ class EmailTestCase(TestCase):
         response = self.client.post('/send', json=self.data)
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json(), {'detail': 'Could not validate credentials'})
+
+    def test_bad_email(self):
+        self.data['recipient'] = 'test'
+        self.data['token'] = jwt.encode(
+            {'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=1), 'sub': 'access', 'user_id': 1},
+            SECRET_KEY,
+            algorithm=ALGORITHM
+        )
+        response = self.client.post('/send', json=self.data)
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()['detail'][0]['msg'], 'value is not a valid email address')
