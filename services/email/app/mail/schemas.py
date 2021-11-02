@@ -1,8 +1,8 @@
 from pydantic import BaseModel, EmailStr
 
 
-class Data(BaseModel):
-    """ Data """
+class SendData(BaseModel):
+    """ Send data """
 
     recipient: EmailStr
     subject: str
@@ -10,9 +10,3 @@ class Data(BaseModel):
     data: dict
     token: str
     user_id: int
-
-
-class Message(BaseModel):
-    """ Message """
-
-    msg: str

@@ -3,8 +3,8 @@ import os
 import jwt
 from fastapi import HTTPException, status
 
-from config import SECRET_KEY, TEST
-from schemas import Data
+from app.mail.schemas import SendData
+from config import TEST, SECRET_KEY
 from tasks import send_email
 
 ALGORITHM = 'HS256'
@@ -33,11 +33,11 @@ def verify_token(token: str) -> int:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Could not validate credentials')
 
 
-async def send(schema: Data) -> dict[str, str]:
+async def send(schema: SendData) -> dict[str, str]:
     """
         Send email
-        :param schema: Data
-        :type schema: Data
+        :param schema: Send data
+        :type schema: SendData
         :return: Message
         :rtype: dict
         :raise HTTPException 400: Bad token

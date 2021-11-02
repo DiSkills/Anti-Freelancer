@@ -1,9 +1,8 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-import views
-from config import PROJECT_NAME
-from schemas import Data, Message
+from app.mail.routers import mail_router
+from config import PROJECT_NAME, API
 
 app = FastAPI(
     title=PROJECT_NAME,
@@ -19,15 +18,4 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-
-@app.post(
-    '/send',
-    name='Send email',
-    description='Send email',
-    response_description='Message',
-    status_code=status.HTTP_200_OK,
-    response_model=Message,
-    tags=['email'],
-)
-async def send(schema: Data):
-    return await views.send(schema)
+app.include_router(mail_router, prefix=f'/{API}')

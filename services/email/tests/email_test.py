@@ -4,9 +4,9 @@ from unittest import TestCase
 import jwt
 from fastapi.testclient import TestClient
 
-from config import SECRET_KEY
+from app.mail.views import ALGORITHM
+from config import SECRET_KEY, API
 from main import app
-from views import ALGORITHM
 
 
 class EmailTestCase(TestCase):
@@ -22,6 +22,7 @@ class EmailTestCase(TestCase):
             'user_id': 1,
         }
         self.client = TestClient(app)
+        self.url = f'/{API}'
 
     def test_email_send(self):
         self.data['token'] = jwt.encode(
@@ -29,7 +30,7 @@ class EmailTestCase(TestCase):
             SECRET_KEY,
             algorithm=ALGORITHM
         )
-        response = self.client.post('/send', json=self.data)
+        response = self.client.post(f'{self.url}/send', json=self.data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {'msg': 'Email has been send'})
 
@@ -40,7 +41,7 @@ class EmailTestCase(TestCase):
             algorithm=ALGORITHM
         )
         self.data['template'] = 'test.html'
-        response = self.client.post('/send', json=self.data)
+        response = self.client.post(f'{self.url}/send', json=self.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Template not found'})
 
@@ -51,7 +52,7 @@ class EmailTestCase(TestCase):
             SECRET_KEY,
             algorithm=ALGORITHM
         )
-        response = self.client.post('/send', json=self.data)
+        response = self.client.post(f'{self.url}/send', json=self.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Bad token'})
 
@@ -61,7 +62,7 @@ class EmailTestCase(TestCase):
             SECRET_KEY,
             algorithm=ALGORITHM
         )
-        response = self.client.post('/send', json=self.data)
+        response = self.client.post(f'{self.url}/send', json=self.data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Bad token'})
 
@@ -71,7 +72,7 @@ class EmailTestCase(TestCase):
             SECRET_KEY,
             algorithm=ALGORITHM
         )
-        response = self.client.post('/send', json=self.data)
+        response = self.client.post(f'{self.url}/send', json=self.data)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json(), {'detail': 'Token lifetime ended'})
 
@@ -81,7 +82,7 @@ class EmailTestCase(TestCase):
             SECRET_KEY,
             algorithm=ALGORITHM
         ) + 'Z'
-        response = self.client.post('/send', json=self.data)
+        response = self.client.post(f'{self.url}/send', json=self.data)
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json(), {'detail': 'Could not validate credentials'})
 
@@ -92,6 +93,6 @@ class EmailTestCase(TestCase):
             SECRET_KEY,
             algorithm=ALGORITHM
         )
-        response = self.client.post('/send', json=self.data)
+        response = self.client.post(f'{self.url}/send', json=self.data)
         self.assertEqual(response.status_code, 422)
         self.assertEqual(response.json()['detail'][0]['msg'], 'value is not a valid email address')
