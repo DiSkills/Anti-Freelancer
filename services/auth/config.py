@@ -11,6 +11,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 PROJECT_NAME = 'Anti-Freelancer'
 SERVER_BACKEND = 'http://localhost:8000/'
+SERVER_EMAIL = 'http://localhost:8003/'
 API = 'api/v1'
 
 TEST = os.environ.get('TEST', 0)
@@ -29,6 +30,9 @@ if int(TEST):
     DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}_test'
     MEDIA_ROOT = 'media/tests/'
 
+if int(DOCKER):
+    SERVER_EMAIL = 'http://email:8003/'
+
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 15
 RESET_TOKEN_EXPIRE_MINUTES = 15
@@ -36,9 +40,6 @@ RESET_TOKEN_EXPIRE_MINUTES = 15
 ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
-
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379')
-CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379')
 
 social_auth = OAuth()
 redirect_url = f'{SERVER_BACKEND}{API}/github/bind'

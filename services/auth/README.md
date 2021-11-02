@@ -17,7 +17,7 @@
 ## TODO
 
 - [x] Last login
-- [x] Celery email send
+- [x] Email send in new service
 - [x] Logger errors in file
 - [x] Create superuser
 - [x] Get media
