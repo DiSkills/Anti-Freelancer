@@ -1,5 +1,4 @@
 import datetime
-import typing
 
 from pydantic import BaseModel, validator
 
@@ -7,7 +6,6 @@ from pydantic import BaseModel, validator
 class CreateMessage(BaseModel):
     sender_id: int
     msg: str
-    dialogue_id: typing.Optional[int] = None
     recipient_id: int
 
 

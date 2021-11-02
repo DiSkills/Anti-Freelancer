@@ -89,6 +89,10 @@ class MessengerView:
             await websocket_error(websocket, {'msg': 'Sender not found'})
             return
 
+        if schema.sender_id == schema.recipient_id:
+            await websocket_error(websocket, {'msg': 'You cannot send yourself message'})
+            return
+
         viewed = False
         if schema.recipient_id not in self._state.get_websockets.keys():
             try:
@@ -100,25 +104,12 @@ class MessengerView:
             viewed = True
 
         async with async_session() as db:
-            if schema.dialogue_id is None:
+            users_ids = f'{min(schema.sender_id, schema.recipient_id)}_{max(schema.sender_id, schema.recipient_id)}'
 
-                if not await dialogue_crud.exist_by_users(db, schema.sender_id, schema.recipient_id):
-                    dialogue = await dialogue_crud.create(db, users_ids=f'{schema.sender_id}_{schema.recipient_id}')
-
-                else:
-                    dialogue = await dialogue_crud.get_by_users(db, schema.sender_id, schema.recipient_id)
-
-            elif not await dialogue_crud.exist_by_users(
-                    db,
-                    schema.sender_id,
-                    schema.recipient_id,
-                    id=schema.dialogue_id
-            ):
-                await websocket_error(websocket, {'msg': 'Dialogue not found'})
-                return
-
+            if not await dialogue_crud.exist(db, users_ids=users_ids):
+                dialogue = await dialogue_crud.create(db, users_ids=users_ids)
             else:
-                dialogue = await dialogue_crud.get(db, id=schema.dialogue_id)
+                dialogue = await dialogue_crud.get(db, users_ids=users_ids)
 
             msg = await message_crud.create(
                 db, sender_id=schema.sender_id, viewed=viewed, msg=schema.msg, dialogue_id=dialogue.id

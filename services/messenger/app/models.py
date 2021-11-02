@@ -37,7 +37,7 @@ class Dialogue(Base):
     __tablename__ = 'dialogue'
 
     id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    users_ids: str = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    users_ids: str = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
 
     messages: typing.Union[relationship, list[Message]] = relationship(
         Message, backref='dialogue', cascade='all, delete',
