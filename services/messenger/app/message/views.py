@@ -4,7 +4,7 @@ import typing
 from fastapi import WebSocket
 
 from app.crud import dialogue_crud, message_crud
-from app.message.schemas import CreateMessage, GetMessage
+from app.message.schemas import CreateMessage, GetMessage, UserData
 from app.message.service import websocket_error
 from app.message.state import WebSocketState
 from app.requests import sender_profile, get_user
@@ -120,5 +120,5 @@ class MessengerView:
             recipient_id=schema.recipient_id,
             success_msg='Message has been send',
             response_type='SEND',
-            data=GetMessage(**{**msg.__dict__, 'viewed': False}).dict()
+            data=GetMessage(**{**msg.__dict__, 'viewed': False}, sender=UserData(**self._user_data)).dict()
         )

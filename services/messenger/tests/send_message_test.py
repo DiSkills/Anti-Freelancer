@@ -1,7 +1,7 @@
 from unittest import mock, TestCase
 
 from app.crud import message_crud, dialogue_crud
-from app.message.schemas import GetMessage, CreateMessage
+from app.message.schemas import GetMessage, CreateMessage, UserData
 from tests import BaseTest, async_loop
 
 
@@ -26,7 +26,8 @@ class SendMessageTestCase(BaseTest, TestCase):
                         response,
                         {
                             'data': GetMessage(
-                                **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False}
+                                **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False},
+                                sender=UserData(**self.get_new_user(1))
                             ).dict(), 'type': 'SEND'
                         }
                     )
@@ -60,7 +61,8 @@ class SendMessageTestCase(BaseTest, TestCase):
                             response,
                             {
                                 'data': GetMessage(
-                                    **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False}
+                                    **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False},
+                                    sender=UserData(**self.get_new_user(1))
                                 ).dict(), 'type': 'SEND'
                             }
                         )
@@ -76,7 +78,8 @@ class SendMessageTestCase(BaseTest, TestCase):
                             response,
                             {
                                 'data': GetMessage(
-                                    **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False}
+                                    **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False},
+                                    sender=UserData(**self.get_new_user(1)),
                                 ).dict(), 'type': 'SEND'
                             }
                         )
@@ -112,7 +115,10 @@ class SendMessageTestCase(BaseTest, TestCase):
                                 response,
                                 {
                                     'data': GetMessage(
-                                        **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False}
+                                        **{
+                                            **async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False
+                                        },
+                                        sender=UserData(**self.get_new_user(1)),
                                     ).dict(), 'type': 'SEND'
                                 }
                             )
@@ -122,7 +128,10 @@ class SendMessageTestCase(BaseTest, TestCase):
                                 response,
                                 {
                                     'data': GetMessage(
-                                        **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False}
+                                        **{
+                                            **async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False
+                                        },
+                                        sender=UserData(**self.get_new_user(1)),
                                     ).dict(), 'type': 'SEND'
                                 }
                             )
@@ -163,7 +172,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                                 **{
                                                     **async_loop(message_crud.get(self.session, id=1)).__dict__,
                                                     'viewed': False
-                                                }
+                                                }, sender=UserData(**self.get_new_user(1)),
                                             ).dict(), 'type': 'SEND'
                                         }
                                     )
@@ -176,7 +185,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                                 **{
                                                     **async_loop(message_crud.get(self.session, id=1)).__dict__,
                                                     'viewed': False
-                                                }
+                                                }, sender=UserData(**self.get_new_user(1)),
                                             ).dict(), 'type': 'SEND'
                                         }
                                     )
@@ -195,7 +204,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                                 **{
                                                     **async_loop(message_crud.get(self.session, id=1)).__dict__,
                                                     'viewed': False
-                                                }
+                                                }, sender=UserData(**self.get_new_user(1)),
                                             ).dict(), 'type': 'SEND'
                                         }
                                     )
@@ -208,7 +217,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                                 **{
                                                     **async_loop(message_crud.get(self.session, id=1)).__dict__,
                                                     'viewed': False
-                                                }
+                                                }, sender=UserData(**self.get_new_user(1)),
                                             ).dict(), 'type': 'SEND'
                                         }
                                     )
@@ -249,7 +258,8 @@ class SendMessageTestCase(BaseTest, TestCase):
                         response,
                         {
                             'data': GetMessage(
-                                **{**async_loop(message_crud.get(self.session, id=2)).__dict__, 'viewed': False}
+                                **{**async_loop(message_crud.get(self.session, id=2)).__dict__, 'viewed': False},
+                                sender=UserData(**self.get_new_user(2)),
                             ).dict(), 'type': 'SEND'
                         }
                     )
@@ -287,7 +297,8 @@ class SendMessageTestCase(BaseTest, TestCase):
                         response,
                         {
                             'data': GetMessage(
-                                **{**async_loop(message_crud.get(self.session, id=2)).__dict__, 'viewed': False}
+                                **{**async_loop(message_crud.get(self.session, id=2)).__dict__, 'viewed': False},
+                                sender=UserData(**self.get_new_user(1)),
                             ).dict(), 'type': 'SEND'
                         }
                     )
