@@ -66,7 +66,7 @@ async def validate_login(db: AsyncSession, username: str, password: str) -> User
         else:
             verification = await verification_crud.get(db, user_id=user.id)
 
-        await send_register_email(user.id, user.email, user.username, f'{SERVER_BACKEND}{API}/verify?link={verification.link}')
+        await send_register_email(user.email, user.username, f'{SERVER_BACKEND}{API}/verify?link={verification.link}')
 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You not activated')
 

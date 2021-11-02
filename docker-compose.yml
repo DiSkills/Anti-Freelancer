@@ -23,6 +23,17 @@ services:
     ports:
       - "5434:5434"
 
+  email_db:
+    build:
+      context: ./services/email/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=email_user
+    volumes:
+      - ./services/email/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5435:5435"
+
   pg_admin:
     image: dpage/pgadmin4
     ports:
@@ -75,6 +86,8 @@ services:
       - worker
     volumes:
       - ./services/email:/app
+    environment:
+      - DOCKER=1
 
   worker:
     build: ./services/email
@@ -84,8 +97,10 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DOCKER=1
     depends_on:
       - redis
+      - email_db
 
   redis:
     image: redis

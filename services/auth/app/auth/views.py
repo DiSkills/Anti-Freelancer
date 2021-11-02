@@ -44,7 +44,7 @@ async def register(db: AsyncSession, schema: Register) -> dict[str, str]:
 
     verification = await verification_crud.create(db, **VerificationCreate(user_id=user.id, link=str(uuid4())).dict())
 
-    await send_register_email(user.id, user.email, user.username, f'{SERVER_BACKEND}{API}/verify?link={verification.link}')
+    await send_register_email(user.email, user.username, f'{SERVER_BACKEND}{API}/verify?link={verification.link}')
 
     return {'msg': 'Send email for activate your account'}
 
@@ -107,7 +107,7 @@ async def get_username(db: AsyncSession, email: str) -> dict[str, str]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
 
     user = await user_crud.get(db, email=email)
-    await send_username_email(user.id, user.email, user.username)
+    await send_username_email(user.email, user.username)
 
     return {'msg': 'Email send'}
 
@@ -285,7 +285,7 @@ async def reset_password_request(db: AsyncSession, email: str) -> dict[str, str]
     user = await user_crud.get(db, email=email)
     token = create_reset_password_token(user.id)
     link = SERVER_BACKEND + f'{API}/reset-password?token={token}'
-    await send_reset_password_email(user.id, user.email, user.username, link)
+    await send_reset_password_email(user.email, user.username, link)
     return {'msg': 'Send reset password email. Check your email address'}
 
 
