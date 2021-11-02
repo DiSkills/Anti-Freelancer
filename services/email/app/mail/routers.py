@@ -1,8 +1,10 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.mail import views
 from app.mail.schemas import SendData
 from app.schemas import Message
+from db import get_db
 
 mail_router = APIRouter()
 
@@ -16,5 +18,5 @@ mail_router = APIRouter()
     response_model=Message,
     tags=['email'],
 )
-async def send(schema: SendData):
-    return await views.send(schema)
+async def send(schema: SendData, db: AsyncSession = Depends(get_db)):
+    return await views.send(db, schema)

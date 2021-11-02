@@ -8,5 +8,6 @@ class SendData(BaseModel):
     subject: str
     template: str
     data: dict
-    token: str
-    user_id: int
+
+    secret: str
+    client_name: str
