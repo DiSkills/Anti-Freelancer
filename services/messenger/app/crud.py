@@ -1,3 +1,6 @@
+import sqlalchemy
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.message.schemas import CreateMessage
 from app.models import Dialogue, Message, Notification
 from crud import CRUD
@@ -15,7 +18,15 @@ class MessageCRUD(CRUD[Message, CreateMessage, CreateMessage]):
 
 class NotificationCRUD(CRUD[Notification, Notification, Notification]):
     """ Notification CRUD """
-    pass
+
+    @staticmethod
+    async def filter_ids(db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> list[Notification]:
+        query = await db.execute(
+            sqlalchemy.select(Notification.sender_id).filter_by(
+                **kwargs
+            ).order_by(Notification.id.desc()).offset(skip).limit(limit)
+        )
+        return query.scalars().all()
 
 
 dialogue_crud = DialogueCRUD(Dialogue)
