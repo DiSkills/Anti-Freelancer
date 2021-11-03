@@ -174,7 +174,13 @@ async def profiles_by_ids(db: AsyncSession, ids: list[int]) -> dict[str, typing.
         :return: Profiles
         :rtype: dict
     """
-    return {user.id: user.__dict__ for user in await user_crud.get_by_ids(db, ids)}
+    return {
+        user.id: {
+            **user.__dict__,
+            'skills': [skill.__dict__ for skill in user.skills],
+            'github': user.github.git_username if user.github else None,
+        } for user in await user_crud.get_by_ids(db, ids)
+    }
 
 
 async def profile(db: AsyncSession, user_id: int) -> dict[str, typing.Any]:

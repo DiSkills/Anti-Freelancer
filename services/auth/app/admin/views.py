@@ -92,7 +92,7 @@ async def update_user(db: AsyncSession, schema: UpdateUser, user_id: int) -> dic
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email exist')
 
     user = await user_crud.update(db, {'id': user_id}, **schema.dict())
-    return user.__dict__
+    return {**user.__dict__, 'github': user.github.__dict__ if user.github else None}
 
 
 async def unbind_github(db: AsyncSession, pk: int) -> dict[str, str]:
