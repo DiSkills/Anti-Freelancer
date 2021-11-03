@@ -19,7 +19,10 @@
     - [ ] Get all dialogues
     - [ ] Get dialogue
 - [ ] Notification
-    - [x] Create
+    - [ ] Send email about new message
+    - [x] Create (message has been sent)
+    - [ ] Create (message has been deleted)
+    - [ ] Create (message has been changed)
     - [x] Get
     - [ ] Delete (viewed)
 - [ ] Tests
@@ -27,5 +30,5 @@
         - [ ] WebSockets
             - [x] Send
     - [ ] Notification
-        - [x] Create
+        - [x] Create (message has been sent)
         - [x] Get
