@@ -20,9 +20,12 @@
     - [ ] Get dialogue
 - [ ] Notification
     - [x] Create
+    - [x] Get
+    - [ ] Delete (viewed)
 - [ ] Tests
     - [ ] Message
         - [ ] WebSockets
             - [x] Send
     - [ ] Notification
         - [x] Create
+        - [x] Get
