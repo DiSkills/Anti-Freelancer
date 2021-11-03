@@ -18,7 +18,11 @@
     - [ ] Get all for dialogue (pagination)
     - [ ] Get all dialogues
     - [ ] Get dialogue
+- [ ] Notification
+    - [x] Create
 - [ ] Tests
     - [ ] Message
         - [ ] WebSockets
             - [x] Send
+    - [ ] Notification
+        - [x] Create

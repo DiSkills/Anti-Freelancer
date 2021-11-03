@@ -1,6 +1,6 @@
 from unittest import mock, TestCase
 
-from app.crud import message_crud, dialogue_crud
+from app.crud import message_crud, dialogue_crud, notification_crud
 from app.message.schemas import GetMessage, CreateMessage, UserData
 from config import ERROR, SUCCESS, SEND
 from tests import BaseTest, async_loop
@@ -10,6 +10,7 @@ class SendMessageTestCase(BaseTest, TestCase):
 
     def test_only_1_sender_connection_first_message(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
@@ -39,10 +40,12 @@ class SendMessageTestCase(BaseTest, TestCase):
         self.assertEqual(async_loop(dialogue_crud.get(self.session, id=1)).users_ids, '1_2')
         socket.close()
         self.assertEqual(async_loop(message_crud.get(self.session, id=1)).dialogue_id, 1)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 1)
 
     def test_only_2_sender_connections(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
@@ -92,10 +95,12 @@ class SendMessageTestCase(BaseTest, TestCase):
         socket_1.close()
         socket_2.close()
         self.assertEqual(async_loop(message_crud.get(self.session, id=1)).dialogue_id, 1)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 1)
 
     def test_sender_and_recipient_connections(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
@@ -138,8 +143,9 @@ class SendMessageTestCase(BaseTest, TestCase):
                             )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 1)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 1)
 
-        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, True)
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, False)
         self.assertEqual(async_loop(dialogue_crud.get(self.session, id=1)).users_ids, '1_2')
         socket_sender.close()
         socket_recipient.close()
@@ -148,6 +154,7 @@ class SendMessageTestCase(BaseTest, TestCase):
     def test_2_sender_and_2_recipient_connections(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
@@ -225,8 +232,9 @@ class SendMessageTestCase(BaseTest, TestCase):
 
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 1)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 1)
 
-        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, True)
+        self.assertEqual(async_loop(message_crud.get(self.session, id=1)).viewed, False)
         self.assertEqual(async_loop(dialogue_crud.get(self.session, id=1)).users_ids, '1_2')
         self.assertEqual(async_loop(message_crud.get(self.session, id=1)).dialogue_id, 1)
         socket_sender_1.close()
@@ -240,9 +248,11 @@ class SendMessageTestCase(BaseTest, TestCase):
         async_loop(dialogue_crud.create(self.session, users_ids=f'1_2'))
         del schema.recipient_id
         async_loop(message_crud.create(self.session, **schema.dict(), dialogue_id=1))
+        async_loop(notification_crud.create(self.session, sender_id=schema.sender_id, message_id=1))
 
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 1)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 1)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(2)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(1)) as _:
@@ -272,6 +282,7 @@ class SendMessageTestCase(BaseTest, TestCase):
         self.assertEqual(async_loop(dialogue_crud.get(self.session, id=1)).users_ids, '1_2')
         socket.close()
         self.assertEqual(async_loop(message_crud.get(self.session, id=2)).dialogue_id, 1)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 2)
 
     def test_only_1_sender_connection_second_message_after_sender(self):
         schema = CreateMessage(sender_id=1, msg='Hello world!', recipient_id=2)
@@ -279,9 +290,11 @@ class SendMessageTestCase(BaseTest, TestCase):
         async_loop(dialogue_crud.create(self.session, users_ids=f'1_2'))
         del schema.recipient_id
         async_loop(message_crud.create(self.session, **schema.dict(), dialogue_id=1))
+        async_loop(notification_crud.create(self.session, sender_id=schema.sender_id, message_id=1))
 
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 1)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 1)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
@@ -311,6 +324,7 @@ class SendMessageTestCase(BaseTest, TestCase):
         self.assertEqual(async_loop(dialogue_crud.get(self.session, id=1)).users_ids, '1_2')
         socket.close()
         self.assertEqual(async_loop(message_crud.get(self.session, id=2)).dialogue_id, 1)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 2)
 
 
 class BadSendMessageTestCase(BaseTest, TestCase):
@@ -318,6 +332,7 @@ class BadSendMessageTestCase(BaseTest, TestCase):
     def test_yourself(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(1)) as _:
@@ -331,10 +346,12 @@ class BadSendMessageTestCase(BaseTest, TestCase):
         socket.close()
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
     def test_bad_recipient(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request') as recipient:
@@ -348,12 +365,14 @@ class BadSendMessageTestCase(BaseTest, TestCase):
                     )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         socket.close()
 
     def test_invalid_data_schema(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
@@ -366,9 +385,14 @@ class BadSendMessageTestCase(BaseTest, TestCase):
                     )
         socket.close()
 
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
+
     def test_not_type(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
@@ -381,9 +405,14 @@ class BadSendMessageTestCase(BaseTest, TestCase):
                     )
         socket.close()
 
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
+
     def test_bad_type(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
@@ -396,9 +425,14 @@ class BadSendMessageTestCase(BaseTest, TestCase):
                     )
         socket.close()
 
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
+
     def test_bad_sender(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         with mock.patch('app.requests.sender_profile_request') as sender:
             sender.side_effect = ValueError('Token lifetime ended')
@@ -410,5 +444,6 @@ class BadSendMessageTestCase(BaseTest, TestCase):
                 )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
 
         socket.close()

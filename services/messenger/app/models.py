@@ -4,6 +4,7 @@ import typing
 import sqlalchemy
 from sqlalchemy.orm import relationship
 
+from config import SEND
 from db import Base
 
 
@@ -19,6 +20,7 @@ class Message(Base):
         sqlalchemy.DateTime, default=datetime.datetime.utcnow, nullable=False,
     )
     viewed: bool = sqlalchemy.Column(sqlalchemy.Boolean, default=False, nullable=False)
+    is_deleted: bool = sqlalchemy.Column(sqlalchemy.Boolean, default=False, nullable=False)
 
     dialogue_id: int = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('dialogue.id', ondelete='CASCADE'), nullable=False,
@@ -48,3 +50,22 @@ class Dialogue(Base):
 
     def __repr__(self):
         return f'<Dialogue {self.id}>'
+
+
+class Notification(Base):
+    """ Notification """
+
+    __tablename__ = 'notification'
+
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    type: str = sqlalchemy.Column(sqlalchemy.String, nullable=False, default=SEND)
+    sender_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    message_id: int = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('message.id', ondelete='CASCADE'), nullable=False,
+    )
+
+    def __str__(self):
+        return f'<Notification {self.id}>'
+
+    def __repr__(self):
+        return f'<Notification {self.id}>'

@@ -1,5 +1,5 @@
 from app.message.schemas import CreateMessage
-from app.models import Dialogue, Message
+from app.models import Dialogue, Message, Notification
 from crud import CRUD
 
 
@@ -13,5 +13,11 @@ class MessageCRUD(CRUD[Message, CreateMessage, CreateMessage]):
     pass
 
 
+class NotificationCRUD(CRUD[Notification, Notification, Notification]):
+    """ Notification CRUD """
+    pass
+
+
 dialogue_crud = DialogueCRUD(Dialogue)
 message_crud = MessageCRUD(Message)
+notification_crud = NotificationCRUD(Notification)

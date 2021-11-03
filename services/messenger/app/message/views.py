@@ -3,7 +3,7 @@ import typing
 
 from fastapi import WebSocket
 
-from app.crud import dialogue_crud, message_crud
+from app.crud import dialogue_crud, message_crud, notification_crud
 from app.message.schemas import CreateMessage, GetMessage, UserData
 from app.message.service import websocket_error
 from app.message.state import WebSocketState
@@ -133,15 +133,12 @@ class MessengerView:
             await websocket_error(websocket, {'msg': 'You cannot send yourself message'})
             return
 
-        viewed = False
         if schema.recipient_id not in self._state.get_websockets.keys():
             try:
                 await get_user(schema.recipient_id)
             except ValueError:
                 await websocket_error(websocket, {'msg': 'Recipient not found'})
                 return
-        else:
-            viewed = True
 
         async with async_session() as db:
             users_ids = f'{min(schema.sender_id, schema.recipient_id)}_{max(schema.sender_id, schema.recipient_id)}'
@@ -151,14 +148,13 @@ class MessengerView:
             else:
                 dialogue = await dialogue_crud.get(db, users_ids=users_ids)
 
-            msg = await message_crud.create(
-                db, sender_id=schema.sender_id, viewed=viewed, msg=schema.msg, dialogue_id=dialogue.id
-            )
+            msg = await message_crud.create(db, sender_id=schema.sender_id, msg=schema.msg, dialogue_id=dialogue.id)
+            await notification_crud.create(db, sender_id=schema.sender_id, message_id=msg.id)
 
         await self._state.send(
             sender_id=schema.sender_id,
             recipient_id=schema.recipient_id,
             success_msg='Message has been send',
             response_type=SEND,
-            data=GetMessage(**{**msg.__dict__, 'viewed': False}, sender=UserData(**self._user_data)).dict()
+            data=GetMessage(**msg.__dict__, sender=UserData(**self._user_data)).dict()
         )
