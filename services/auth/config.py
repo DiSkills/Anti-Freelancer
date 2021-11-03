@@ -43,6 +43,10 @@ ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
 
+SERVER_USER_EMAIL = os.environ.get('SERVER_EMAIL')
+SERVER_USER_USERNAME = os.environ.get('SERVER_USERNAME')
+SERVER_USER_PASSWORD = os.environ.get('SERVER_PASSWORD')
+
 social_auth = OAuth()
 redirect_url = f'{SERVER_BACKEND}{API}/github/bind'
 

@@ -1,7 +1,9 @@
+import typing
+
 import aiohttp
 from fastapi import HTTPException
 
-from config import SERVER_AUTH_BACKEND, API
+from config import SERVER_AUTH_BACKEND, API, SERVER_EMAIL, CLIENT_NAME
 
 
 async def get_user(user_id: int) -> dict:
@@ -22,3 +24,9 @@ async def get_user(user_id: int) -> dict:
             raise HTTPException(status_code=response.status, detail=json['detail'])
 
     return json
+
+
+# async def get_client() -> dict[str, typing.Union[str, int]]:
+#     async with aiohttp.ClientSession() as session:
+#         response = await session.get(url=f'{SERVER_EMAIL}{API}/clients/name?client_name={CLIENT_NAME}')
+#

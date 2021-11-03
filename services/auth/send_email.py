@@ -2,7 +2,7 @@ import aiohttp
 
 from app.crud import user_crud
 from app.tokens import create_access_token
-from config import TEST, SERVER_EMAIL, API, CLIENT_NAME
+from config import TEST, SERVER_EMAIL, API, CLIENT_NAME, SERVER_USER_USERNAME
 from db import async_session
 
 
@@ -24,7 +24,7 @@ async def send_email(recipient: str, subject: str, template: str, **data) -> Non
 
     async with aiohttp.ClientSession() as session:
         async with async_session() as db:
-            superuser = await user_crud.get(db, is_superuser=True)
+            superuser = await user_crud.get(db, username=SERVER_USER_USERNAME)
             access_token = create_access_token(superuser.id)['access_token']
             response = await session.post(
                 url=f'{SERVER_EMAIL}{API}/clients/name?client_name={CLIENT_NAME}',
