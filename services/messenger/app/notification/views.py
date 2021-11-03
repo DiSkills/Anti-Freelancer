@@ -5,6 +5,15 @@ from app.requests import get_users
 
 
 async def get_notifications(db: AsyncSession, user_id: int):
+    """
+        Get notifications
+        :param db: DB
+        :type db: AsyncSession
+        :param user_id: User ID
+        :type user_id: int
+        :return: Notifications for user
+    """
+
     ids = await notification_crud.filter_ids(db, recipient_id=user_id)
 
     users = await get_users(ids)
