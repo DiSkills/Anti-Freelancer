@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.notification import views
 from app.notification.schemas import GetNotification
 from app.permission import is_active
+from app.schemas import Message
 from db import get_db
 
 notification_router = APIRouter()
@@ -20,3 +21,16 @@ notification_router = APIRouter()
 )
 async def get_notifications(user_id: int = Depends(is_active), db: AsyncSession = Depends(get_db)):
     return await views.get_notifications(db, user_id)
+
+
+@notification_router.delete(
+    '/',
+    name='View notifications',
+    description='View notifications',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['notifications'],
+)
+async def view_notifications(user_id: int = Depends(is_active), db: AsyncSession = Depends(get_db)):
+    return await views.view_notifications(db, user_id)

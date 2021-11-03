@@ -7,7 +7,7 @@ from tests import BaseTest, async_loop
 
 class NotificationTestCase(BaseTest, TestCase):
 
-    def test_get_notifications(self):
+    def test_notifications(self):
         async_loop(dialogue_crud.create(self.session, users_ids='1_2'))
         async_loop(message_crud.create(self.session, sender_id=1, msg='Hello world!', dialogue_id=1))
         async_loop(
@@ -203,18 +203,29 @@ class NotificationTestCase(BaseTest, TestCase):
                                 )
                             },
                         },
-                        {
-                            'id': 1, 'type': 'SEND',
-                            'data': {
-                                **GetMessage(
-                                    sender=UserData(**self.get_new_user(1)),
-                                    **async_loop(message_crud.get(self.session, id=1)).__dict__,
-                                ).dict(),
-                                'created_at': f'{async_loop(message_crud.get(self.session, id=1)).created_at}Z'.replace(
-                                    ' ',
-                                    'T'
-                                )
-                            },
-                        }
                     ]
                 )
+        self.assertEqual(len(async_loop(notification_crud.filter(self.session, recipient_id=2))), 3)
+        self.assertEqual(len(response.json()), 2)
+
+        # Delete
+        with mock.patch('app.permission.permission', return_value=2) as _:
+            response = self.client.delete(f'{self.url}/notifications/', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Notifications has been viewed. You have more notifications'})
+
+        self.assertEqual(len(async_loop(notification_crud.filter(self.session, recipient_id=2))), 1)
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 4)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 2)
+
+        with mock.patch('app.permission.permission', return_value=2) as _:
+            response = self.client.delete(f'{self.url}/notifications/', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json(),
+                {'msg': 'Notifications has been viewed. You don\'t have more notifications'}
+            )
+
+        self.assertEqual(len(async_loop(notification_crud.filter(self.session, recipient_id=2))), 0)
+        self.assertEqual(len(async_loop(message_crud.all(self.session))), 4)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 1)

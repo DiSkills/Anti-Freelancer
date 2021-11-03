@@ -40,6 +40,36 @@ class NotificationCRUD(CRUD[Notification, Notification, Notification]):
         )
         return query.scalars().all()
 
+    @staticmethod
+    async def view(db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> None:
+        """
+            View notifications
+            :param db: DB
+            :type db: AsyncSession
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :param kwargs: Filter params
+            :return: None
+        """
+
+        query = await db.execute(
+            sqlalchemy.select(Notification.id).filter_by(
+                **kwargs
+            ).order_by(Notification.id.desc()).offset(skip).limit(limit)
+        )
+        query = query.scalars().all()
+
+        await db.execute(
+            sqlalchemy.delete(Notification).filter_by(
+                **kwargs
+            ).filter(
+                Notification.id.in_(query)
+            )
+        )
+        await db.commit()
+
 
 dialogue_crud = DialogueCRUD(Dialogue)
 message_crud = MessageCRUD(Message)
