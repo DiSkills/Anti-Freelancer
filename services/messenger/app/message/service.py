@@ -1,5 +1,7 @@
 from fastapi import WebSocket
 
+from config import ERROR
+
 
 async def websocket_error(websocket: WebSocket, detail: dict) -> None:
     """
@@ -12,7 +14,7 @@ async def websocket_error(websocket: WebSocket, detail: dict) -> None:
     """
     await websocket.send_json(
         {
-            'type': 'ERROR',
+            'type': ERROR,
             'data': {'detail': detail}
         }
     )

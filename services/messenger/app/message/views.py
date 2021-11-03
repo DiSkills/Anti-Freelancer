@@ -8,6 +8,7 @@ from app.message.schemas import CreateMessage, GetMessage, UserData
 from app.message.service import websocket_error
 from app.message.state import WebSocketState
 from app.requests import sender_profile, get_user
+from config import SEND
 from db import async_session
 
 
@@ -78,7 +79,7 @@ class MessengerView:
             return
 
         types = {
-            'SEND': (self.send_message, CreateMessage)
+            SEND: (self.send_message, CreateMessage)
         }
 
         try:
@@ -158,6 +159,6 @@ class MessengerView:
             sender_id=schema.sender_id,
             recipient_id=schema.recipient_id,
             success_msg='Message has been send',
-            response_type='SEND',
+            response_type=SEND,
             data=GetMessage(**{**msg.__dict__, 'viewed': False}, sender=UserData(**self._user_data)).dict()
         )

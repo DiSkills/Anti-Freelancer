@@ -1,6 +1,7 @@
 from fastapi import WebSocket
 
 from app.message.service import websocket_error
+from config import SUCCESS
 
 
 class WebSocketState:
@@ -70,7 +71,7 @@ class WebSocketState:
         for socket in self._websockets[sender_id]:
             await socket.send_json(
                 {
-                    'type': 'SUCCESS',
+                    'type': SUCCESS,
                     'data': {'msg': success_msg},
                 }
             )

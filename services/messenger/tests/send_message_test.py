@@ -2,6 +2,7 @@ from unittest import mock, TestCase
 
 from app.crud import message_crud, dialogue_crud
 from app.message.schemas import GetMessage, CreateMessage, UserData
+from config import ERROR, SUCCESS, SEND
 from tests import BaseTest, async_loop
 
 
@@ -14,11 +15,11 @@ class SendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'})
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND})
                     response = socket.receive_json()
                     self.assertEqual(
                         response,
-                        {'data': {'msg': 'Message has been send'}, 'type': 'SUCCESS'}
+                        {'data': {'msg': 'Message has been send'}, 'type': SUCCESS}
                     )
 
                     response = socket.receive_json()
@@ -28,7 +29,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                             'data': GetMessage(
                                 **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False},
                                 sender=UserData(**self.get_new_user(1))
-                            ).dict(), 'type': 'SEND'
+                            ).dict(), 'type': SEND
                         }
                     )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -48,12 +49,12 @@ class SendMessageTestCase(BaseTest, TestCase):
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket_1:
                     with self.client.websocket_connect(f'{self.url}/ws/token') as socket_2:
                         socket_1.send_json(
-                            {'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'}
+                            {'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND}
                         )
                         response = socket_1.receive_json()
                         self.assertEqual(
                             response,
-                            {'data': {'msg': 'Message has been send'}, 'type': 'SUCCESS'}
+                            {'data': {'msg': 'Message has been send'}, 'type': SUCCESS}
                         )
 
                         response = socket_1.receive_json()
@@ -63,14 +64,14 @@ class SendMessageTestCase(BaseTest, TestCase):
                                 'data': GetMessage(
                                     **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False},
                                     sender=UserData(**self.get_new_user(1))
-                                ).dict(), 'type': 'SEND'
+                                ).dict(), 'type': SEND
                             }
                         )
 
                         response = socket_2.receive_json()
                         self.assertEqual(
                             response,
-                            {'data': {'msg': 'Message has been send'}, 'type': 'SUCCESS'}
+                            {'data': {'msg': 'Message has been send'}, 'type': SUCCESS}
                         )
 
                         response = socket_2.receive_json()
@@ -80,7 +81,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                 'data': GetMessage(
                                     **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False},
                                     sender=UserData(**self.get_new_user(1)),
-                                ).dict(), 'type': 'SEND'
+                                ).dict(), 'type': SEND
                             }
                         )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -102,12 +103,12 @@ class SendMessageTestCase(BaseTest, TestCase):
                     with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(2)) as _:
                         with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient:
                             socket_sender.send_json(
-                                {'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'}
+                                {'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND}
                             )
                             response = socket_sender.receive_json()
                             self.assertEqual(
                                 response,
-                                {'data': {'msg': 'Message has been send'}, 'type': 'SUCCESS'}
+                                {'data': {'msg': 'Message has been send'}, 'type': SUCCESS}
                             )
 
                             response = socket_sender.receive_json()
@@ -119,7 +120,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                             **async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False
                                         },
                                         sender=UserData(**self.get_new_user(1)),
-                                    ).dict(), 'type': 'SEND'
+                                    ).dict(), 'type': SEND
                                 }
                             )
 
@@ -132,7 +133,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                             **async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False
                                         },
                                         sender=UserData(**self.get_new_user(1)),
-                                    ).dict(), 'type': 'SEND'
+                                    ).dict(), 'type': SEND
                                 }
                             )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -156,12 +157,12 @@ class SendMessageTestCase(BaseTest, TestCase):
                             with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient_1:
                                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient_2:
                                     socket_sender_1.send_json(
-                                        {'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'}
+                                        {'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND}
                                     )
                                     response = socket_sender_1.receive_json()
                                     self.assertEqual(
                                         response,
-                                        {'data': {'msg': 'Message has been send'}, 'type': 'SUCCESS'}
+                                        {'data': {'msg': 'Message has been send'}, 'type': SUCCESS}
                                     )
 
                                     response = socket_sender_1.receive_json()
@@ -173,7 +174,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                                     **async_loop(message_crud.get(self.session, id=1)).__dict__,
                                                     'viewed': False
                                                 }, sender=UserData(**self.get_new_user(1)),
-                                            ).dict(), 'type': 'SEND'
+                                            ).dict(), 'type': SEND
                                         }
                                     )
 
@@ -186,14 +187,14 @@ class SendMessageTestCase(BaseTest, TestCase):
                                                     **async_loop(message_crud.get(self.session, id=1)).__dict__,
                                                     'viewed': False
                                                 }, sender=UserData(**self.get_new_user(1)),
-                                            ).dict(), 'type': 'SEND'
+                                            ).dict(), 'type': SEND
                                         }
                                     )
 
                                     response = socket_sender_2.receive_json()
                                     self.assertEqual(
                                         response,
-                                        {'data': {'msg': 'Message has been send'}, 'type': 'SUCCESS'}
+                                        {'data': {'msg': 'Message has been send'}, 'type': SUCCESS}
                                     )
 
                                     response = socket_sender_2.receive_json()
@@ -205,7 +206,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                                     **async_loop(message_crud.get(self.session, id=1)).__dict__,
                                                     'viewed': False
                                                 }, sender=UserData(**self.get_new_user(1)),
-                                            ).dict(), 'type': 'SEND'
+                                            ).dict(), 'type': SEND
                                         }
                                     )
 
@@ -218,7 +219,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                                                     **async_loop(message_crud.get(self.session, id=1)).__dict__,
                                                     'viewed': False
                                                 }, sender=UserData(**self.get_new_user(1)),
-                                            ).dict(), 'type': 'SEND'
+                                            ).dict(), 'type': SEND
                                         }
                                     )
 
@@ -246,11 +247,11 @@ class SendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(2)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(1)) as _:
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 1, 'type': 'SEND'})
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 1, 'type': SEND})
                     response = socket.receive_json()
                     self.assertEqual(
                         response,
-                        {'data': {'msg': 'Message has been send'}, 'type': 'SUCCESS'}
+                        {'data': {'msg': 'Message has been send'}, 'type': SUCCESS}
                     )
 
                     response = socket.receive_json()
@@ -260,7 +261,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                             'data': GetMessage(
                                 **{**async_loop(message_crud.get(self.session, id=2)).__dict__, 'viewed': False},
                                 sender=UserData(**self.get_new_user(2)),
-                            ).dict(), 'type': 'SEND'
+                            ).dict(), 'type': SEND
                         }
                     )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 2)
@@ -285,11 +286,11 @@ class SendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'})
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND})
                     response = socket.receive_json()
                     self.assertEqual(
                         response,
-                        {'data': {'msg': 'Message has been send'}, 'type': 'SUCCESS'}
+                        {'data': {'msg': 'Message has been send'}, 'type': SUCCESS}
                     )
 
                     response = socket.receive_json()
@@ -299,7 +300,7 @@ class SendMessageTestCase(BaseTest, TestCase):
                             'data': GetMessage(
                                 **{**async_loop(message_crud.get(self.session, id=2)).__dict__, 'viewed': False},
                                 sender=UserData(**self.get_new_user(1)),
-                            ).dict(), 'type': 'SEND'
+                            ).dict(), 'type': SEND
                         }
                     )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 2)
@@ -321,11 +322,11 @@ class BadSendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(1)) as _:
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                    socket.send_json({'recipient_id': 1, 'type': 'SEND', 'msg': 'Hello world!'})
+                    socket.send_json({'recipient_id': 1, 'type': SEND, 'msg': 'Hello world!'})
                     response = socket.receive_json()
                     self.assertEqual(
                         response,
-                        {'data': {'detail': {'msg': 'You cannot send yourself message'}}, 'type': 'ERROR'}
+                        {'data': {'detail': {'msg': 'You cannot send yourself message'}}, 'type': ERROR}
                     )
         socket.close()
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
@@ -339,11 +340,11 @@ class BadSendMessageTestCase(BaseTest, TestCase):
             with mock.patch('app.requests.get_user_request') as recipient:
                 recipient.side_effect = ValueError()
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': 'SEND'})
+                    socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND})
                     response = socket.receive_json()
                     self.assertEqual(
                         response,
-                        {'data': {'detail': {'msg': 'Recipient not found'}}, 'type': 'ERROR'}
+                        {'data': {'detail': {'msg': 'Recipient not found'}}, 'type': ERROR}
                     )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
@@ -357,11 +358,11 @@ class BadSendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
-                    socket.send_json({'recipient_id': 2, 'type': 'SEND'})
+                    socket.send_json({'recipient_id': 2, 'type': SEND})
                     response = socket.receive_json()
                     self.assertEqual(
                         response,
-                        {'data': {'detail': {'msg': 'Invalid SEND data'}}, 'type': 'ERROR'}
+                        {'data': {'detail': {'msg': 'Invalid SEND data'}}, 'type': ERROR}
                     )
         socket.close()
 
@@ -376,7 +377,7 @@ class BadSendMessageTestCase(BaseTest, TestCase):
                     response = socket.receive_json()
                     self.assertEqual(
                         response,
-                        {'data': {'detail': {'msg': 'Request type not found'}}, 'type': 'ERROR'}
+                        {'data': {'detail': {'msg': 'Request type not found'}}, 'type': ERROR}
                     )
         socket.close()
 
@@ -391,7 +392,7 @@ class BadSendMessageTestCase(BaseTest, TestCase):
                     response = socket.receive_json()
                     self.assertEqual(
                         response,
-                        {'data': {'detail': {'msg': 'Bad request type'}}, 'type': 'ERROR'}
+                        {'data': {'detail': {'msg': 'Bad request type'}}, 'type': ERROR}
                     )
         socket.close()
 
@@ -405,7 +406,7 @@ class BadSendMessageTestCase(BaseTest, TestCase):
                 response = socket.receive_json()
                 self.assertEqual(
                     response,
-                    {'data': {'detail': {'msg': 'Token lifetime ended'}}, 'type': 'ERROR'}
+                    {'data': {'detail': {'msg': 'Token lifetime ended'}}, 'type': ERROR}
                 )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 0)
