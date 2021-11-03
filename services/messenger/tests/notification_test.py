@@ -218,6 +218,11 @@ class NotificationTestCase(BaseTest, TestCase):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 4)
         self.assertEqual(len(async_loop(notification_crud.all(self.session))), 2)
 
+        self.assertEqual(async_loop(notification_crud.exist(self.session, id=4)), False)
+        self.assertEqual(async_loop(notification_crud.exist(self.session, id=3)), True)
+        self.assertEqual(async_loop(notification_crud.exist(self.session, id=2)), False)
+        self.assertEqual(async_loop(notification_crud.exist(self.session, id=1)), True)
+
         with mock.patch('app.permission.permission', return_value=2) as _:
             response = self.client.delete(f'{self.url}/notifications/', headers=headers)
             self.assertEqual(response.status_code, 200)
@@ -229,3 +234,8 @@ class NotificationTestCase(BaseTest, TestCase):
         self.assertEqual(len(async_loop(notification_crud.filter(self.session, recipient_id=2))), 0)
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 4)
         self.assertEqual(len(async_loop(notification_crud.all(self.session))), 1)
+
+        self.assertEqual(async_loop(notification_crud.exist(self.session, id=4)), False)
+        self.assertEqual(async_loop(notification_crud.exist(self.session, id=3)), True)
+        self.assertEqual(async_loop(notification_crud.exist(self.session, id=2)), False)
+        self.assertEqual(async_loop(notification_crud.exist(self.session, id=1)), False)
