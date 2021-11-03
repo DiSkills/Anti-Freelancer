@@ -17,6 +17,4 @@
     - [ ] Referral registration system
     - [ ] Reviews freelancers
     - [ ] Add a level purchase for a freelancer
-- [ ] Messenger
-    - [ ] Notifications
 - [ ] Export user data

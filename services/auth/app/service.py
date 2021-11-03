@@ -1,6 +1,7 @@
 import datetime
 import os
 import typing
+from functools import wraps
 from uuid import uuid4
 
 import aiofiles
@@ -120,6 +121,7 @@ def paginate(get_function, exist_function, url: str, *filter_params):
             :return: Wrapper
         """
 
+        @wraps(function)
         async def wrapper(*args, page: int, page_size: int, db: AsyncSession, **kwargs) -> dict[str, typing.Any]:
             """
                 Wrapper

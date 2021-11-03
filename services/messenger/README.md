@@ -13,8 +13,8 @@
 - [ ] Message
     - [ ] WebSockets
         - [x] Send
-        - [ ] Update (by dialogue id **and** message id **and** sender id)
-        - [ ] Delete (by dialogue id **and** message id **and** sender id)
+        - [ ] Update (by message id **and** sender id)
+        - [ ] Delete (by message id **and** sender id)
     - [ ] Get all for dialogue (pagination)
     - [ ] Get all dialogues
     - [ ] Get dialogue

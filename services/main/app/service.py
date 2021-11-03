@@ -1,5 +1,6 @@
 import os
 import typing
+from functools import wraps
 
 import aiofiles
 from fastapi import HTTPException, status, UploadFile
@@ -53,6 +54,7 @@ def paginate(get_function, exist_function, url: str, *filter_params):
             :return: Wrapper
         """
 
+        @wraps(function)
         async def wrapper(*args, page: int, page_size: int, db: AsyncSession, **kwargs) -> dict[str, typing.Any]:
             """
                 Wrapper
@@ -123,6 +125,7 @@ def user_exist(key: str, *, freelancer: bool = False, customer: bool = False):
             :return: Wrapper
         """
 
+        @wraps(function)
         async def wrapper(*args, **kwargs):
             """
                 Wrapper
