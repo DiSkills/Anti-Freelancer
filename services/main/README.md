@@ -42,6 +42,7 @@
     - [x] Search
     - [x] Get
     - [x] Select executor
+    - [x] Send email executor
     - [x] Complete job
     - [x] Get all without completed
     - [x] Get for categories without completed

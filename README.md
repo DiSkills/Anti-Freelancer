@@ -19,6 +19,4 @@
     - [ ] Add a level purchase for a freelancer
 - [ ] Messenger
     - [ ] Notifications
-- [ ] Main
-    - [ ] Notification for selected freelancer that he is selected for job (email)
 - [ ] Export user data
