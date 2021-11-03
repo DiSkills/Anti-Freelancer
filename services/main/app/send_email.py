@@ -4,6 +4,14 @@ from send_email import send_email
 
 
 async def send_select_email(user_id: int, job_id: int) -> None:
+    """
+        Send select executor email
+        :param user_id: User ID
+        :type user_id: int
+        :param job_id: Job ID
+        :type job_id: int
+        :return: None
+    """
     if int(TEST):
         return
 

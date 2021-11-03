@@ -4,6 +4,19 @@ from config import TEST, SERVER_EMAIL, API, CLIENT_NAME
 
 
 async def send_email(server_token: str, recipient: str, subject: str, template: str, **data) -> None:
+    """
+        Send email
+        :param server_token: Server token
+        :type server_token: str
+        :param recipient: Recipient
+        :type recipient: str
+        :param subject: Subject
+        :type subject: str
+        :param template: Template
+        :type template: str
+        :param data: data
+        :return: None
+    """
     if int(TEST):
         return
 

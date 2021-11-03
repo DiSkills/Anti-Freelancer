@@ -27,6 +27,13 @@ async def get_user(user_id: int) -> dict:
 
 
 async def get_user_data_and_server_token(user_id: int) -> typing.Optional[tuple[str, dict]]:
+    """
+        Get user data and server token
+        :param user_id: User ID
+        :type user_id: int
+        :return: Server token and user data
+        :rtype: tuple
+    """
     if int(TEST):
         return
 
