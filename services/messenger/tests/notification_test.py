@@ -208,7 +208,7 @@ class NotificationTestCase(BaseTest, TestCase):
         self.assertEqual(len(async_loop(notification_crud.filter(self.session, recipient_id=2))), 3)
         self.assertEqual(len(response.json()), 2)
 
-        # Delete
+        # View (delete)
         with mock.patch('app.permission.permission', return_value=2) as _:
             response = self.client.delete(f'{self.url}/notifications/', headers=headers)
             self.assertEqual(response.status_code, 200)

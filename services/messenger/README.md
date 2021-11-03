@@ -24,7 +24,7 @@
     - [ ] Create (message has been deleted)
     - [ ] Create (message has been changed)
     - [x] Get
-    - [ ] Delete (viewed)
+    - [x] View (delete)
 - [ ] Tests
     - [ ] Message
         - [ ] WebSockets
@@ -32,3 +32,4 @@
     - [ ] Notification
         - [x] Create (message has been sent)
         - [x] Get
+        - [x] View (delete)
