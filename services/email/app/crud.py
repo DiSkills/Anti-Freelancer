@@ -3,6 +3,7 @@ from crud import CRUD
 
 
 class ClientCRUD(CRUD[Client, Client, Client]):
+    """ Client CRUD """
     pass
 
 

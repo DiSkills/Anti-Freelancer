@@ -4,6 +4,7 @@ from db import Base
 
 
 class Client(Base):
+    """ Client """
 
     __tablename__ = 'client'
 

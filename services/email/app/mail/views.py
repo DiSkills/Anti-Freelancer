@@ -10,6 +10,19 @@ from tasks import send_email
 
 
 async def send(db: AsyncSession, schema: SendData) -> dict[str, str]:
+    """
+        Send
+        :param db: DB
+        :type db: AsyncSession
+        :param schema: Send data
+        :type schema: SendData
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Client not found
+        :raise HTTPException 400: Bad client secret
+        :raise HTTPException 400: Template not found
+    """
+
     if not await client_crud.exist(db, client_name=schema.client_name):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Client not found')
 
