@@ -149,7 +149,12 @@ class MessengerView:
                 dialogue = await dialogue_crud.get(db, users_ids=users_ids)
 
             msg = await message_crud.create(db, sender_id=schema.sender_id, msg=schema.msg, dialogue_id=dialogue.id)
-            await notification_crud.create(db, sender_id=schema.sender_id, message_id=msg.id)
+            await notification_crud.create(
+                db,
+                sender_id=schema.sender_id,
+                recipient_id=schema.recipient_id,
+                message_id=msg.id
+            )
 
         await self._state.send(
             sender_id=schema.sender_id,

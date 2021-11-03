@@ -41,6 +41,8 @@ class SendMessageTestCase(BaseTest, TestCase):
         socket.close()
         self.assertEqual(async_loop(message_crud.get(self.session, id=1)).dialogue_id, 1)
         self.assertEqual(len(async_loop(notification_crud.all(self.session))), 1)
+        self.assertEqual(async_loop(notification_crud.get(self.session, id=1)).recipient_id, 2)
+        self.assertEqual(async_loop(notification_crud.get(self.session, id=1)).sender_id, 1)
 
     def test_only_2_sender_connections(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
@@ -248,7 +250,7 @@ class SendMessageTestCase(BaseTest, TestCase):
         async_loop(dialogue_crud.create(self.session, users_ids=f'1_2'))
         del schema.recipient_id
         async_loop(message_crud.create(self.session, **schema.dict(), dialogue_id=1))
-        async_loop(notification_crud.create(self.session, sender_id=schema.sender_id, message_id=1))
+        async_loop(notification_crud.create(self.session, sender_id=schema.sender_id, message_id=1, recipient_id=2))
 
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 1)
@@ -290,7 +292,7 @@ class SendMessageTestCase(BaseTest, TestCase):
         async_loop(dialogue_crud.create(self.session, users_ids=f'1_2'))
         del schema.recipient_id
         async_loop(message_crud.create(self.session, **schema.dict(), dialogue_id=1))
-        async_loop(notification_crud.create(self.session, sender_id=schema.sender_id, message_id=1))
+        async_loop(notification_crud.create(self.session, sender_id=schema.sender_id, message_id=1, recipient_id=2))
 
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
         self.assertEqual(len(async_loop(dialogue_crud.all(self.session))), 1)

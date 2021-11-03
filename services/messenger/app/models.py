@@ -25,6 +25,7 @@ class Message(Base):
     dialogue_id: int = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('dialogue.id', ondelete='CASCADE'), nullable=False,
     )
+    notification = relationship('Notification', back_populates='message', uselist=False, cascade='all, delete')
 
     def __str__(self):
         return f'<Message {self.id}>'
@@ -60,9 +61,12 @@ class Notification(Base):
     id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     type: str = sqlalchemy.Column(sqlalchemy.String, nullable=False, default=SEND)
     sender_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    recipient_id: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
     message_id: int = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('message.id', ondelete='CASCADE'), nullable=False,
     )
+
+    message = relationship('Message', back_populates='notification', uselist=False, lazy='selectin')
 
     def __str__(self):
         return f'<Notification {self.id}>'
