@@ -70,6 +70,15 @@ async def sender_profile(token: str) -> dict:
 
 
 async def get_users_request(ids: list[int]) -> dict:
+    """
+        Get profiles users request
+        :param ids: Users IDs
+        :type ids: list
+        :return: Profiles
+        :rtype: dict
+        :raise HTTPException: Bad response
+    """
+
     async with aiohttp.ClientSession() as session:
         response = await session.post(url=f'{SERVER_AUTH_BACKEND}{API}/profile/ids', json=ids)
 
@@ -80,5 +89,12 @@ async def get_users_request(ids: list[int]) -> dict:
     return json
 
 
-async def get_users(ids: list[int]):
+async def get_users(ids: list[int]) -> dict:
+    """
+        Get users profiles
+        :param ids: Users IDs
+        :type ids: list
+        :return: Profiles
+        :rtype: dict
+    """
     return await get_users_request(ids)

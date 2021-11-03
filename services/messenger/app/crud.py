@@ -21,6 +21,18 @@ class NotificationCRUD(CRUD[Notification, Notification, Notification]):
 
     @staticmethod
     async def filter_ids(db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> list[Notification]:
+        """
+            Get notifications ids
+            :param db: DB
+            :type db: AsyncSession
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :param kwargs: Filter params
+            :return: Notifications
+            :rtype: list
+        """
         query = await db.execute(
             sqlalchemy.select(Notification.sender_id).filter_by(
                 **kwargs
