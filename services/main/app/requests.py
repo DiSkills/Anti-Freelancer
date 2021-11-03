@@ -3,7 +3,7 @@ import typing
 import aiohttp
 from fastapi import HTTPException
 
-from config import SERVER_AUTH_BACKEND, API, SERVER_EMAIL, CLIENT_NAME
+from config import SERVER_AUTH_BACKEND, API, SERVER_USER_USERNAME, SERVER_USER_PASSWORD, TEST
 
 
 async def get_user(user_id: int) -> dict:
@@ -26,7 +26,22 @@ async def get_user(user_id: int) -> dict:
     return json
 
 
-# async def get_client() -> dict[str, typing.Union[str, int]]:
-#     async with aiohttp.ClientSession() as session:
-#         response = await session.get(url=f'{SERVER_EMAIL}{API}/clients/name?client_name={CLIENT_NAME}')
-#
+async def get_user_data_and_server_token(user_id: int) -> typing.Optional[tuple[str, dict]]:
+    if int(TEST):
+        return
+
+    async with aiohttp.ClientSession() as session:
+        response = await session.post(
+            url=f'{SERVER_AUTH_BACKEND}{API}/login',
+            data={'username': SERVER_USER_USERNAME, 'password': SERVER_USER_PASSWORD}
+        )
+        response.raise_for_status()
+        json = await response.json()
+
+        access_token = json['access_token']
+        headers = {'Authorization': f'Bearer {access_token}'}
+
+        response = await session.get(url=f'{SERVER_AUTH_BACKEND}{API}/admin/user/{user_id}', headers=headers)
+        response.raise_for_status()
+        json = await response.json()
+    return access_token, json

@@ -13,6 +13,10 @@ SERVER_MAIN_BACKEND = 'http://localhost:8001/'
 
 CLIENT_NAME = 'main'
 
+SERVER_USER_EMAIL = os.environ.get('SERVER_EMAIL')
+SERVER_USER_USERNAME = os.environ.get('SERVER_USERNAME')
+SERVER_USER_PASSWORD = os.environ.get('SERVER_PASSWORD')
+
 LOGIN_URL = f'{SERVER_AUTH_BACKEND}{API}/login'
 
 TEST = os.environ.get('TEST', 0)

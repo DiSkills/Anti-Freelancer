@@ -10,6 +10,7 @@ from app import requests
 from app.crud import sub_category_crud, job_crud, attachment_crud
 from app.jobs.schemas import CreateJob, UpdateJob, UpdateJobAdmin
 from app.models import Job
+from app.send_email import send_select_email
 from app.service import paginate, user_exist, write_file, remove_file
 from config import SERVER_MAIN_BACKEND, API, MEDIA_ROOT
 
@@ -258,6 +259,7 @@ async def select_executor(db: AsyncSession, pk: int, user_id: int, owner_id: int
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Executor not freelancer')
 
     job = await job_crud.update(db, {'id': pk}, executor_id=executor_data['id'])
+    await send_select_email(executor_data['id'], job.id)
     return job.__dict__
 
 
