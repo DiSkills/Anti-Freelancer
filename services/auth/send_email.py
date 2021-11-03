@@ -1,8 +1,9 @@
 import aiohttp
-from fastapi import HTTPException
 
+from app.crud import user_crud
 from app.tokens import create_access_token
-from config import TEST, SERVER_EMAIL
+from config import TEST, SERVER_EMAIL, API, CLIENT_NAME
+from db import async_session
 
 
 async def send_email(recipient: str, subject: str, template: str, **data) -> None:
@@ -21,20 +22,26 @@ async def send_email(recipient: str, subject: str, template: str, **data) -> Non
     if int(TEST):
         return
 
-    # async with aiohttp.ClientSession() as session:
-    #     response = await session.post(
-    #         url=f'{SERVER_EMAIL}send', json={
-    #             'recipient': recipient,
-    #             'subject': subject,
-    #             'template': template,
-    #             'data': data,
-    #             'token': create_access_token(user_id)['access_token'],
-    #             'user_id': user_id,
-    #         }
-    #     )
-    #
-    #     json = await response.json()
-    #     if not response.ok:
-    #         raise HTTPException(status_code=response.status, detail=json['detail'])
-    #
-    # return json
+    async with aiohttp.ClientSession() as session:
+        async with async_session() as db:
+            superuser = await user_crud.get(db, is_superuser=True)
+            access_token = create_access_token(superuser.id)['access_token']
+            response = await session.post(
+                url=f'{SERVER_EMAIL}{API}/clients/name?client_name={CLIENT_NAME}',
+                headers={'Authorization': f'Bearer {access_token}'}
+            )
+            json = await response.json()
+
+            if not response.ok:
+                raise ValueError(json)
+
+        await session.post(
+            url=f'{SERVER_EMAIL}{API}/send', json={
+                'recipient': recipient,
+                'subject': subject,
+                'template': template,
+                'data': data,
+                'secret': json['secret'],
+                'client_name': f'{CLIENT_NAME}',
+            }
+        )

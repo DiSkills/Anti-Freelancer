@@ -38,6 +38,20 @@ async def create_client(client_name: str, db: AsyncSession = Depends(get_db)):
     return await views.create_client(db, client_name)
 
 
+@client_router.post(
+    '/name',
+    name='Get or create client',
+    description='Get or create client',
+    response_description='Client',
+    status_code=status.HTTP_200_OK,
+    response_model=GetClient,
+    tags=['clients'],
+    dependencies=[Depends(is_superuser)],
+)
+async def create_or_get_client(client_name: str, db: AsyncSession = Depends(get_db)):
+    return await views.create_or_get_client(db, client_name)
+
+
 @client_router.get(
     '/{pk}',
     name='Get client',

@@ -66,6 +66,34 @@ class ClientTestCase(BaseTest, TestCase):
             self.assertEqual(response.status_code, 403)
             self.assertEqual(response.json(), {'detail': 'User not superuser'})
 
+        # Get by client name or create
+        self.assertEqual(len(async_loop(client_crud.all(self.session))), 2)
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            response = self.client.post(f'{self.url}/clients/name?client_name=email', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json(),
+                {'id': 3, 'secret': async_loop(client_crud.get(self.session, id=3)).secret, 'client_name': 'email'}
+            )
+            self.assertEqual(len(async_loop(client_crud.all(self.session))), 3)
+
+            response = self.client.post(f'{self.url}/clients/name?client_name=auth', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json(),
+                {'id': 1, 'secret': async_loop(client_crud.get(self.session, id=1)).secret, 'client_name': 'auth'}
+            )
+
+        with mock.patch('app.permission.permission', return_value=1) as user:
+            user.side_effect = HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User not superuser')
+            response = self.client.post(f'{self.url}/clients/name?client_name=auth', headers=headers)
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.json(), {'detail': 'User not superuser'})
+        self.assertEqual(len(async_loop(client_crud.all(self.session))), 3)
+
+        async_loop(client_crud.remove(self.session, id=3))
+        async_loop(self.session.commit())
+
         # Get all
         with mock.patch('app.permission.permission', return_value=1) as _:
             response = self.client.get(f'{self.url}/clients/', headers=headers)
