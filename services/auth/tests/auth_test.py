@@ -14,6 +14,28 @@ from tests import BaseTest, async_loop
 
 class AuthTestCase(BaseTest, TestCase):
 
+    def test_profiles_by_ids(self):
+        self.client.post(f'{self.url}/register', json=self.user_data)
+        self.client.post(
+            f'{self.url}/register',
+            json={**self.user_data, 'username': 'test2', 'email': 'test2@example.com', 'freelancer': True}
+        )
+        self.client.post(
+            f'{self.url}/register',
+            json={**self.user_data, 'username': 'test3', 'email': 'test3@example.com', 'freelancer': False}
+        )
+
+        response = self.client.post(f'{self.url}/profile/ids', json=[143, 144])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {})
+
+        response = self.client.post(f'{self.url}/profile/ids', json=[1, 2, 3])
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['1']['id'], 1)
+        self.assertEqual(response.json()['2']['id'], 2)
+        self.assertEqual(response.json()['3']['id'], 3)
+        self.assertEqual(len(response.json()), 3)
+
     def test_get_freelancers(self):
         self.client.post(f'{self.url}/register', json={**self.user_data, 'freelancer': True})
         self.client.post(

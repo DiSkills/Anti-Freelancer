@@ -9,6 +9,24 @@ from crud import CRUD
 class UserCRUD(CRUD[User, Register, Register]):
     """ User CRUD """
 
+    @staticmethod
+    async def get_by_ids(db: AsyncSession, ids: list[int]) -> list[User]:
+        """
+            Get by ids
+            :param db: DB
+            :type db: AsyncSession
+            :param ids: IDs
+            :type ids: list
+            :return: Users
+            :rtype: list
+        """
+        query = await db.execute(
+            sqlalchemy.select(User).filter(
+                User.id.in_(ids)
+            )
+        )
+        return query.scalars().all()
+
     async def freelancers(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> list[User]:
         """
             Freelancers

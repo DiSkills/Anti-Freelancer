@@ -164,6 +164,19 @@ async def search_freelancers(*, db: AsyncSession, page: int, page_size: int, sea
     return (user.__dict__ for user in queryset)
 
 
+async def profiles_by_ids(db: AsyncSession, ids: list[int]) -> dict[str, typing.Any]:
+    """
+        Get profiles by ids
+        :param db: DB
+        :type db: AsyncSession
+        :param ids: IDs
+        :type ids: list
+        :return: Profiles
+        :rtype: dict
+    """
+    return {user.id: user.__dict__ for user in await user_crud.get_by_ids(db, ids)}
+
+
 async def profile(db: AsyncSession, user_id: int) -> dict[str, typing.Any]:
     """
         Profile

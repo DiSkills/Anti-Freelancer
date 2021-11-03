@@ -41,6 +41,7 @@
     - [x] Remove user skills
     - [x] Profile
     - [x] Current profile
+    - [x] Profiles by ids
     - [x] Resend email for activation account if user login
     - [x] Get freelancers (username and ID)
     - [x] Search freelancers by username
@@ -82,6 +83,7 @@
       - [x] Off OTP in reset password
       - [x] Profile
       - [x] Current profile
+      - [x] Profiles by ids
       - [x] Get freelancers (username and ID)
       - [x] Search freelancers by username
     - [x] Permission

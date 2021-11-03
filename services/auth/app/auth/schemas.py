@@ -117,9 +117,13 @@ class UserSkills(BaseModel):
     other: list[GetSkill]
 
 
-class Profile(UserPublic):
+class Profile(GetFreelancer):
     """ Profile """
 
+    about: typing.Optional[str]
+    date_joined: datetime.datetime
+    last_login: datetime.datetime
+    freelancer: bool
     skills: list[GetSkill]
     github: typing.Optional[str]
 

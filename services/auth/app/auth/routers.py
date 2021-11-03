@@ -127,6 +127,19 @@ async def search_freelancers(
     return await views.search_freelancers(db=db, page=page, page_size=page_size, search=search)
 
 
+@auth_router.post(
+    f'/profile/ids',
+    name='Users profiles by ids',
+    description='Users profiles by ids',
+    response_description='Profiles',
+    status_code=status.HTTP_200_OK,
+    response_model=dict[str, Profile],
+    tags=['auth'],
+)
+async def profiles_by_ids(ids: list[int], db: AsyncSession = Depends(get_db)):
+    return await views.profiles_by_ids(db, ids)
+
+
 @auth_router.get(
     '/profile/current',
     name='Current user profile',
@@ -135,7 +148,6 @@ async def search_freelancers(
     status_code=status.HTTP_200_OK,
     response_model=Profile,
     tags=['auth'],
-    response_model_exclude={'email'},
 )
 async def current_profile(user: User = Depends(is_active), db: AsyncSession = Depends(get_db)):
     return await views.profile(db, user.id)
@@ -149,7 +161,6 @@ async def current_profile(user: User = Depends(is_active), db: AsyncSession = De
     status_code=status.HTTP_200_OK,
     response_model=Profile,
     tags=['auth'],
-    response_model_exclude={'email'},
 )
 async def profile(user_id: int, db: AsyncSession = Depends(get_db)):
     return await views.profile(db, user_id)
