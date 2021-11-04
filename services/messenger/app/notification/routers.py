@@ -23,6 +23,19 @@ async def get_notifications(user_id: int = Depends(is_active), db: AsyncSession 
     return await views.get_notifications(db, user_id)
 
 
+@notification_router.get(
+    '/{pk}',
+    name='Get notification',
+    description='Get notification',
+    response_description='Notification',
+    status_code=status.HTTP_200_OK,
+    response_model=GetNotification,
+    tags=['notifications'],
+)
+async def get_notification(pk: int, user_id: int = Depends(is_active), db: AsyncSession = Depends(get_db)):
+    return await views.get_notification(db, user_id, pk)
+
+
 @notification_router.delete(
     '/',
     name='View notifications',

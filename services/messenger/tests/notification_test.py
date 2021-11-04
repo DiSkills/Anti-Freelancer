@@ -208,6 +208,39 @@ class NotificationTestCase(BaseTest, TestCase):
         self.assertEqual(len(async_loop(notification_crud.filter(self.session, recipient_id=2))), 3)
         self.assertEqual(len(response.json()), 2)
 
+        # Get
+        with mock.patch('app.permission.permission', return_value=2) as _:
+            with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(1)) as _:
+                response = self.client.get(f'{self.url}/notifications/1', headers=headers)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    response.json(), {
+                        'id': 1, 'type': 'SEND',
+                        'data': {
+                            **GetMessage(
+                                sender=UserData(**self.get_new_user(1)),
+                                **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                            ).dict(),
+                            'created_at': f'{async_loop(message_crud.get(self.session, id=1)).created_at}Z'.replace(
+                                ' ',
+                                'T'
+                            )
+                        },
+                    }
+                )
+
+        with mock.patch('app.permission.permission', return_value=2) as _:
+            with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(1)) as _:
+                response = self.client.get(f'{self.url}/notifications/3', headers=headers)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'You not owner this notification'})
+
+        with mock.patch('app.permission.permission', return_value=2) as _:
+            with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(1)) as _:
+                response = self.client.get(f'{self.url}/notifications/143', headers=headers)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Notification not found'})
+
         # View (delete)
         with mock.patch('app.permission.permission', return_value=2) as _:
             response = self.client.delete(f'{self.url}/notifications/', headers=headers)

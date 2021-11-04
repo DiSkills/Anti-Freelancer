@@ -18,10 +18,11 @@
     - [ ] Get all for dialogue (pagination)
     - [ ] Get all dialogues
     - [ ] Get dialogue
-- [ ] Notification
     - [ ] Send email about new message
+- [ ] Notification
     - [x] Create (sent)
     - [x] Create (changed)
+    - [x] Get all
     - [x] Get
     - [x] View (delete)
 - [ ] Tests
@@ -33,5 +34,6 @@
     - [ ] Notification
         - [x] Create (sent)
         - [x] Create (changed)
-        - [x] Get
+        - [x] Get all
         - [x] View (delete)
+        - [x] Get
