@@ -7,7 +7,7 @@ from app.crud import dialogue_crud, message_crud, notification_crud
 from app.message.schemas import CreateMessage, GetMessage, UserData
 from app.message.service import websocket_error
 from app.message.state import WebSocketState
-from app.requests import sender_profile, get_user
+from app.requests import sender_profile, get_user, get_sender_data
 from config import SEND
 from db import async_session
 
@@ -17,7 +17,6 @@ class MessengerView:
     def __init__(self):
         self._state: typing.Optional[WebSocketState] = None
         self._user_id: typing.Optional[int] = None
-        self._user_data: typing.Optional[dict[str, typing.Union[str, int]]] = None
 
     async def connect(self, state: typing.Optional[WebSocketState], websocket: WebSocket) -> None:
         """
@@ -44,9 +43,6 @@ class MessengerView:
 
         user_id: int = user_data.get('id')
         self._user_id = user_id
-        self._user_data: typing.Optional[dict[str, typing.Union[str, int]]] = {
-            'id': user_id, 'username': user_data.get('username'), 'avatar': user_data.get('avatar'),
-        }
         self._state.add(self._user_id, websocket)
 
     async def disconnect(self, websocket: WebSocket) -> None:
@@ -156,10 +152,11 @@ class MessengerView:
                 message_id=msg.id
             )
 
+        user_data: dict = await get_sender_data(schema.sender_id)
         await self._state.send(
             sender_id=schema.sender_id,
             recipient_id=schema.recipient_id,
             success_msg='Message has been send',
             response_type=SEND,
-            data=GetMessage(**msg.__dict__, sender=UserData(**self._user_data)).dict()
+            data=GetMessage(**msg.__dict__, sender=UserData(**user_data)).dict()
         )

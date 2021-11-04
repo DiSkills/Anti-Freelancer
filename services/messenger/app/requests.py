@@ -35,6 +35,37 @@ async def get_user(user_id: int) -> dict:
     return await get_user_request(user_id)
 
 
+async def get_sender_data_request(user_id: int) -> dict:
+    """
+        Get sender data request
+        :param user_id: User ID
+        :type user_id: int
+        :return: Sender profile
+        :rtype: dict
+        :raise ValueError: Bad response
+    """
+
+    async with aiohttp.ClientSession() as session:
+        response = await session.get(url=f'{SERVER_AUTH_BACKEND}{API}/profile/{user_id}')
+
+        json = await response.json()
+        if not response.ok:
+            raise ValueError(json['detail'])
+
+    return json
+
+
+async def get_sender_data(user_id: int) -> dict:
+    """
+        Sender profile
+        :param user_id: User ID
+        :type user_id: int
+        :return: Sender profile
+        :rtype: dict
+    """
+    return await get_sender_data_request(user_id)
+
+
 async def sender_profile_request(token: str) -> dict:
     """
         Sender profile request
