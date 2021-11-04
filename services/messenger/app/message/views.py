@@ -4,11 +4,11 @@ import typing
 from fastapi import WebSocket
 
 from app.crud import dialogue_crud, message_crud, notification_crud
-from app.message.schemas import CreateMessage, GetMessage, UserData, UpdateMessage
+from app.message.schemas import CreateMessage, GetMessage, UserData, UpdateMessage, DeleteMessage
 from app.message.service import websocket_error
 from app.message.state import WebSocketState
 from app.requests import sender_profile, get_user, get_sender_data
-from config import SEND, CHANGE
+from config import SEND, CHANGE, DELETE
 from db import async_session
 
 
@@ -77,6 +77,7 @@ class MessengerView:
         types = {
             SEND: (self.send_message, CreateMessage),
             CHANGE: (self.update_message, UpdateMessage),
+            DELETE: (self.delete_message, DeleteMessage)
         }
 
         try:
@@ -203,4 +204,31 @@ class MessengerView:
             success_msg='Message has been changed',
             response_type=CHANGE,
             data=GetMessage(**msg.__dict__, sender=UserData(**user_data)).dict()
+        )
+
+    async def delete_message(self, websocket: WebSocket, schema: DeleteMessage) -> None:
+        if schema.sender_id not in self._state.get_websockets.keys():
+            await websocket_error(websocket, {'msg': 'Sender not found'})
+            return
+
+        async with async_session() as db:
+            if not await message_crud.exist(db, id=schema.id):
+                await websocket_error(websocket, {'msg': 'Message not found'})
+                return
+            msg = await message_crud.get(db, id=schema.id)
+            if msg.sender_id != schema.sender_id:
+                await websocket_error(websocket, {'msg': 'You not send this message'})
+                return
+            await message_crud.remove(db, id=schema.id)
+            dialogue = await dialogue_crud.get(db, id=msg.dialogue_id)
+            recipient_id: int = dialogue.get_recipient_id(schema.sender_id)
+
+        user_data: dict = await get_sender_data(schema.sender_id)
+
+        await self._state.send(
+            sender_id=schema.sender_id,
+            recipient_id=recipient_id,
+            success_msg='Message has been deleted',
+            response_type=DELETE,
+            data={'id': msg.id, 'sender': UserData(**user_data).dict()}
         )
