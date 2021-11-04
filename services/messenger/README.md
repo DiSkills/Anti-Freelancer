@@ -24,7 +24,8 @@
     - [x] Create (changed)
     - [x] Get all
     - [x] Get
-    - [x] View (delete)
+    - [x] View all for user (delete all)
+    - [x] View only 1 (delete)
 - [ ] Tests
     - [ ] Message
         - [x] WebSockets
@@ -35,5 +36,6 @@
         - [x] Create (sent)
         - [x] Create (changed)
         - [x] Get all
-        - [x] View (delete)
         - [x] Get
+        - [x] View all for user (delete all)
+        - [x] View only 1 (delete)

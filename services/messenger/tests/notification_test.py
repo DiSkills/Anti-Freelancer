@@ -241,7 +241,13 @@ class NotificationTestCase(BaseTest, TestCase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.json(), {'detail': 'Notification not found'})
 
-        # View (delete)
+        # View only 1
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            response = self.client.delete(f'{self.url}/notifications/1', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'You not owner this notification'})
+
+        # View all (delete)
         with mock.patch('app.permission.permission', return_value=2) as _:
             response = self.client.delete(f'{self.url}/notifications/', headers=headers)
             self.assertEqual(response.status_code, 200)
@@ -272,3 +278,16 @@ class NotificationTestCase(BaseTest, TestCase):
         self.assertEqual(async_loop(notification_crud.exist(self.session, id=3)), True)
         self.assertEqual(async_loop(notification_crud.exist(self.session, id=2)), False)
         self.assertEqual(async_loop(notification_crud.exist(self.session, id=1)), False)
+
+        # View only 1
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            response = self.client.delete(f'{self.url}/notifications/3', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Notification has been viewed'})
+        self.assertEqual(async_loop(notification_crud.exist(self.session, id=3)), False)
+        self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
+
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            response = self.client.delete(f'{self.url}/notifications/143', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Notification not found'})
