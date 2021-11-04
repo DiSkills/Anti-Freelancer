@@ -4,11 +4,11 @@ import typing
 from fastapi import WebSocket
 
 from app.crud import dialogue_crud, message_crud, notification_crud
-from app.message.schemas import CreateMessage, GetMessage, UserData
+from app.message.schemas import CreateMessage, GetMessage, UserData, UpdateMessage
 from app.message.service import websocket_error
 from app.message.state import WebSocketState
 from app.requests import sender_profile, get_user, get_sender_data
-from config import SEND
+from config import SEND, CHANGE
 from db import async_session
 
 
@@ -75,7 +75,8 @@ class MessengerView:
             return
 
         types = {
-            SEND: (self.send_message, CreateMessage)
+            SEND: (self.send_message, CreateMessage),
+            CHANGE: (self.update_message, UpdateMessage),
         }
 
         try:
@@ -158,5 +159,39 @@ class MessengerView:
             recipient_id=schema.recipient_id,
             success_msg='Message has been send',
             response_type=SEND,
+            data=GetMessage(**msg.__dict__, sender=UserData(**user_data)).dict()
+        )
+
+    async def update_message(self, websocket: WebSocket, schema: UpdateMessage) -> None:
+        if schema.sender_id not in self._state.get_websockets.keys():
+            await websocket_error(websocket, {'msg': 'Sender not found'})
+            return
+
+        async with async_session() as db:
+            if not await message_crud.exist(db, id=schema.id):
+                await websocket_error(websocket, {'msg': 'Message not found'})
+                return
+            msg = await message_crud.get(db, id=schema.id)
+            if msg.sender_id != schema.sender_id:
+                await websocket_error(websocket, {'msg': 'You not send this message'})
+                return
+            msg = await message_crud.update(db, {'id': schema.id}, msg=schema.msg, viewed=False)
+            dialogue = await dialogue_crud.get(db, id=msg.dialogue_id)
+            recipient_id: int = dialogue.get_recipient_id(schema.sender_id)
+            await notification_crud.create(
+                db,
+                sender_id=schema.sender_id,
+                recipient_id=recipient_id,
+                message_id=msg.id,
+                type=CHANGE,
+            )
+
+        user_data: dict = await get_sender_data(schema.sender_id)
+
+        await self._state.send(
+            sender_id=schema.sender_id,
+            recipient_id=recipient_id,
+            success_msg='Message has been changed',
+            response_type=CHANGE,
             data=GetMessage(**msg.__dict__, sender=UserData(**user_data)).dict()
         )

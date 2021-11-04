@@ -52,6 +52,11 @@ class Dialogue(Base):
     def __repr__(self):
         return f'<Dialogue {self.id}>'
 
+    def get_recipient_id(self, sender_id: int):
+        users = self.users_ids.split('_')
+        del users[users.index(f'{sender_id}')]
+        return int(users[0])
+
 
 class Notification(Base):
     """ Notification """

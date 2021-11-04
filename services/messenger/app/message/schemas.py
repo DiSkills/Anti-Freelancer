@@ -11,6 +11,14 @@ class CreateMessage(BaseModel):
     recipient_id: int
 
 
+class UpdateMessage(BaseModel):
+    """ Update message """
+
+    id: int
+    msg: str
+    sender_id: int
+
+
 class UserData(BaseModel):
     """ User data """
 

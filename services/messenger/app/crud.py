@@ -1,7 +1,7 @@
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.message.schemas import CreateMessage
+from app.message.schemas import CreateMessage, UpdateMessage
 from app.models import Dialogue, Message, Notification
 from crud import CRUD
 
@@ -11,7 +11,7 @@ class DialogueCRUD(CRUD[Dialogue, Dialogue, Dialogue]):
     pass
 
 
-class MessageCRUD(CRUD[Message, CreateMessage, CreateMessage]):
+class MessageCRUD(CRUD[Message, CreateMessage, UpdateMessage]):
     """ Message CRUD """
     pass
 

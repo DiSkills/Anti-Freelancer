@@ -23,6 +23,7 @@ DB_PORT = os.environ.get('DB_PORT')
 DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
 SEND = 'SEND'
+CHANGE = 'CHANGE'
 SUCCESS = 'SUCCESS'
 ERROR = 'ERROR'
 
