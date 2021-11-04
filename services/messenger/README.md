@@ -19,7 +19,7 @@
     - [ ] Get all dialogues
     - [ ] Get dialogue
     - [ ] Send email about new message
-- [ ] Notification
+- [x] Notification
     - [x] Create (sent)
     - [x] Create (changed)
     - [x] Get all
@@ -32,7 +32,7 @@
             - [x] Send
             - [x] Update (change)
             - [x] Delete
-    - [ ] Notification
+    - [x] Notification
         - [x] Create (sent)
         - [x] Create (changed)
         - [x] Get all
