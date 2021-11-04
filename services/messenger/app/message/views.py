@@ -77,7 +77,7 @@ class MessengerView:
         types = {
             SEND: (self.send_message, CreateMessage),
             CHANGE: (self.update_message, UpdateMessage),
-            DELETE: (self.delete_message, DeleteMessage)
+            DELETE: (self.delete_message, DeleteMessage),
         }
 
         try:
@@ -207,6 +207,14 @@ class MessengerView:
         )
 
     async def delete_message(self, websocket: WebSocket, schema: DeleteMessage) -> None:
+        """
+            Delete message
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param schema: Delete message data
+            :type schema: DeleteMessage
+            :return: None
+        """
         if schema.sender_id not in self._state.get_websockets.keys():
             await websocket_error(websocket, {'msg': 'Sender not found'})
             return
