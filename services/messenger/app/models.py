@@ -20,7 +20,6 @@ class Message(Base):
         sqlalchemy.DateTime, default=datetime.datetime.utcnow, nullable=False,
     )
     viewed: bool = sqlalchemy.Column(sqlalchemy.Boolean, default=False, nullable=False)
-    is_deleted: bool = sqlalchemy.Column(sqlalchemy.Boolean, default=False, nullable=False)
 
     dialogue_id: int = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey('dialogue.id', ondelete='CASCADE'), nullable=False,

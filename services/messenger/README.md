@@ -22,7 +22,6 @@
     - [ ] Send email about new message
     - [x] Create (sent)
     - [x] Create (changed)
-    - [ ] Create (deleted)
     - [x] Get
     - [x] View (delete)
 - [ ] Tests

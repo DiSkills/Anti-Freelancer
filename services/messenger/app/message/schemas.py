@@ -36,7 +36,6 @@ class GetMessage(BaseModel):
     created_at: datetime.datetime
     viewed: bool
     sender: UserData
-    is_deleted: bool
 
     @validator('created_at')
     def validate_created_at(cls, created_at: datetime.datetime):
