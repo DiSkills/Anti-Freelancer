@@ -52,7 +52,14 @@ class Dialogue(Base):
     def __repr__(self):
         return f'<Dialogue {self.id}>'
 
-    def get_recipient_id(self, sender_id: int):
+    def get_recipient_id(self, sender_id: int) -> int:
+        """
+            Get recipient ID
+            :param sender_id: Sender ID
+            :type sender_id: int
+            :return: Recipient ID
+            :rtype: int
+        """
         users = self.users_ids.split('_')
         del users[users.index(f'{sender_id}')]
         return int(users[0])

@@ -13,23 +13,25 @@
 - [ ] Message
     - [ ] WebSockets
         - [x] Send
-        - [ ] Update (by message id **and** sender id)
+        - [x] Update (change)
         - [ ] Delete (by message id **and** sender id)
     - [ ] Get all for dialogue (pagination)
     - [ ] Get all dialogues
     - [ ] Get dialogue
 - [ ] Notification
     - [ ] Send email about new message
-    - [x] Create (message has been sent)
-    - [ ] Create (message has been deleted)
-    - [ ] Create (message has been changed)
+    - [x] Create (sent)
+    - [x] Create (changed)
+    - [ ] Create (deleted)
     - [x] Get
     - [x] View (delete)
 - [ ] Tests
     - [ ] Message
         - [ ] WebSockets
             - [x] Send
+            - [x] Update (change)
     - [ ] Notification
-        - [x] Create (message has been sent)
+        - [x] Create (sent)
+        - [x] Create (changed)
         - [x] Get
         - [x] View (delete)
