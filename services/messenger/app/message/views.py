@@ -163,6 +163,15 @@ class MessengerView:
         )
 
     async def update_message(self, websocket: WebSocket, schema: UpdateMessage) -> None:
+        """
+            Update (change) message
+            :param websocket: Websocket
+            :type websocket: WebSocket
+            :param schema: New message data
+            :type schema: UpdateMessage
+            :return: None
+        """
+
         if schema.sender_id not in self._state.get_websockets.keys():
             await websocket_error(websocket, {'msg': 'Sender not found'})
             return
