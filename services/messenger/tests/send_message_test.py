@@ -8,8 +8,6 @@ from tests import BaseTest, async_loop
 
 class SendMessageTestCase(BaseTest, TestCase):
 
-    maxDiff = None
-
     def test_only_1_sender_connection_first_message(self):
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 0)
         self.assertEqual(len(async_loop(notification_crud.all(self.session))), 0)
@@ -71,7 +69,9 @@ class SendMessageTestCase(BaseTest, TestCase):
                                 response,
                                 {
                                     'data': GetMessage(
-                                        **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False},
+                                        **{
+                                            **async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False
+                                        },
                                         sender=UserData(**self.get_new_user(1))
                                     ).dict(), 'type': SEND
                                 }
@@ -88,7 +88,9 @@ class SendMessageTestCase(BaseTest, TestCase):
                                 response,
                                 {
                                     'data': GetMessage(
-                                        **{**async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False},
+                                        **{
+                                            **async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False
+                                        },
                                         sender=UserData(**self.get_new_user(1)),
                                     ).dict(), 'type': SEND
                                 }
@@ -129,7 +131,8 @@ class SendMessageTestCase(BaseTest, TestCase):
                                     {
                                         'data': GetMessage(
                                             **{
-                                                **async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False
+                                                **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                                'viewed': False
                                             },
                                             sender=UserData(**self.get_new_user(1)),
                                         ).dict(), 'type': SEND
@@ -142,7 +145,8 @@ class SendMessageTestCase(BaseTest, TestCase):
                                     {
                                         'data': GetMessage(
                                             **{
-                                                **async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False
+                                                **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                                'viewed': False
                                             },
                                             sender=UserData(**self.get_new_user(1)),
                                         ).dict(), 'type': SEND
@@ -168,7 +172,10 @@ class SendMessageTestCase(BaseTest, TestCase):
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(1)) as _:
                     with self.client.websocket_connect(f'{self.url}/ws/token') as socket_sender_1:
                         with self.client.websocket_connect(f'{self.url}/ws/token') as socket_sender_2:
-                            with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(2)) as _:
+                            with mock.patch(
+                                    'app.requests.sender_profile_request',
+                                    return_value=self.get_new_user(2)
+                            ) as _:
                                 with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient_1:
                                     with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient_2:
                                         socket_sender_1.send_json(
