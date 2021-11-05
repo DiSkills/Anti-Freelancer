@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.dialogues.routers import dialogues_router
+from app.dialogue.routers import dialogues_router
 from app.message.middleware import WebSocketStateMiddleware
 from app.message.routers import message_router
 from app.notification.routers import notification_router

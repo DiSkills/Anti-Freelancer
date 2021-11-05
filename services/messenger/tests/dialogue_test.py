@@ -25,6 +25,25 @@ class MessageTestCase(BaseTest, TestCase):
         self.assertEqual(len(dialogues), self.count_true_results)
         self.assertEqual([dialogue.get_recipient_id(1) for dialogue in dialogues], self.true_results)
 
+    def test_get_dialogue(self):
+        headers = {'Authorization': 'Bearer Token'}
+
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
+                response = self.client.get(f'{self.url}/dialogues/1', headers=headers)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json(), {'id': 1, 'user': self.get_new_user(2)})
+
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            response = self.client.get(f'{self.url}/dialogues/7', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'You are not in this dialogue'})
+
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            response = self.client.get(f'{self.url}/dialogues/143', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Dialogue not found'})
+
     def test_get_dialogues(self):
         headers = {'Authorization': 'Bearer Token'}
 

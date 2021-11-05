@@ -2,6 +2,7 @@
 
 ## TODO
 
+- [x] No admin area
 - [ ] Docker
 - [ ] Logger errors in file
 - [x] Permission requests
@@ -18,8 +19,8 @@
     - [ ] Send email about new message
 - [ ] Dialogue
     - [x] Get all for user
+    - [x] Get
     - [ ] Get all messages for dialogue (pagination)
-    - [ ] Get
 - [x] Notification
     - [x] Create (sent)
     - [x] Create (changed)
@@ -34,7 +35,8 @@
             - [x] Update (change)
             - [x] Delete
     - [ ] Dialogue
-      - [x] Get all for user
+        - [x] Get all for user
+        - [x] Get
     - [x] Notification
         - [x] Create (sent)
         - [x] Create (changed)
