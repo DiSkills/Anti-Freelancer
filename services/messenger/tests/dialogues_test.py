@@ -8,7 +8,7 @@ class MessageTestCase(BaseTest, TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        async_loop(dialogue_crud.create(self.session, users_ids='1_2'))
+        async_loop(dialogue_crud.create(self.session, users_ids='2_1'))
         async_loop(dialogue_crud.create(self.session, users_ids='1_4'))
         async_loop(dialogue_crud.create(self.session, users_ids='1_6'))
         async_loop(dialogue_crud.create(self.session, users_ids='11_2'))

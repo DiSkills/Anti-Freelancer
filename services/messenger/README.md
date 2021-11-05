@@ -17,9 +17,9 @@
         - [x] Delete
     - [ ] Send email about new message
 - [ ] Dialogue
-    - [x] Get all dialogues for user
-    - [ ] Get all for dialogue (pagination)
-    - [ ] Get dialogue
+    - [x] Get all for user
+    - [ ] Get all messages for dialogue (pagination)
+    - [ ] Get
 - [x] Notification
     - [x] Create (sent)
     - [x] Create (changed)
@@ -34,7 +34,7 @@
             - [x] Update (change)
             - [x] Delete
     - [ ] Dialogue
-      - [x] Get all dialogues for user
+      - [x] Get all for user
     - [x] Notification
         - [x] Create (sent)
         - [x] Create (changed)
