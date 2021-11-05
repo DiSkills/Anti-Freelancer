@@ -1,5 +1,3 @@
-import typing
-
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +7,7 @@ from app.requests import get_users, get_user
 
 async def get_all_dialogues_for_user(db: AsyncSession, user_id: int):
     """
-        Get all dialogue for user
+        Get all dialogues for user
         :param db: DB
         :type db: AsyncSession
         :param user_id: User ID
