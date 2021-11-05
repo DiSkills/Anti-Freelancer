@@ -1,7 +1,7 @@
 from unittest import mock, TestCase
 
 from app.crud import message_crud, dialogue_crud, notification_crud
-from app.message.schemas import UserData
+from app.schemas import UserData
 from config import ERROR, SUCCESS, DELETE
 from tests import BaseTest, async_loop
 

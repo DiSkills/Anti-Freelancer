@@ -4,10 +4,11 @@ import typing
 from fastapi import WebSocket
 
 from app.crud import dialogue_crud, message_crud, notification_crud
-from app.message.schemas import CreateMessage, GetMessage, UserData, UpdateMessage, DeleteMessage
+from app.message.schemas import CreateMessage, GetMessage, UpdateMessage, DeleteMessage
 from app.message.service import websocket_error
 from app.message.state import WebSocketState
 from app.requests import sender_profile, get_user, get_sender_data
+from app.schemas import UserData
 from config import SEND, CHANGE, DELETE
 from db import async_session
 

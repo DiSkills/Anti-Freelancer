@@ -2,6 +2,8 @@ import datetime
 
 from pydantic import BaseModel, validator
 
+from app.schemas import UserData
+
 
 class CreateMessage(BaseModel):
     """ Create message """
@@ -22,14 +24,6 @@ class UpdateMessage(DeleteMessage):
     """ Update message """
 
     msg: str
-
-
-class UserData(BaseModel):
-    """ User data """
-
-    id: int
-    username: str
-    avatar: str
 
 
 class GetMessage(BaseModel):

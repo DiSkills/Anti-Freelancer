@@ -8,7 +8,27 @@ from crud import CRUD
 
 class DialogueCRUD(CRUD[Dialogue, Dialogue, Dialogue]):
     """ Dialogue CRUD """
-    pass
+
+    @staticmethod
+    async def get_for_user(db: AsyncSession, user_id: int) -> list[Dialogue]:
+        """
+            Get dialogues for user
+            :param db: DB
+            :type db: AsyncSession
+            :param user_id: User ID
+            :type user_id: int
+            :return: Dialogues
+            :rtype: list
+        """
+        query = await db.execute(
+            sqlalchemy.select(Dialogue).filter(
+                sqlalchemy.or_(
+                    sqlalchemy.func.split_part(Dialogue.users_ids, '_', 1) == f'{user_id}',
+                    sqlalchemy.func.split_part(Dialogue.users_ids, '_', 2) == f'{user_id}',
+                )
+            ).order_by(Dialogue.id.desc())
+        )
+        return query.scalars().all()
 
 
 class MessageCRUD(CRUD[Message, CreateMessage, UpdateMessage]):

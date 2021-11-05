@@ -15,10 +15,11 @@
         - [x] Send
         - [x] Update (change)
         - [x] Delete
-    - [ ] Get all for dialogue (pagination)
-    - [ ] Get all dialogues
-    - [ ] Get dialogue
     - [ ] Send email about new message
+- [ ] Dialogue
+    - [x] Get all dialogues for user
+    - [ ] Get all for dialogue (pagination)
+    - [ ] Get dialogue
 - [x] Notification
     - [x] Create (sent)
     - [x] Create (changed)
@@ -32,6 +33,8 @@
             - [x] Send
             - [x] Update (change)
             - [x] Delete
+    - [ ] Dialogue
+      - [x] Get all dialogues for user
     - [x] Notification
         - [x] Create (sent)
         - [x] Create (changed)
