@@ -93,6 +93,8 @@ async def view_notification(db: AsyncSession, user_id: int, pk: int) -> dict[str
         :type pk: int
         :return: Message
         :rtype: dict
+        :raise HTTPException 400: Notification not found
+        :raise HTTPException 400: User not owner this notification
     """
 
     if not await notification_crud.exist(db, id=pk):
