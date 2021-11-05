@@ -16,11 +16,11 @@
         - [x] Send
         - [x] Update (change)
         - [x] Delete
+    - [x] Get all messages for dialogue (pagination)
     - [ ] Send email about new message
 - [ ] Dialogue
     - [x] Get all for user
     - [x] Get
-    - [ ] Get all messages for dialogue (pagination)
 - [x] Notification
     - [x] Create (sent)
     - [x] Create (changed)
@@ -29,12 +29,13 @@
     - [x] View all for user (delete all)
     - [x] View only 1 (delete)
 - [ ] Tests
-    - [ ] Message
+    - [x] Message
         - [x] WebSockets
             - [x] Send
             - [x] Update (change)
             - [x] Delete
-    - [ ] Dialogue
+        - [x] Get all messages for dialogue (pagination)
+    - [x] Dialogue
         - [x] Get all for user
         - [x] Get
     - [x] Notification
