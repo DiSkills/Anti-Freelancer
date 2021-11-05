@@ -7,13 +7,35 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.crud import dialogue_crud
 
 
-def dialogue_exist(dialogue_id: str, user_id_param: str):
+def dialogue_exist(dialogue_id_param: str, user_id_param: str):
+    """
+        Dialogue exist
+        :param dialogue_id_param: Dialogue ID param
+        :type dialogue_id_param: str
+        :param user_id_param: User ID param
+        :type user_id_param: str
+        :return: Dialogue exist wrapper
+    """
 
-    def decorator(function):
+    def dialogue_exist_wrapper(function):
+        """
+            Dialogue exist wrapper
+            :param function: Function
+            :return: Wrapper
+        """
 
         @wraps(function)
         async def wrapper(*args, **kwargs):
-            pk = kwargs.get(dialogue_id)
+            """
+                Wrapper
+                :param args: args
+                :param kwargs: kwargs
+                :return: Function
+                :raise HTTPException 400: Dialogue not found
+                :raise HTTPException 400: User not in this dialogue
+            """
+
+            pk = kwargs.get(dialogue_id_param)
             user_id = kwargs.get(user_id_param)
             db = kwargs.get('db')
 
@@ -28,7 +50,7 @@ def dialogue_exist(dialogue_id: str, user_id_param: str):
 
         return wrapper
 
-    return decorator
+    return dialogue_exist_wrapper
 
 
 def paginate(get_function, exist_function, url: str, *filter_params):

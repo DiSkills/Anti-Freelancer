@@ -32,6 +32,22 @@ async def get_messages_for_dialogue(
     dialogue_id: int,
     queryset: list[Message]
 ):
+    """
+        Get messages for dialogue
+        :param db: DB
+        :type db: AsyncSession
+        :param user_id: User ID
+        :type user_id: int
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param dialogue_id: Dialogue ID
+        :type dialogue_id: int
+        :param queryset: Messages
+        :type queryset: list
+        :return: Paginate messages
+    """
     return (message.__dict__ for message in queryset)
 
 
