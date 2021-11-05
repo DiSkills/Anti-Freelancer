@@ -1,12 +1,41 @@
 import typing
 
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, status, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.endpoints import WebSocketEndpoint
 
 from app.message import views
+from app.message.schemas import MessagesPaginate
 from app.message.state import WebSocketState
+from app.permission import is_active
+from db import get_db
 
 message_router = APIRouter()
+
+
+@message_router.get(
+    '/dialogue',
+    name='Messages for dialogue',
+    description='Messages for dialogue',
+    response_description='Messages',
+    status_code=status.HTTP_200_OK,
+    response_model=MessagesPaginate,
+    tags=['messages'],
+)
+async def get_messages_for_dialogue(
+    dialogue_id: int,
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    user_id: int = Depends(is_active),
+    db: AsyncSession = Depends(get_db),
+):
+    return await views.get_messages_for_dialogue(
+        db=db,
+        user_id=user_id,
+        page=page,
+        page_size=page_size,
+        dialogue_id=dialogue_id,
+    )
 
 
 @message_router.websocket_route('/ws/{token}')

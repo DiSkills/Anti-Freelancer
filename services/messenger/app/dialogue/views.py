@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import dialogue_crud
 from app.requests import get_users, get_user
+from app.service import dialogue_exist
 
 
 async def get_all_dialogues_for_user(db: AsyncSession, user_id: int):
@@ -28,7 +29,8 @@ async def get_all_dialogues_for_user(db: AsyncSession, user_id: int):
     )
 
 
-async def get_dialogue(db: AsyncSession, user_id: int, pk: int) -> dict:
+@dialogue_exist('pk', 'user_id')
+async def get_dialogue(*, db: AsyncSession, user_id: int, pk: int) -> dict:
     """
         Get dialogue
         :param db: DB
@@ -41,12 +43,7 @@ async def get_dialogue(db: AsyncSession, user_id: int, pk: int) -> dict:
         :rtype: dict
     """
 
-    if not await dialogue_crud.exist(db, id=pk):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Dialogue not found')
     dialogue = await dialogue_crud.get(db, id=pk)
-
-    if not any(filter(lambda user: user == f'{user_id}', dialogue.users_ids.split('_'))):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You are not in this dialogue')
 
     user = await get_user(dialogue.get_recipient_id(user_id))
     return {**dialogue.__dict__, 'user': user}

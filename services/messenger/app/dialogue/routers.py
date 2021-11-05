@@ -32,4 +32,4 @@ async def get_all_dialogues_for_user(user_id: int = Depends(is_active), db: Asyn
     tags=['dialogues'],
 )
 async def get_dialogue(pk: int, user_id: int = Depends(is_active), db: AsyncSession = Depends(get_db)):
-    return await views.get_dialogue(db, user_id, pk)
+    return await views.get_dialogue(db=db, user_id=user_id, pk=pk)

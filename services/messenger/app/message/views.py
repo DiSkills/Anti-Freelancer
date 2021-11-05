@@ -2,15 +2,37 @@ import json
 import typing
 
 from fastapi import WebSocket
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import dialogue_crud, message_crud, notification_crud
 from app.message.schemas import CreateMessage, GetMessage, UpdateMessage, DeleteMessage
 from app.message.service import websocket_error
 from app.message.state import WebSocketState
+from app.models import Message
 from app.requests import sender_profile, get_user, get_sender_data
 from app.schemas import UserData
-from config import SEND, CHANGE, DELETE
+from app.service import paginate, dialogue_exist
+from config import SEND, CHANGE, DELETE, SERVER_MESSENGER_BACKEND, API
 from db import async_session
+
+
+@dialogue_exist('dialogue_id', 'user_id')
+@paginate(
+    message_crud.filter,
+    message_crud.exist_page,
+    f'{SERVER_MESSENGER_BACKEND}{API}/messages/dialogue',
+    'dialogue_id'
+)
+async def get_messages_for_dialogue(
+    *,
+    db: AsyncSession,
+    user_id: int,
+    page: int,
+    page_size: int,
+    dialogue_id: int,
+    queryset: list[Message]
+):
+    return (message.__dict__ for message in queryset)
 
 
 class MessengerView:

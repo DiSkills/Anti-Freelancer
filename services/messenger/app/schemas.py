@@ -1,3 +1,5 @@
+import typing
+
 from pydantic import BaseModel
 
 
@@ -13,3 +15,12 @@ class UserData(BaseModel):
     id: int
     username: str
     avatar: str
+
+
+class Paginate(BaseModel):
+    """ Paginate """
+
+    next: typing.Optional[str]
+    previous: typing.Optional[str]
+    page: int
+    results: list
