@@ -17,7 +17,7 @@ class SendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(1)) as _:
-                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                         socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND})
                         response = socket.receive_json()
                         self.assertEqual(
@@ -54,8 +54,8 @@ class SendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(1)) as _:
-                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket_1:
-                        with self.client.websocket_connect(f'{self.url}/ws/token') as socket_2:
+                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_1:
+                        with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_2:
                             socket_1.send_json(
                                 {'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND}
                             )
@@ -114,9 +114,9 @@ class SendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(1)) as _:
-                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket_sender:
+                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_sender:
                         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(2)) as _:
-                            with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient:
+                            with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_recipient:
                                 socket_sender.send_json(
                                     {'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND}
                                 )
@@ -171,14 +171,14 @@ class SendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(1)) as _:
-                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket_sender_1:
-                        with self.client.websocket_connect(f'{self.url}/ws/token') as socket_sender_2:
+                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_sender_1:
+                        with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_sender_2:
                             with mock.patch(
                                     'app.requests.sender_profile_request',
                                     return_value=self.get_new_user(2)
                             ) as _:
-                                with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient_1:
-                                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient_2:
+                                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_recipient_1:
+                                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_recipient_2:
                                         socket_sender_1.send_json(
                                             {'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND}
                                         )
@@ -273,7 +273,7 @@ class SendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(2)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(1)) as _:
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(2)) as _:
-                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                         socket.send_json({'msg': 'Hello world!', 'recipient_id': 1, 'type': SEND})
                         response = socket.receive_json()
                         self.assertEqual(
@@ -316,7 +316,7 @@ class SendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(1)) as _:
-                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                         socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND})
                         response = socket.receive_json()
                         self.assertEqual(
@@ -354,7 +354,7 @@ class BadSendMessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(1)) as _:
-                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                     socket.send_json({'recipient_id': 1, 'type': SEND, 'msg': 'Hello world!'})
                     response = socket.receive_json()
                     self.assertEqual(
@@ -374,7 +374,7 @@ class BadSendMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request') as recipient:
                 recipient.side_effect = ValueError()
-                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                     socket.send_json({'msg': 'Hello world!', 'recipient_id': 2, 'type': SEND})
                     response = socket.receive_json()
                     self.assertEqual(
@@ -394,7 +394,7 @@ class BadSendMessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
-                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                     socket.send_json({'recipient_id': 2, 'type': SEND})
                     response = socket.receive_json()
                     self.assertEqual(
@@ -414,7 +414,7 @@ class BadSendMessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
-                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                     socket.send_json({'recipient_id': 2})
                     response = socket.receive_json()
                     self.assertEqual(
@@ -434,7 +434,7 @@ class BadSendMessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
-                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                     socket.send_json({'recipient_id': 2, 'type': 'Hello world!'})
                     response = socket.receive_json()
                     self.assertEqual(
@@ -454,7 +454,7 @@ class BadSendMessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request') as sender:
             sender.side_effect = ValueError('Token lifetime ended')
-            with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+            with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                 response = socket.receive_json()
                 self.assertEqual(
                     response,

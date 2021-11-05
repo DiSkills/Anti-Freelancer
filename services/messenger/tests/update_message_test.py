@@ -30,7 +30,7 @@ class UpdateMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(1)) as _:
-                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                         socket.send_json({'msg': 'Hello python!', 'id': 1, 'type': CHANGE})
                         response = socket.receive_json()
                         self.assertEqual(
@@ -74,8 +74,8 @@ class UpdateMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(1)) as _:
-                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket_1:
-                        with self.client.websocket_connect(f'{self.url}/ws/token') as socket_2:
+                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_1:
+                        with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_2:
                             socket_1.send_json(
                                 {'msg': 'Hello python!', 'id': 1, 'type': CHANGE}
                             )
@@ -144,9 +144,9 @@ class UpdateMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(1)) as _:
-                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket_sender:
+                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_sender:
                         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(2)) as _:
-                            with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient:
+                            with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_recipient:
                                 socket_sender.send_json(
                                     {'msg': 'Hello python!', 'id': 1, 'type': CHANGE}
                                 )
@@ -209,14 +209,14 @@ class UpdateMessageTestCase(BaseTest, TestCase):
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 with mock.patch('app.requests.get_sender_data_request', return_value=self.get_new_user(1)) as _:
-                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket_sender_1:
-                        with self.client.websocket_connect(f'{self.url}/ws/token') as socket_sender_2:
+                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_sender_1:
+                        with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_sender_2:
                             with mock.patch(
                                     'app.requests.sender_profile_request',
                                     return_value=self.get_new_user(2)
                             ) as _:
-                                with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient_1:
-                                    with self.client.websocket_connect(f'{self.url}/ws/token') as socket_recipient_2:
+                                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_recipient_1:
+                                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_recipient_2:
                                         socket_sender_1.send_json(
                                             {'msg': 'Hello python!', 'id': 1, 'type': CHANGE}
                                         )
@@ -326,7 +326,7 @@ class BadUpdateMessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
-                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                     socket.send_json({'msg': 'Hello python!', 'type': CHANGE})
                     response = socket.receive_json()
                     self.assertEqual(
@@ -350,7 +350,7 @@ class BadUpdateMessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(2)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(1)) as _:
-                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                     socket.send_json({'msg': 'Hello python!', 'id': 1, 'type': CHANGE})
                     response = socket.receive_json()
                     self.assertEqual(
@@ -375,7 +375,7 @@ class BadUpdateMessageTestCase(BaseTest, TestCase):
 
         with mock.patch('app.requests.sender_profile_request', return_value=self.get_new_user(1)) as _:
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
-                with self.client.websocket_connect(f'{self.url}/ws/token') as socket:
+                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket:
                     socket.send_json({'msg': 'Hello python!', 'id': 143, 'type': CHANGE})
                     response = socket.receive_json()
                     self.assertEqual(

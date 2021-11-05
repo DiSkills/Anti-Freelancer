@@ -23,6 +23,6 @@ app.add_middleware(
 
 app.add_middleware(WebSocketStateMiddleware)
 
-app.include_router(message_router, prefix=f'/{API}')
+app.include_router(message_router, prefix=f'/{API}/messages')
 app.include_router(notification_router, prefix=f'/{API}/notifications')
 app.include_router(dialogues_router, prefix=f'/{API}/dialogues')

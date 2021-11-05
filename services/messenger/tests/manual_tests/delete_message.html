@@ -54,7 +54,7 @@
 
         const connect = () => {
             id = document.querySelector('#sender').value;
-            ws = new WebSocket(`ws://localhost:8002/api/v1/ws/${id}`);
+            ws = new WebSocket(`ws://localhost:8002/api/v1/messages/ws/${id}`);
 
             ws.onmessage = (event) => {
                 console.log(event.data);
