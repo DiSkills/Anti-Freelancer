@@ -11,13 +11,13 @@
     - [x] Is superuser
     - [x] Is customer
     - [x] Is freelancer
-- [ ] Message
+- [x] Message
     - [x] WebSockets
         - [x] Send
         - [x] Update (change)
         - [x] Delete
     - [x] Get all messages for dialogue (pagination)
-    - [ ] Send email about new message
+    - [x] Send email about new message
 - [x] Dialogue
     - [x] Get all for user
     - [x] Get
@@ -28,7 +28,7 @@
     - [x] Get
     - [x] View all for user (delete all)
     - [x] View only 1 (delete)
-- [ ] Tests
+- [x] Tests
     - [x] Message
         - [x] WebSockets
             - [x] Send

@@ -5,6 +5,13 @@ from send_email import send_email
 
 
 async def send_notification_email(notification: Notification) -> None:
+    """
+        Send notification email
+        :param notification: Notification
+        :type notification: Notification
+        :return: None
+    """
+
     if int(TEST):
         return
 
