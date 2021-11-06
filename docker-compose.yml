@@ -34,6 +34,17 @@ services:
     ports:
       - "5435:5435"
 
+  messenger_db:
+    build:
+      context: ./services/messenger/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=messenger_user
+    volumes:
+      - ./services/messenger/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5436:5436"
+
   pg_admin:
     image: dpage/pgadmin4
     ports:
@@ -44,6 +55,8 @@ services:
     depends_on:
       - auth_db
       - main_db
+      - email_db
+      - messenger_db
 
   auth:
     build:
@@ -86,6 +99,21 @@ services:
       - worker
     volumes:
       - ./services/email:/app
+    environment:
+      - DOCKER=1
+
+  messenger:
+    build:
+      context: ./services/messenger
+      dockerfile: Dockerfile
+    depends_on:
+      - main
+      - messenger_db
+    ports:
+      - "8002:8002"
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8002 --log-config logger.yml
+    volumes:
+      - ./services/messenger:/app
     environment:
       - DOCKER=1
 
