@@ -6,9 +6,10 @@
     - [x] Auth
     - [x] Main
     - [x] Email
+    - [x] Messenger
     - [ ] Advertisement, Feedbacks and Reviews
-    - [ ] Messenger
 - [ ] Docker compose
+- [ ] Nginx
 
 ### Ideas
 
