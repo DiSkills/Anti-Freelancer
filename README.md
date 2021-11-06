@@ -10,6 +10,7 @@
     - [ ] Advertisement, Feedbacks and Reviews
 - [ ] Docker compose
 - [ ] Nginx
+- [x] Flower
 
 ### Ideas
 

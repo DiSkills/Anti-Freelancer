@@ -130,5 +130,19 @@ services:
       - redis
       - email_db
 
+  dashboard:
+    build: ./services/email
+    command: poetry run celery flower --app=tasks.celery --port=5555 --broker=redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./services/email:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DOCKER=1
+    depends_on:
+      - worker
+
   redis:
     image: redis
