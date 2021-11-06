@@ -18,7 +18,7 @@
         - [x] Delete
     - [x] Get all messages for dialogue (pagination)
     - [ ] Send email about new message
-- [ ] Dialogue
+- [x] Dialogue
     - [x] Get all for user
     - [x] Get
 - [x] Notification

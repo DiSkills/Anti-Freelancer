@@ -7,13 +7,21 @@ BASE_DIR = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_NAME = 'Anti-Freelancer'
 SERVER_AUTH_BACKEND = 'http://localhost:8000/'
 SERVER_MAIN_BACKEND = 'http://localhost:8001/'
+SERVER_EMAIL = 'http://localhost:8003/'
 
 API = 'api/v1'
 SERVER_MESSENGER_BACKEND = 'http://localhost:8002/'
 
 LOGIN_URL = f'{SERVER_AUTH_BACKEND}{API}/login'
 
+CLIENT_NAME = 'messenger'
+
+SERVER_USER_EMAIL = os.environ.get('SERVER_EMAIL')
+SERVER_USER_USERNAME = os.environ.get('SERVER_USERNAME')
+SERVER_USER_PASSWORD = os.environ.get('SERVER_PASSWORD')
+
 TEST = os.environ.get('TEST', 0)
+DOCKER = os.environ.get('DOCKER', 0)
 
 DB_USER = os.environ.get('DB_USER')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
@@ -33,3 +41,9 @@ NOTIFICATION_LIMIT = 100
 if int(TEST):
     DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}_test'
     NOTIFICATION_LIMIT = 2
+
+
+if int(DOCKER):
+    SERVER_AUTH_BACKEND = 'http://auth:8000/'
+    SERVER_MAIN_BACKEND = 'http://main:8001/'
+    SERVER_EMAIL = 'http://email:8003/'

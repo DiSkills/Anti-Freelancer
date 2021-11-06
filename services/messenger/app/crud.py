@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.message.schemas import CreateMessage, UpdateMessage
 from app.models import Dialogue, Message, Notification
+from app.send_email import send_notification_email
 from crud import CRUD
 
 
@@ -38,6 +39,18 @@ class MessageCRUD(CRUD[Message, CreateMessage, UpdateMessage]):
 
 class NotificationCRUD(CRUD[Notification, Notification, Notification]):
     """ Notification CRUD """
+
+    async def create(self, db: AsyncSession, **kwargs) -> Notification:
+        """
+            Create notification
+            :param db: DB
+            :type db: AsyncSession
+            :param kwargs: kwargs
+            :return: New notification
+        """
+        notification = await super().create(db, **kwargs)
+        await send_notification_email(notification)
+        return notification
 
     @staticmethod
     async def filter_ids(db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> list[Notification]:
