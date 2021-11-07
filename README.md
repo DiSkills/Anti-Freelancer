@@ -15,7 +15,6 @@
 ### Ideas
 
 - [ ] Auth Service
-    - [ ] Levels freelancers
     - [ ] Referral registration system
     - [ ] Reviews freelancers
     - [ ] Add a level purchase for a freelancer

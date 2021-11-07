@@ -70,6 +70,6 @@ class UpdateUser(BaseModel):
 
     @validator('level')
     def set_level(cls, level):
-        if level <= 0:
+        if (level is not None) and (level <= 0):
             raise ValueError('Level cannot be less than or equal to 0')
         return level

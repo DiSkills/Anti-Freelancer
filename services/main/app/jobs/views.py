@@ -1,5 +1,6 @@
 import datetime
 import os
+import random
 import typing
 
 from fastapi import HTTPException, status, UploadFile
@@ -10,6 +11,7 @@ from app import requests
 from app.crud import sub_category_crud, job_crud, attachment_crud
 from app.jobs.schemas import CreateJob, UpdateJob, UpdateJobAdmin
 from app.models import Job
+from app.requests import update_level
 from app.send_email import send_select_email
 from app.service import paginate, user_exist, write_file, remove_file
 from config import SERVER_MAIN_BACKEND, API, MEDIA_ROOT
@@ -294,6 +296,7 @@ async def complete_job(db: AsyncSession, pk: int, user_id: int) -> dict[str, str
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Job has not executor')
 
     await job_crud.update(db, {'id': pk}, completed=True)
+    await update_level(job.executor_id, random.randint(30, 51))
     return {'msg': 'Job has been completed'}
 
 
