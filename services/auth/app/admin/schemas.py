@@ -67,3 +67,9 @@ class UpdateUser(BaseModel):
     freelancer: bool
     is_superuser: bool = False
     level: typing.Optional[int] = None
+
+    @validator('level')
+    def set_level(cls, level):
+        if level <= 0:
+            raise ValueError('Level cannot be less than or equal to 0')
+        return level

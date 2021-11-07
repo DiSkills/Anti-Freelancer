@@ -72,6 +72,30 @@ async def create_user(db: AsyncSession, schema: RegisterAdmin) -> dict[str, str]
     return {'msg': 'User has been created'}
 
 
+async def update_level(db: AsyncSession, user_id: int, level: int) -> dict[str, typing.Any]:
+    """
+        Update level
+        :param db: DB
+        :type db: AsyncSession
+        :param user_id: User ID
+        :type user_id: int
+        :param level: Level
+        :type level: int
+        :return: User
+        :rtype: dict
+    """
+
+    if not await user_crud.exist(db, id=user_id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found')
+
+    user = await user_crud.get(db, id=user_id)
+    if not user.freelancer:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User is customer')
+
+    user = await user_crud.update(db, {'id': user_id}, level=user.level + level)
+    return {**user.__dict__, 'github': user.github.__dict__ if user.github else None}
+
+
 async def update_user(db: AsyncSession, schema: UpdateUser, user_id: int) -> dict[str, typing.Any]:
     """
         Update user

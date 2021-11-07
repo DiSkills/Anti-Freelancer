@@ -264,7 +264,7 @@ class AdminTestCase(BaseTest, TestCase):
         self.assertEqual(response.json(), {'detail': 'Results not found'})
 
     def test_update_user(self):
-        self.client.post(self.url + '/register', json={**self.user_data, 'freelancer': True})
+        self.client.post(self.url + '/register', json=self.user_data)
         verification = async_loop(verification_crud.get(self.session, id=1))
         self.client.get(self.url + f'/verify?link={verification.link}')
         async_loop(user_crud.update(self.session, {'id': 1}, is_superuser=True))
@@ -317,6 +317,7 @@ class AdminTestCase(BaseTest, TestCase):
         self.assertEqual(response.json()['about'], 'Hello world!')
         self.assertEqual(response.json()['freelancer'], True)
         self.assertEqual(response.json()['is_superuser'], False)
+        self.assertEqual(response.json()['level'], 0.0)
 
         response = self.client.put(
             f'{self.url}/admin/user/2', headers=headers, json={
@@ -405,3 +406,30 @@ class AdminTestCase(BaseTest, TestCase):
         self.assertEqual(response.json()['freelancer'], True)
         self.assertEqual(response.json()['is_superuser'], False)
         self.assertEqual(response.json()['level'], 2.0)
+
+        response = self.client.put(
+            f'{self.url}/admin/user/2', headers=headers, json={
+                'email': 'test3@example.com',
+                'about': 'Hello world!',
+                'freelancer': True,
+                'is_superuser': False,
+                'level': -500,
+            }
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()['detail'][0]['msg'], 'Level cannot be less than or equal to 0')
+
+        # Update level
+        self.assertEqual(async_loop(user_crud.get(self.session, id=2)).level, 200)
+        response = self.client.put(f'{self.url}/admin/user/level/2?level=500', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['level'], 7.0)
+        self.assertEqual(async_loop(user_crud.get(self.session, id=2)).level, 700)
+
+        response = self.client.put(f'{self.url}/admin/user/level/1?level=500', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'User is customer'})
+
+        response = self.client.put(f'{self.url}/admin/user/level/143?level=500', headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'User not found'})

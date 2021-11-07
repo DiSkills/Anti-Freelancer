@@ -57,6 +57,24 @@ async def create_user(schema: RegisterAdmin, db: AsyncSession = Depends(get_db))
 
 
 @admin_router.put(
+    '/user/level/{user_id}',
+    name='Update user level',
+    description='Update user level',
+    response_description='User',
+    status_code=status.HTTP_200_OK,
+    response_model=UserMaximal,
+    tags=['admin'],
+    dependencies=[Depends(is_superuser)],
+)
+async def update_level(
+    user_id: int,
+    level: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db)
+):
+    return await views.update_level(db, user_id, level)
+
+
+@admin_router.put(
     '/user/{user_id}',
     name='Update user',
     description='Update user',
