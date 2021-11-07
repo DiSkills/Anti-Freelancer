@@ -22,7 +22,8 @@
 - [x] Get media
 - [x] Docker
 - [ ] Auth
-    - [ ] Freelancers Levels
+    - [x] Freelancers Levels
+    - [x] Filter by freelancers levels
     - [x] Registration
     - [x] Login
     - [x] Activation account
