@@ -60,7 +60,8 @@ class AuthTestCase(BaseTest, TestCase):
                     {
                         'id': 2,
                         'username': 'test2',
-                        'avatar': 'https://via.placeholder.com/400x400'
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 0.0,
                     }
                 ]
             }
@@ -77,7 +78,8 @@ class AuthTestCase(BaseTest, TestCase):
                     {
                         'id': 1,
                         'username': 'test',
-                        'avatar': 'https://via.placeholder.com/400x400'
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 0.0,
                     }
                 ]
             }
@@ -115,7 +117,8 @@ class AuthTestCase(BaseTest, TestCase):
                     {
                         'id': 2,
                         'username': 'test2',
-                        'avatar': 'https://via.placeholder.com/400x400'
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 0.0
                     }
                 ]
             }
@@ -132,7 +135,8 @@ class AuthTestCase(BaseTest, TestCase):
                     {
                         'id': 1,
                         'username': 'test',
-                        'avatar': 'https://via.placeholder.com/400x400'
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 0.0
                     }
                 ]
             }
@@ -149,7 +153,8 @@ class AuthTestCase(BaseTest, TestCase):
                     {
                         'id': 2,
                         'username': 'test2',
-                        'avatar': 'https://via.placeholder.com/400x400'
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 0.0
                     }
                 ]
             }
@@ -166,7 +171,8 @@ class AuthTestCase(BaseTest, TestCase):
                     {
                         'id': 1,
                         'username': 'test',
-                        'avatar': 'https://via.placeholder.com/400x400'
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 0.0
                     }
                 ]
             }
@@ -1002,7 +1008,8 @@ class AuthTestCase(BaseTest, TestCase):
                 'avatar': 'https://via.placeholder.com/400x400',
                 'freelancer': True,
                 'skills': [],
-                'github': None
+                'github': None,
+                'level': 0.0
             }
         )
 
@@ -1029,7 +1036,8 @@ class AuthTestCase(BaseTest, TestCase):
                         'image': 'https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white'
                     }
                 ],
-                'github': None
+                'github': None,
+                'level': 0.0
             }
         )
 
@@ -1057,7 +1065,8 @@ class AuthTestCase(BaseTest, TestCase):
                         'image': 'https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white'
                     }
                 ],
-                'github': 'Counter021'
+                'github': 'Counter021',
+                'level': 0.0
             }
         )
 
@@ -1078,7 +1087,8 @@ class AuthTestCase(BaseTest, TestCase):
                 'avatar': 'https://via.placeholder.com/400x400',
                 'freelancer': True,
                 'skills': [],
-                'github': 'Counter021'
+                'github': 'Counter021',
+                'level': 0.0
             }
         )
 
@@ -1105,7 +1115,8 @@ class AuthTestCase(BaseTest, TestCase):
                 'avatar': f'{SERVER_BACKEND}{user.avatar}',
                 'freelancer': True,
                 'skills': [],
-                'github': 'Counter021'
+                'github': 'Counter021',
+                'level': 0.0
             }
         )
 
@@ -1122,7 +1133,8 @@ class AuthTestCase(BaseTest, TestCase):
                 'avatar': f'{SERVER_BACKEND}{user.avatar}',
                 'freelancer': True,
                 'skills': [],
-                'github': 'Counter021'
+                'github': 'Counter021',
+                'level': 0.0
             }
         )
 
@@ -1148,6 +1160,7 @@ class AuthTestCase(BaseTest, TestCase):
                 'avatar': 'https://via.placeholder.com/400x400',
                 'freelancer': False,
                 'skills': [],
-                'github': None
+                'github': None,
+                'level': None
             }
         )

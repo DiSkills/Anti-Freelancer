@@ -63,8 +63,12 @@ async def create_user(db: AsyncSession, schema: RegisterAdmin) -> dict[str, str]
     if await user_crud.exist(db, email=schema.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email exist')
 
+    level = None
+    if schema.freelancer:
+        level = 0
+
     del schema.confirm_password
-    await user_crud.create(db, **{**schema.dict(), 'password': get_password_hash(schema.password)})
+    await user_crud.create(db, **{**schema.dict(), 'password': get_password_hash(schema.password)}, level=level)
     return {'msg': 'User has been created'}
 
 
@@ -91,7 +95,13 @@ async def update_user(db: AsyncSession, schema: UpdateUser, user_id: int) -> dic
     if (await user_crud.exist(db, email=schema.email)) and (user.email != schema.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email exist')
 
-    user = await user_crud.update(db, {'id': user_id}, **schema.dict())
+    level = None
+    if schema.freelancer:
+        level = 0
+        if schema.level:
+            level = schema.level
+
+    user = await user_crud.update(db, {'id': user_id}, **{**schema.dict(), 'level': level})
     return {**user.__dict__, 'github': user.github.__dict__ if user.github else None}
 
 

@@ -105,6 +105,7 @@ class User(Base):
     last_login: datetime.datetime = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.utcnow, nullable=False
     )
+    level: typing.Optional[int] = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
 
     verification: typing.Union[relationship, Verification] = relationship(
         Verification, backref='user', lazy='selectin', cascade='all, delete', uselist=False,

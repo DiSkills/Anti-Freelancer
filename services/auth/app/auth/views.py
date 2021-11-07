@@ -39,8 +39,12 @@ async def register(db: AsyncSession, schema: Register) -> dict[str, str]:
     if await user_crud.exist(db, email=schema.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Email exist')
 
+    level = None
+    if schema.freelancer:
+        level = 0
+
     del schema.confirm_password
-    user = await user_crud.create(db, **{**schema.dict(), 'password': get_password_hash(schema.password)})
+    user = await user_crud.create(db, **{**schema.dict(), 'password': get_password_hash(schema.password), 'level': level})
 
     verification = await verification_crud.create(db, **VerificationCreate(user_id=user.id, link=str(uuid4())).dict())
 

@@ -16,6 +16,11 @@ class UserMinimal(BaseModel):
     avatar: typing.Optional[str]
     freelancer: bool
     is_superuser: bool
+    level: typing.Optional[int]
+
+    @validator('level')
+    def set_level(cls, level):
+        return level / 100 if level is not None else None
 
     @validator('avatar')
     def set_avatar(cls, avatar):
@@ -61,3 +66,4 @@ class UpdateUser(BaseModel):
     about: typing.Optional[str]
     freelancer: bool
     is_superuser: bool = False
+    level: int = None

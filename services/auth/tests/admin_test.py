@@ -57,6 +57,15 @@ class AdminTestCase(BaseTest, TestCase):
             'is_superuser': True,
             'is_active': True,
         }
+        user_data_2 = {
+            'password': 'Test1234!',
+            'confirm_password': 'Test1234!',
+            'username': 'test3',
+            'email': 'test3@example.com',
+            'freelancer': True,
+            'is_superuser': True,
+            'is_active': True,
+        }
         response = self.client.post(f'{self.url}/admin/user', json=user_data, headers=headers)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json(), {'msg': 'User has been created'})
@@ -65,21 +74,48 @@ class AdminTestCase(BaseTest, TestCase):
         self.assertEqual(async_loop(user_crud.get(self.session, id=2)).is_superuser, True)
         self.assertEqual(async_loop(user_crud.get(self.session, id=2)).is_active, True)
 
+        response = self.client.post(f'{self.url}/admin/user', json=user_data_2, headers=headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {'msg': 'User has been created'})
+        self.assertEqual(len(async_loop(user_crud.all(self.session))), 3)
+
         response = self.client.get(f'{self.url}/admin/user/2', headers=headers)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
-            'id': 2,
-            'github': None,
-            'username': 'test2',
-            'email': 'test2@example.com',
-            'about': None,
-            'avatar': 'https://via.placeholder.com/400x400',
-            'freelancer': False,
-            'is_superuser': True,
-            'is_active': True,
-            'date_joined': response.json()['date_joined'],
-            'last_login': response.json()['last_login'],
-        })
+        self.assertEqual(
+            response.json(), {
+                'id': 2,
+                'github': None,
+                'username': 'test2',
+                'email': 'test2@example.com',
+                'about': None,
+                'avatar': 'https://via.placeholder.com/400x400',
+                'freelancer': False,
+                'is_superuser': True,
+                'is_active': True,
+                'level': None,
+                'date_joined': response.json()['date_joined'],
+                'last_login': response.json()['last_login'],
+            }
+        )
+
+        response = self.client.get(f'{self.url}/admin/user/3', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'id': 3,
+                'github': None,
+                'username': 'test3',
+                'email': 'test3@example.com',
+                'about': None,
+                'avatar': 'https://via.placeholder.com/400x400',
+                'freelancer': True,
+                'is_superuser': True,
+                'is_active': True,
+                'level': 0.0,
+                'date_joined': response.json()['date_joined'],
+                'last_login': response.json()['last_login'],
+            }
+        )
 
     def test_get_user(self):
         self.client.post(self.url + '/register', json={**self.user_data, 'freelancer': True})
@@ -100,11 +136,13 @@ class AdminTestCase(BaseTest, TestCase):
             self.assertEqual(response.status_code, 201)
             self.assertEqual(response.json(), {'msg': 'GitHub account has been bind'})
 
-        self.client.put(self.url + '/change-data', headers=headers, json={
-            'username': 'test',
-            'email': 'test@example.com',
-            'about': 'Hello world!',
-        })
+        self.client.put(
+            self.url + '/change-data', headers=headers, json={
+                'username': 'test',
+                'email': 'test@example.com',
+                'about': 'Hello world!',
+            }
+        )
 
         file = UploadFile('image.png', content_type='image/png')
         response = self.client.post(
@@ -131,7 +169,8 @@ class AdminTestCase(BaseTest, TestCase):
             'is_active': True,
             'is_superuser': True,
             'last_login': response.json()['last_login'],
-            'username': 'test'
+            'username': 'test',
+            'level': 0.0,
         }
         self.assertEqual(response.json(), user_1)
 
@@ -148,7 +187,8 @@ class AdminTestCase(BaseTest, TestCase):
             'is_active': False,
             'is_superuser': False,
             'last_login': response.json()['last_login'],
-            'username': 'test2'
+            'username': 'test2',
+            'level': None,
         }
         self.assertEqual(response.json(), user_2)
 
@@ -186,6 +226,7 @@ class AdminTestCase(BaseTest, TestCase):
                     'avatar': 'https://via.placeholder.com/400x400',
                     'freelancer': False,
                     'is_superuser': False,
+                    'level': None,
                 },
                 {
                     'id': 2,
@@ -193,6 +234,7 @@ class AdminTestCase(BaseTest, TestCase):
                     'avatar': 'https://via.placeholder.com/400x400',
                     'freelancer': False,
                     'is_superuser': False,
+                    'level': None,
                 },
             ]
         }
@@ -211,6 +253,7 @@ class AdminTestCase(BaseTest, TestCase):
                     'avatar': 'https://via.placeholder.com/400x400',
                     'freelancer': False,
                     'is_superuser': True,
+                    'level': None,
                 },
             ]
         }
@@ -254,16 +297,19 @@ class AdminTestCase(BaseTest, TestCase):
             'is_active': True,
             'date_joined': response.json()['date_joined'],
             'last_login': response.json()['last_login'],
+            'level': None,
         }
         self.assertEqual(response.json(), response_data)
 
         # Update
-        response = self.client.put(f'{self.url}/admin/user/2', headers=headers, json={
-            'email': 'test2@example.com',
-            'about': 'Hello world!',
-            'freelancer': True,
-            'is_superuser': False,
-        })
+        response = self.client.put(
+            f'{self.url}/admin/user/2', headers=headers, json={
+                'email': 'test2@example.com',
+                'about': 'Hello world!',
+                'freelancer': True,
+                'is_superuser': False,
+            }
+        )
         self.assertEqual(response.status_code, 200)
         self.assertNotEqual(response.json(), response_data)
         response = self.client.get(f'{self.url}/admin/user/2', headers=headers)
@@ -272,33 +318,90 @@ class AdminTestCase(BaseTest, TestCase):
         self.assertEqual(response.json()['freelancer'], True)
         self.assertEqual(response.json()['is_superuser'], False)
 
-        response = self.client.put(f'{self.url}/admin/user/2', headers=headers, json={
-            'email': 'test3@example.com',
-            'about': 'Hello world!',
-            'freelancer': True,
-            'is_superuser': False,
-        })
+        response = self.client.put(
+            f'{self.url}/admin/user/2', headers=headers, json={
+                'email': 'test3@example.com',
+                'about': 'Hello world!',
+                'freelancer': True,
+                'is_superuser': False,
+            }
+        )
         self.assertEqual(response.status_code, 200)
         response = self.client.get(f'{self.url}/admin/user/2', headers=headers)
         self.assertEqual(response.json()['email'], 'test3@example.com')
         self.assertEqual(response.json()['about'], 'Hello world!')
         self.assertEqual(response.json()['freelancer'], True)
         self.assertEqual(response.json()['is_superuser'], False)
+        self.assertEqual(response.json()['level'], 0.0)
 
-        response = self.client.put(f'{self.url}/admin/user/2', headers=headers, json={
-            'email': 'test@example.com',
-            'about': 'Hello world!',
-            'freelancer': True,
-            'is_superuser': False,
-        })
+        response = self.client.put(
+            f'{self.url}/admin/user/2', headers=headers, json={
+                'email': 'test@example.com',
+                'about': 'Hello world!',
+                'freelancer': True,
+                'is_superuser': False,
+            }
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Email exist'})
 
-        response = self.client.put(f'{self.url}/admin/user/143', headers=headers, json={
-            'email': 'test@example.com',
-            'about': 'Hello world!',
-            'freelancer': True,
-            'is_superuser': False,
-        })
+        response = self.client.put(
+            f'{self.url}/admin/user/143', headers=headers, json={
+                'email': 'test@example.com',
+                'about': 'Hello world!',
+                'freelancer': True,
+                'is_superuser': False,
+            }
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'User not found'})
+
+        response = self.client.put(
+            f'{self.url}/admin/user/2', headers=headers, json={
+                'email': 'test3@example.com',
+                'about': 'Hello world!',
+                'freelancer': False,
+                'is_superuser': False,
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(f'{self.url}/admin/user/2', headers=headers)
+        self.assertEqual(response.json()['email'], 'test3@example.com')
+        self.assertEqual(response.json()['about'], 'Hello world!')
+        self.assertEqual(response.json()['freelancer'], False)
+        self.assertEqual(response.json()['is_superuser'], False)
+        self.assertEqual(response.json()['level'], None)
+
+        response = self.client.put(
+            f'{self.url}/admin/user/2', headers=headers, json={
+                'email': 'test3@example.com',
+                'about': 'Hello world!',
+                'freelancer': False,
+                'is_superuser': False,
+                'level': 200,
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(f'{self.url}/admin/user/2', headers=headers)
+        self.assertEqual(response.json()['email'], 'test3@example.com')
+        self.assertEqual(response.json()['about'], 'Hello world!')
+        self.assertEqual(response.json()['freelancer'], False)
+        self.assertEqual(response.json()['is_superuser'], False)
+        self.assertEqual(response.json()['level'], None)
+
+        response = self.client.put(
+            f'{self.url}/admin/user/2', headers=headers, json={
+                'email': 'test3@example.com',
+                'about': 'Hello world!',
+                'freelancer': True,
+                'is_superuser': False,
+                'level': 200,
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(f'{self.url}/admin/user/2', headers=headers)
+        self.assertEqual(response.json()['email'], 'test3@example.com')
+        self.assertEqual(response.json()['about'], 'Hello world!')
+        self.assertEqual(response.json()['freelancer'], True)
+        self.assertEqual(response.json()['is_superuser'], False)
+        self.assertEqual(response.json()['level'], 2.0)

@@ -96,6 +96,11 @@ class GetFreelancer(BaseModel):
     id: int
     username: str
     avatar: typing.Optional[str]
+    level: typing.Optional[int]
+
+    @validator('level')
+    def set_level(cls, level):
+        return level / 100 if level is not None else None
 
     @validator('avatar')
     def set_avatar(cls, avatar):
