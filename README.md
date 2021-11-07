@@ -15,7 +15,6 @@
 ### Ideas
 
 - [ ] Auth Service
-    - [ ] Referral registration system
     - [ ] Reviews freelancers
     - [ ] Add a level purchase for a freelancer
 - [ ] Export user data
