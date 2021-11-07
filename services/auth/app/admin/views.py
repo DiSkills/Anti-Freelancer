@@ -83,6 +83,8 @@ async def update_level(db: AsyncSession, user_id: int, level: int) -> dict[str, 
         :type level: int
         :return: User
         :rtype: dict
+        :raise HTTPException 400: User not found
+        :raise HTTPException 400: User is customer
     """
 
     if not await user_crud.exist(db, id=user_id):
