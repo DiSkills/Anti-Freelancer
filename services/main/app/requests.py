@@ -26,7 +26,15 @@ async def get_user(user_id: int) -> dict:
     return json
 
 
-async def get_server_token(session: aiohttp.ClientSession):
+async def get_server_token(session: aiohttp.ClientSession) -> str:
+    """
+        Get server access token
+        :param session: Request session
+        :type session: ClientSession
+        :return: Access Token
+        :rtype: str
+    """
+
     response = await session.post(
         url=f'{SERVER_AUTH_BACKEND}{API}/login',
         data={'username': SERVER_USER_USERNAME, 'password': SERVER_USER_PASSWORD}
