@@ -113,6 +113,7 @@ class UserPublic(UserChangeData, GetFreelancer):
     date_joined: datetime.datetime
     last_login: datetime.datetime
     freelancer: bool
+    referral_link: str
 
 
 class UserSkills(BaseModel):

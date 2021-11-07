@@ -44,6 +44,7 @@ class UserMaximal(UserMinimal):
     is_active: bool
     last_login: datetime.datetime
     date_joined: datetime.datetime
+    referral_link: str
 
 
 class UsersPaginate(Paginate):

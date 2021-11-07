@@ -95,6 +95,7 @@ class AdminTestCase(BaseTest, TestCase):
                 'level': None,
                 'date_joined': response.json()['date_joined'],
                 'last_login': response.json()['last_login'],
+                'referral_link': async_loop(user_crud.get(self.session, id=2)).referral_link
             }
         )
 
@@ -114,6 +115,7 @@ class AdminTestCase(BaseTest, TestCase):
                 'level': 0.0,
                 'date_joined': response.json()['date_joined'],
                 'last_login': response.json()['last_login'],
+                'referral_link': async_loop(user_crud.get(self.session, id=3)).referral_link
             }
         )
 
@@ -171,6 +173,7 @@ class AdminTestCase(BaseTest, TestCase):
             'last_login': response.json()['last_login'],
             'username': 'test',
             'level': 0.0,
+            'referral_link': async_loop(user_crud.get(self.session, id=1)).referral_link
         }
         self.assertEqual(response.json(), user_1)
 
@@ -189,6 +192,7 @@ class AdminTestCase(BaseTest, TestCase):
             'last_login': response.json()['last_login'],
             'username': 'test2',
             'level': None,
+            'referral_link': async_loop(user_crud.get(self.session, id=2)).referral_link
         }
         self.assertEqual(response.json(), user_2)
 
@@ -298,6 +302,7 @@ class AdminTestCase(BaseTest, TestCase):
             'date_joined': response.json()['date_joined'],
             'last_login': response.json()['last_login'],
             'level': None,
+            'referral_link': async_loop(user_crud.get(self.session, id=2)).referral_link
         }
         self.assertEqual(response.json(), response_data)
 

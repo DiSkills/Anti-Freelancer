@@ -1,5 +1,6 @@
 import io
 import os
+import random
 import typing
 from datetime import datetime
 from uuid import uuid4
@@ -21,13 +22,15 @@ from app.tokens import create_login_tokens, verify_token, create_access_token, c
 from config import SERVER_BACKEND, API, MEDIA_ROOT, social_auth, redirect_url, PROJECT_NAME
 
 
-async def register(db: AsyncSession, schema: Register) -> dict[str, str]:
+async def register(db: AsyncSession, schema: Register, link: typing.Optional[str]) -> dict[str, str]:
     """
         Register
         :param db: DB
         :type db: AsyncSession
         :param schema: Register data
         :type schema: Register
+        :param link: Referral link
+        :type link: str
         :return: Message
         :rtype: dict
         :raise HTTPException 400: Username or email exist
@@ -43,8 +46,31 @@ async def register(db: AsyncSession, schema: Register) -> dict[str, str]:
     if schema.freelancer:
         level = 0
 
+        if link:
+            if await user_crud.exist(db, referral_link=link):
+                referral_user = await user_crud.get(db, referral_link=link)
+
+                if not referral_user.freelancer:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail='Bad referral link. Referral user is customer'
+                    )
+
+                await user_crud.update(db, {'referral_link': link}, level=referral_user.level + random.randint(70, 100))
+                level = random.randint(70, 100)
+            else:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Bad referral link')
+    elif link:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Customer can not register by referral link'
+        )
+
     del schema.confirm_password
-    user = await user_crud.create(db, **{**schema.dict(), 'password': get_password_hash(schema.password), 'level': level})
+    user = await user_crud.create(
+        db,
+        **{**schema.dict(), 'password': get_password_hash(schema.password), 'level': level}
+    )
 
     verification = await verification_crud.create(db, **VerificationCreate(user_id=user.id, link=str(uuid4())).dict())
 

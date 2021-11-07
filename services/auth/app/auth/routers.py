@@ -1,3 +1,5 @@
+import typing
+
 from fastapi import APIRouter, Depends, status, Form, Request, UploadFile, File, Query
 from fastapi.responses import StreamingResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,8 +34,12 @@ auth_router = APIRouter()
     response_model=Message,
     tags=['auth'],
 )
-async def register(schema: Register, db: AsyncSession = Depends(get_db)):
-    return await views.register(db, schema)
+async def register(
+    schema: Register,
+    link: typing.Optional[str] = Query(default=None),
+    db: AsyncSession = Depends(get_db)
+):
+    return await views.register(db, schema, link)
 
 
 @auth_router.get(

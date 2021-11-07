@@ -106,6 +106,7 @@ class User(Base):
         sqlalchemy.DateTime, default=datetime.datetime.utcnow, nullable=False
     )
     level: typing.Optional[int] = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    referral_link: str = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
 
     verification: typing.Union[relationship, Verification] = relationship(
         Verification, backref='user', lazy='selectin', cascade='all, delete', uselist=False,

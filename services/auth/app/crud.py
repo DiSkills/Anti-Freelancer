@@ -1,3 +1,5 @@
+import uuid
+
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,6 +10,16 @@ from crud import CRUD
 
 class UserCRUD(CRUD[User, Register, Register]):
     """ User CRUD """
+
+    async def create(self, db: AsyncSession, **kwargs) -> User:
+        """
+            Create user
+            :param db: DB
+            :type db: AsyncSession
+            :param kwargs: kwargs
+            :return: New user
+        """
+        return await super().create(db, referral_link=f'{uuid.uuid4()}', **kwargs)
 
     @staticmethod
     async def get_by_ids(db: AsyncSession, ids: list[int]) -> list[User]:

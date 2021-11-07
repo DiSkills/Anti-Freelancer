@@ -26,6 +26,7 @@
     - [x] Filter by freelancers levels
     - [x] Update level for freelancer
     - [x] Registration
+    - [x] Referral registration system
     - [x] Login
     - [x] Activation account
     - [x] Refresh access token

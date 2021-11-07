@@ -350,6 +350,59 @@ class AuthTestCase(BaseTest, TestCase):
 
         self.assertEqual(async_loop(verification_crud.get(self.session, id=1)).user_id, 1)
         self.assertEqual(async_loop(user_crud.get(self.session, id=1)).freelancer, False)
+        self.assertEqual(async_loop(user_crud.get(self.session, id=1)).level, None)
+
+        response = self.client.post(
+            f'{self.url}/register',
+            json={**self.user_data, 'username': 'test2', 'email': 'test2@example.com', 'freelancer': True}
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {'msg': 'Send email for activate your account'})
+        self.assertEqual(len(async_loop(user_crud.all(self.session))), 2)
+        self.assertEqual(len(async_loop(verification_crud.all(self.session))), 2)
+        self.assertEqual(async_loop(verification_crud.get(self.session, id=2)).user_id, 2)
+        self.assertEqual(async_loop(user_crud.get(self.session, id=2)).freelancer, True)
+        self.assertEqual(async_loop(user_crud.get(self.session, id=2)).level, 0)
+
+        # Referral register
+
+        response = self.client.post(
+            f'{self.url}/register?link=Hello world!',
+            json={**self.user_data, 'username': 'test3', 'email': 'test3@example.com', 'freelancer': True}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Bad referral link'})
+
+        response = self.client.post(
+            f'{self.url}/register?link={async_loop(user_crud.get(self.session, id=1)).referral_link}',
+            json={**self.user_data, 'username': 'test3', 'email': 'test3@example.com', 'freelancer': True}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Bad referral link. Referral user is customer'})
+
+        self.assertEqual(async_loop(user_crud.get(self.session, id=2)).level, 0)
+        response = self.client.post(
+            f'{self.url}/register?link={async_loop(user_crud.get(self.session, id=2)).referral_link}',
+            json={**self.user_data, 'username': 'test3', 'email': 'test3@example.com', 'freelancer': True}
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json(), {'msg': 'Send email for activate your account'})
+        self.assertNotEqual(async_loop(user_crud.get(self.session, id=2)).level, 0)
+        self.assertNotEqual(async_loop(user_crud.get(self.session, id=3)).level, 0)
+
+        response = self.client.post(
+            f'{self.url}/register?link={async_loop(user_crud.get(self.session, id=1)).referral_link}',
+            json={**self.user_data, 'username': 'test4', 'email': 'test4@example.com', 'freelancer': False}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Customer can not register by referral link'})
+
+        response = self.client.post(
+            f'{self.url}/register?link={async_loop(user_crud.get(self.session, id=2)).referral_link}',
+            json={**self.user_data, 'username': 'test5', 'email': 'test5@example.com', 'freelancer': False}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Customer can not register by referral link'})
 
     def test_verification(self):
         self.client.post(f'{self.url}/register', json={**self.user_data, 'freelancer': True})
