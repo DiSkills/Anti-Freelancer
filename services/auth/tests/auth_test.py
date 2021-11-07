@@ -85,6 +85,45 @@ class AuthTestCase(BaseTest, TestCase):
             }
         )
 
+        async_loop(user_crud.update(self.session, {'id': 1}, level=10000))
+        async_loop(user_crud.update(self.session, {'id': 2}, level=1000))
+
+        response = self.client.get(f'{self.url}/freelancers?page=1&page_size=1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'next': 'http://localhost:8000/api/v1/freelancers?page=2&page_size=1',
+                'previous': None,
+                'page': 1,
+                'results': [
+                    {
+                        'id': 1,
+                        'username': 'test',
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 100.0,
+                    }
+                ]
+            }
+        )
+
+        response = self.client.get(f'{self.url}/freelancers?page=2&page_size=1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'next': None,
+                'previous': 'http://localhost:8000/api/v1/freelancers?page=1&page_size=1',
+                'page': 2,
+                'results': [
+                    {
+                        'id': 2,
+                        'username': 'test2',
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 10.0,
+                    }
+                ]
+            }
+        )
+
     def test_search_freelancers(self):
         self.client.post(f'{self.url}/register', json={**self.user_data, 'freelancer': True})
         self.client.post(
@@ -173,6 +212,89 @@ class AuthTestCase(BaseTest, TestCase):
                         'username': 'test',
                         'avatar': 'https://via.placeholder.com/400x400',
                         'level': 0.0
+                    }
+                ]
+            }
+        )
+
+        async_loop(user_crud.update(self.session, {'id': 1}, level=10000))
+        async_loop(user_crud.update(self.session, {'id': 2}, level=1000))
+
+        response = self.client.get(f'{self.url}/freelancers/search?page=1&page_size=1&search=f')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+        response = self.client.get(f'{self.url}/freelancers/search?page=1&page_size=1&search=admin')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+        response = self.client.get(f'{self.url}/freelancers/search?page=1&page_size=1&search=test')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'next': 'http://localhost:8000/api/v1/freelancers/search?page=2&page_size=1&search=test',
+                'previous': None,
+                'page': 1,
+                'results': [
+                    {
+                        'id': 1,
+                        'username': 'test',
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 100.0
+                    }
+                ]
+            }
+        )
+
+        response = self.client.get(f'{self.url}/freelancers/search?page=2&page_size=1&search=test')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'next': None,
+                'previous': 'http://localhost:8000/api/v1/freelancers/search?page=1&page_size=1&search=test',
+                'page': 2,
+                'results': [
+                    {
+                        'id': 2,
+                        'username': 'test2',
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 10.0
+                    }
+                ]
+            }
+        )
+
+        response = self.client.get(f'{self.url}/freelancers/search?page=1&page_size=1&search=TeSt')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'next': 'http://localhost:8000/api/v1/freelancers/search?page=2&page_size=1&search=TeSt',
+                'previous': None,
+                'page': 1,
+                'results': [
+                    {
+                        'id': 1,
+                        'username': 'test',
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 100.0
+                    }
+                ]
+            }
+        )
+
+        response = self.client.get(f'{self.url}/freelancers/search?page=2&page_size=1&search=TeSt')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(), {
+                'next': None,
+                'previous': 'http://localhost:8000/api/v1/freelancers/search?page=1&page_size=1&search=TeSt',
+                'page': 2,
+                'results': [
+                    {
+                        'id': 2,
+                        'username': 'test2',
+                        'avatar': 'https://via.placeholder.com/400x400',
+                        'level': 10.0
                     }
                 ]
             }

@@ -21,7 +21,8 @@
 - [x] Create superuser
 - [x] Get media
 - [x] Docker
-- [x] Auth
+- [ ] Auth
+    - [ ] Freelancers Levels
     - [x] Registration
     - [x] Login
     - [x] Activation account

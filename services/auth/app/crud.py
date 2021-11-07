@@ -27,7 +27,8 @@ class UserCRUD(CRUD[User, Register, Register]):
         )
         return query.scalars().all()
 
-    async def freelancers(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> list[User]:
+    @staticmethod
+    async def freelancers(db: AsyncSession, skip: int = 0, limit: int = 100) -> list[User]:
         """
             Freelancers
             :param db: DB
@@ -39,9 +40,15 @@ class UserCRUD(CRUD[User, Register, Register]):
             :return: Freelancers
             :rtype: list
         """
-        return await super().filter(db, skip, limit, freelancer=True)
+        query = await db.execute(
+            sqlalchemy.select(User).filter_by(
+                freelancer=True
+            ).order_by(User.level.desc(), User.id.desc()).offset(skip).limit(limit)
+        )
+        return query.scalars().all()
 
-    async def freelancers_exist(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> bool:
+    @staticmethod
+    async def freelancers_exist(db: AsyncSession, skip: int = 0, limit: int = 100) -> bool:
         """
             Freelancers exist?
             :param db: DB
@@ -53,7 +60,14 @@ class UserCRUD(CRUD[User, Register, Register]):
             :return: Freelancers exist?
             :rtype: bool
         """
-        return await super().exist_page(db, skip, limit, freelancer=True)
+        query = await db.execute(
+            sqlalchemy.exists(
+                sqlalchemy.select(User.id).filter_by(freelancer=True).order_by(
+                    User.level.desc(), User.id.desc()
+                ).offset(skip).limit(limit)
+            ).select()
+        )
+        return query.scalar()
 
     @staticmethod
     async def search(db: AsyncSession, search: str, skip: int = 0, limit: int = 100) -> list[User]:
@@ -76,7 +90,7 @@ class UserCRUD(CRUD[User, Register, Register]):
                     User.username.ilike(f'%{search}%'),
                     User.freelancer == True,
                 ),
-            ).order_by(User.id.desc()).offset(skip).limit(limit)
+            ).order_by(User.level.desc(), User.id.desc()).offset(skip).limit(limit)
         )
         return query.scalars().all()
 
@@ -102,7 +116,7 @@ class UserCRUD(CRUD[User, Register, Register]):
                         User.username.ilike(f'%{search}%'),
                         User.freelancer == True,
                     ),
-                ).order_by(User.id.desc()).offset(skip).limit(limit)
+                ).order_by(User.level.desc(), User.id.desc()).offset(skip).limit(limit)
             ).select()
         )
         return query.scalar()
