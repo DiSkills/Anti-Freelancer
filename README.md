@@ -3,7 +3,7 @@
 ## TODO
 
 - [ ] Services
-    - [ ] Auth
+    - [x] Auth
     - [x] Main
     - [x] Email
     - [x] Messenger

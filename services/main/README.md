@@ -57,6 +57,7 @@
     - [x] Add attachments
     - [x] Get attachment file
     - [x] Remove attachments
+    - [x] Level up when job has been completed
 - [x] Tests
     - [x] Categories
         - [x] Get all
