@@ -66,4 +66,4 @@ class UpdateUser(BaseModel):
     about: typing.Optional[str]
     freelancer: bool
     is_superuser: bool = False
-    level: int = None
+    level: typing.Optional[int] = None
