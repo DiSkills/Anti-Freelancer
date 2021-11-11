@@ -4,7 +4,7 @@ from app.crud import dialogue_crud
 from tests import BaseTest, async_loop
 
 
-class MessageTestCase(BaseTest, TestCase):
+class DialogueTestCase(BaseTest, TestCase):
 
     def setUp(self) -> None:
         super().setUp()
