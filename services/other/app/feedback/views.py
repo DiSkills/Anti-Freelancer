@@ -30,4 +30,16 @@ async def create_feedback(db: AsyncSession, user_id: int, schema: CreateFeedback
     f'{SERVER_OTHER_BACKEND}{API}/feedbacks/',
 )
 async def get_all_feedbacks(*, db: AsyncSession, page: int, page_size: int, queryset: list[Feedback]):
+    """
+        Get all feedbacks
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param queryset: Feedbacks
+        :type queryset: list
+        :return: Feedbacks
+    """
     return (feedback.__dict__ for feedback in queryset)
