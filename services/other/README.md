@@ -12,10 +12,22 @@
     - [x] Is freelancer
 - [x] Feedbacks
     - [x] Create
-    - [x] Update
-    - [x] Delete
     - [x] Get all (paginate)
     - [x] Get
+    - [x] Update
+    - [x] Delete
+- [ ] Advertisement
+    - [ ] Create
+    - [ ] Get all (paginate)
+    - [ ] Get
+    - [ ] Update
+    - [ ] Delete
+- [ ] Review
+    - [ ] Create
+    - [ ] Get all (paginate)
+    - [ ] Get
+    - [ ] Update
+    - [ ] Delete
 - [ ] Tests
     - [x] Feedbacks
         - [x] Create
@@ -23,3 +35,15 @@
         - [x] Get
         - [x] Update
         - [x] Delete
+    - [ ] Advertisement
+        - [ ] Create
+        - [ ] Get all (paginate)
+        - [ ] Get
+        - [ ] Update
+        - [ ] Delete
+    - [ ] Review
+        - [ ] Create
+        - [ ] Get all (paginate)
+        - [ ] Get
+        - [ ] Update
+        - [ ] Delete
