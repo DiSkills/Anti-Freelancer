@@ -12,6 +12,7 @@ SERVER_MESSENGER_BACKEND = 'http://localhost:8002/'
 SERVER_EMAIL = 'http://localhost:8003/'
 
 API = 'api/v1'
+SERVER_OTHER_BACKEND = 'http://localhost:8004/'
 CLIENT_NAME = 'other'
 
 LOGIN_URL = f'{SERVER_AUTH_BACKEND}{API}/login'
