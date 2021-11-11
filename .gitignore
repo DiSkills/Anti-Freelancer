@@ -15,3 +15,6 @@
 /services/email/venv/
 /services/email/.idea/
 /services/email/config.env
+/services/other/venv/
+/services/other/.idea/
+/services/other/config.env
