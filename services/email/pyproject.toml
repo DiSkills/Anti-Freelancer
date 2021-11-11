@@ -9,7 +9,7 @@ python = "^3.9"
 fastapi = {version = "0.68.1", extras = ["all"]}
 celery = "^5.1.2"
 redis = "^3.5.3"
-SQLAlchemy = {extras = ["asyncio"], version = "^1.4.26"}
+SQLAlchemy = {extras = ["asyncio"], version = "^1.4.25"}
 asyncpg = "^0.24.0"
 psycopg2-binary = "^2.9.1"
 alembic = "^1.7.4"
