@@ -28,6 +28,9 @@ DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT
 
 MEDIA_ROOT = 'media/'
 
+COMPLETED = True
+NEW = False
+
 if int(DOCKER):
     SERVER_AUTH_BACKEND = 'http://auth:8000/'
     SERVER_MAIN_BACKEND = 'http://main:8001/'

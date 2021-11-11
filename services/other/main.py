@@ -3,7 +3,8 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import PROJECT_NAME, DOCKER, MEDIA_ROOT
+from app.feedback.routers import feedbacks_router
+from config import PROJECT_NAME, DOCKER, MEDIA_ROOT, API
 from db import engine, Base
 
 app = FastAPI(
@@ -31,3 +32,6 @@ async def startup():
 
     if not os.path.exists(MEDIA_ROOT):
         os.makedirs(MEDIA_ROOT)
+
+
+app.include_router(feedbacks_router, prefix=f'/{API}/feedbacks')
