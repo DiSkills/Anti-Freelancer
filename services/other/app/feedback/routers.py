@@ -71,3 +71,17 @@ async def get_feedback(pk: int, db: AsyncSession = Depends(get_db)):
 )
 async def update_feedback(pk: int, schema: UpdateFeedback, db: AsyncSession = Depends(get_db)):
     return await views.update_feedback(db, pk, schema)
+
+
+@feedbacks_router.delete(
+    '/{pk}',
+    name='Delete feedback',
+    description='Delete feedback',
+    response_description='Message',
+    response_model=Message,
+    status_code=status.HTTP_200_OK,
+    tags=['feedbacks'],
+    dependencies=[Depends(is_superuser)],
+)
+async def delete_feedback(pk: int, db: AsyncSession = Depends(get_db)):
+    return await views.delete_feedback(db, pk)

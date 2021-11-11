@@ -10,15 +10,16 @@
     - [x] Is superuser
     - [x] Is customer
     - [x] Is freelancer
-- [ ] Feedbacks
+- [x] Feedbacks
     - [x] Create
     - [x] Update
-    - [ ] Delete
+    - [x] Delete
     - [x] Get all (paginate)
     - [x] Get
 - [ ] Tests
-    - [ ] Feedbacks
+    - [x] Feedbacks
         - [x] Create
         - [x] Get all (paginate)
         - [x] Get
         - [x] Update
+        - [x] Delete

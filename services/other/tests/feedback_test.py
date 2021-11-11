@@ -165,3 +165,18 @@ class FeedbackTestCase(BaseTest, TestCase):
                 )
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.json(), {'detail': 'Feedback not found'})
+
+        # Delete
+        self.assertEqual(len(async_loop(feedback_crud.all(self.session))), 2)
+        self.assertEqual(async_loop(feedback_crud.exist(self.session, id=1)), True)
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            response = self.client.delete(f'{self.url}/feedbacks/1', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Feedback has been deleted'})
+            self.assertEqual(len(async_loop(feedback_crud.all(self.session))), 1)
+            self.assertEqual(async_loop(feedback_crud.exist(self.session, id=1)), False)
+
+            response = self.client.delete(f'{self.url}/feedbacks/143', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Feedback not found'})
+            self.assertEqual(len(async_loop(feedback_crud.all(self.session))), 1)

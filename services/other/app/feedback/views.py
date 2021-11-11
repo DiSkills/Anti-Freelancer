@@ -92,3 +92,21 @@ async def update_feedback(db: AsyncSession, pk: int, schema: UpdateFeedback) -> 
     feedback = await feedback_crud.update(db, {'id': pk}, **schema.dict())
     user = await requests.get_user(feedback.user_id)
     return {**feedback.__dict__, 'user': user}
+
+
+async def delete_feedback(db: AsyncSession, pk: int) -> dict[str, str]:
+    """
+        Delete feedback
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Feedback ID
+        :type pk: int
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Feedback not found
+    """
+
+    if not await feedback_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Feedback not found')
+    await feedback_crud.remove(db, id=pk)
+    return {'msg': 'Feedback has been deleted'}
