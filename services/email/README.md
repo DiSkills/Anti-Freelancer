@@ -13,10 +13,25 @@
 ![Celery](https://img.shields.io/badge/-Celery-%2300C7B7?style=for-the-badge&logo=Celery)
 
 # TODO
+
 - [x] Logger errors in file
 - [x] Docker
-- [x] Email
-  - [x] Celery email send
-  - [x] Checking the token for compliance with the user id
+- [x] Mail
+    - [x] Celery email send
+- [x] Client
+    - [x] Create
+    - [x] Get all
+    - [x] Get
+    - [x] Get or create
+    - [x] Update
+    - [x] Delete
 - [x] Tests
-  - [x] Send email
+    - [x] Mail
+        - [x] Send email
+    - [x] Client
+        - [x] Create
+        - [x] Get all
+        - [x] Get
+        - [x] Get or create
+        - [x] Update
+        - [x] Delete
