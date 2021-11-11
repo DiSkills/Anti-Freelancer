@@ -43,3 +43,17 @@ async def get_all_feedbacks(
     db: AsyncSession = Depends(get_db),
 ):
     return await views.get_all_feedbacks(db=db, page=page, page_size=page_size)
+
+
+@feedbacks_router.get(
+    '/{pk}',
+    name='Get feedback',
+    description='Get feedback',
+    response_description='Feedback',
+    response_model=GetFeedback,
+    status_code=status.HTTP_200_OK,
+    tags=['feedbacks'],
+    dependencies=[Depends(is_superuser)],
+)
+async def get_feedback(pk: int, db: AsyncSession = Depends(get_db)):
+    return await views.get_feedback(db, pk)

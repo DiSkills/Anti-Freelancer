@@ -15,8 +15,9 @@
     - [ ] Update
     - [ ] Delete
     - [x] Get all (paginate)
-    - [ ] Get
+    - [x] Get
 - [ ] Tests
     - [ ] Feedbacks
         - [x] Create
         - [x] Get all (paginate)
+        - [x] Get
