@@ -10,7 +10,7 @@
     - [x] Is superuser
     - [x] Is customer
     - [x] Is freelancer
-- [x] Feedbacks
+- [x] Feedback
     - [x] Create
     - [x] Get all (paginate)
     - [x] Get
@@ -29,7 +29,7 @@
     - [ ] Update
     - [ ] Delete
 - [ ] Tests
-    - [x] Feedbacks
+    - [x] Feedback
         - [x] Create
         - [x] Get all (paginate)
         - [x] Get
