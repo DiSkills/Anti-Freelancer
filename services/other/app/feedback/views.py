@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import requests
 from app.crud import feedback_crud
-from app.feedback.schemas import CreateFeedback
+from app.feedback.schemas import CreateFeedback, UpdateFeedback
 from app.models import Feedback
 from app.service import paginate
 from config import SERVER_OTHER_BACKEND, API
@@ -66,8 +66,29 @@ async def get_feedback(db: AsyncSession, pk: int) -> dict:
         :raise HTTPException 400: Feedback not found
     """
 
-    if not await feedback_crud.exist_page(db, id=pk):
+    if not await feedback_crud.exist(db, id=pk):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Feedback not found')
     feedback = await feedback_crud.get(db, id=pk)
+    user = await requests.get_user(feedback.user_id)
+    return {**feedback.__dict__, 'user': user}
+
+
+async def update_feedback(db: AsyncSession, pk: int, schema: UpdateFeedback) -> dict:
+    """
+        Update feedback
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Feedback ID
+        :type pk: int
+        :param schema: New feedback data
+        :type schema: UpdateFeedback
+        :return: Feedback
+        :rtype: dict
+        :raise HTTPException 400: Feedback not found
+    """
+
+    if not await feedback_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Feedback not found')
+    feedback = await feedback_crud.update(db, {'id': pk}, **schema.dict())
     user = await requests.get_user(feedback.user_id)
     return {**feedback.__dict__, 'user': user}

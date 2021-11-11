@@ -12,7 +12,7 @@
     - [x] Is freelancer
 - [ ] Feedbacks
     - [x] Create
-    - [ ] Update
+    - [x] Update
     - [ ] Delete
     - [x] Get all (paginate)
     - [x] Get
@@ -21,3 +21,4 @@
         - [x] Create
         - [x] Get all (paginate)
         - [x] Get
+        - [x] Update

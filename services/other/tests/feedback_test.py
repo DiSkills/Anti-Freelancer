@@ -106,3 +106,62 @@ class FeedbackTestCase(BaseTest, TestCase):
                         )
                     }
                 )
+
+        # Update
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            with mock.patch(
+                    'app.requests.get_user_request',
+                    return_value=self.get_new_user(3)
+            ) as _:
+                response = self.client.get(f'{self.url}/feedbacks/1', headers=headers)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    response.json(),
+                    {
+                        'id': 1, 'status': False, 'text': 'Hello world!', 'user': self.get_new_user(3),
+                        'created_at': f'{async_loop(feedback_crud.get(self.session, id=1)).created_at}Z'.replace(
+                            ' ',
+                            'T'
+                        )
+                    }
+                )
+                old = response.json()
+
+                response = self.client.put(
+                    f'{self.url}/feedbacks/1',
+                    headers=headers,
+                    json={'status': True, 'text': 'Hello python!'}
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    response.json(),
+                    {
+                        'id': 1, 'status': True, 'text': 'Hello python!', 'user': self.get_new_user(3),
+                        'created_at': f'{async_loop(feedback_crud.get(self.session, id=1)).created_at}Z'.replace(
+                            ' ',
+                            'T'
+                        )
+                    }
+                )
+                self.assertNotEqual(response.json(), old)
+
+                response = self.client.get(f'{self.url}/feedbacks/1', headers=headers)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    response.json(),
+                    {
+                        'id': 1, 'status': True, 'text': 'Hello python!', 'user': self.get_new_user(3),
+                        'created_at': f'{async_loop(feedback_crud.get(self.session, id=1)).created_at}Z'.replace(
+                            ' ',
+                            'T'
+                        )
+                    }
+                )
+
+                response = self.client.put(
+                    f'{self.url}/feedbacks/143',
+                    json={'status': False, 'text': 'GG'},
+                    headers=headers,
+                )
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Feedback not found'})

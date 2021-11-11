@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.feedback import views
-from app.feedback.schemas import CreateFeedback, GetFeedback, PaginateFeedbacks
+from app.feedback.schemas import CreateFeedback, GetFeedback, PaginateFeedbacks, UpdateFeedback
 from app.permission import is_active, is_superuser
 from app.schemas import Message
 from db import get_db
@@ -57,3 +57,17 @@ async def get_all_feedbacks(
 )
 async def get_feedback(pk: int, db: AsyncSession = Depends(get_db)):
     return await views.get_feedback(db, pk)
+
+
+@feedbacks_router.put(
+    '/{pk}',
+    name='Update feedback',
+    description='Update feedback',
+    response_description='Feedback',
+    response_model=GetFeedback,
+    status_code=status.HTTP_200_OK,
+    tags=['feedbacks'],
+    dependencies=[Depends(is_superuser)],
+)
+async def update_feedback(pk: int, schema: UpdateFeedback, db: AsyncSession = Depends(get_db)):
+    return await views.update_feedback(db, pk, schema)

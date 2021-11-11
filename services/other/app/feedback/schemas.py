@@ -11,11 +11,16 @@ class CreateFeedback(BaseModel):
     text: str
 
 
-class GetFeedback(CreateFeedback):
+class UpdateFeedback(CreateFeedback):
+    """ Update feedback """
+
+    status: bool
+
+
+class GetFeedback(UpdateFeedback):
     """ Get feedback """
 
     id: int
-    status: bool
     created_at: datetime.datetime
     user: UserData
 
