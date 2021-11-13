@@ -46,6 +46,25 @@ async def get_all_feedbacks(
 
 
 @feedbacks_router.get(
+    '/sort',
+    name='Sort feedbacks',
+    description='Sort feedbacks',
+    response_description='Feedbacks',
+    response_model=PaginateFeedbacks,
+    status_code=status.HTTP_200_OK,
+    tags=['feedbacks'],
+    dependencies=[Depends(is_superuser)],
+)
+async def sort_feedbacks(
+    desc: bool,
+    page: int = Query(default=1, gt=0),
+    page_size: int = Query(default=1, gt=0),
+    db: AsyncSession = Depends(get_db),
+):
+    return await views.sort_feedbacks(db=db, page=page, page_size=page_size, desc=desc)
+
+
+@feedbacks_router.get(
     '/{pk}',
     name='Get feedback',
     description='Get feedback',

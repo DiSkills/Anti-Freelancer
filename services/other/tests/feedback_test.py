@@ -166,6 +166,113 @@ class FeedbackTestCase(BaseTest, TestCase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.json(), {'detail': 'Feedback not found'})
 
+        # Sort
+        self.assertEqual(len(async_loop(feedback_crud.all(self.session))), 2)
+
+        # Desc
+        with mock.patch(
+                'app.requests.get_users_request',
+                return_value={'1': self.get_new_user(1), '3': self.get_new_user(3)}
+        ) as _:
+            with mock.patch('app.permission.permission', return_value=1) as _:
+                response = self.client.get(
+                    f'{self.url}/feedbacks/sort?page=1&page_size=1&desc=true',
+                    headers=headers
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json()['results']), 1)
+                self.assertEqual(
+                    response.json()['next'],
+                    f'{SERVER_OTHER_BACKEND}{API}/feedbacks/sort?page=2&page_size=1&desc=True'
+                )
+                self.assertEqual(response.json()['page'], 1)
+                self.assertEqual(response.json()['previous'], None)
+                self.assertEqual(response.json()['results'][0]['id'], 1)
+                self.assertEqual(response.json()['results'][0]['user'], self.get_new_user(3))
+
+                response = self.client.get(
+                    f'{self.url}/feedbacks/sort?page=2&page_size=1&desc=True',
+                    headers=headers
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json()['results']), 1)
+                self.assertEqual(response.json()['next'], None)
+                self.assertEqual(response.json()['page'], 2)
+                self.assertEqual(
+                    response.json()['previous'],
+                    f'{SERVER_OTHER_BACKEND}{API}/feedbacks/sort?page=1&page_size=1&desc=True'
+                )
+                self.assertEqual(response.json()['results'][0]['id'], 2)
+                self.assertEqual(response.json()['results'][0]['user'], self.get_new_user(1))
+
+                response = self.client.get(
+                    f'{self.url}/feedbacks/sort?page=3&page_size=1&desc=True',
+                    headers=headers
+                )
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+                response = self.client.get(
+                    f'{self.url}/feedbacks/sort?page=1&page_size=11&desc=True',
+                    headers=headers
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json()['results']), 2)
+                self.assertEqual(response.json()['results'][0]['id'], 1)
+                self.assertEqual(response.json()['results'][1]['id'], 2)
+
+        # ASC
+        with mock.patch(
+                'app.requests.get_users_request',
+                return_value={'1': self.get_new_user(1), '3': self.get_new_user(3)}
+        ) as _:
+            with mock.patch('app.permission.permission', return_value=1) as _:
+                response = self.client.get(
+                    f'{self.url}/feedbacks/sort?page=1&page_size=1&desc=false',
+                    headers=headers
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json()['results']), 1)
+                self.assertEqual(
+                    response.json()['next'],
+                    f'{SERVER_OTHER_BACKEND}{API}/feedbacks/sort?page=2&page_size=1&desc=False'
+                )
+                self.assertEqual(response.json()['page'], 1)
+                self.assertEqual(response.json()['previous'], None)
+                self.assertEqual(response.json()['results'][0]['id'], 2)
+                self.assertEqual(response.json()['results'][0]['user'], self.get_new_user(1))
+
+                response = self.client.get(
+                    f'{self.url}/feedbacks/sort?page=2&page_size=1&desc=False',
+                    headers=headers
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json()['results']), 1)
+                self.assertEqual(response.json()['next'], None)
+                self.assertEqual(response.json()['page'], 2)
+                self.assertEqual(
+                    response.json()['previous'],
+                    f'{SERVER_OTHER_BACKEND}{API}/feedbacks/sort?page=1&page_size=1&desc=False'
+                )
+                self.assertEqual(response.json()['results'][0]['id'], 1)
+                self.assertEqual(response.json()['results'][0]['user'], self.get_new_user(3))
+
+                response = self.client.get(
+                    f'{self.url}/feedbacks/sort?page=3&page_size=1&desc=False',
+                    headers=headers
+                )
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), {'detail': 'Results not found'})
+
+                response = self.client.get(
+                    f'{self.url}/feedbacks/sort?page=1&page_size=11&desc=False',
+                    headers=headers
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(response.json()['results']), 2)
+                self.assertEqual(response.json()['results'][0]['id'], 2)
+                self.assertEqual(response.json()['results'][1]['id'], 1)
+
         # Delete
         self.assertEqual(len(async_loop(feedback_crud.all(self.session))), 2)
         self.assertEqual(async_loop(feedback_crud.exist(self.session, id=1)), True)

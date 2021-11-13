@@ -13,6 +13,7 @@
 - [x] Feedback
     - [x] Create
     - [x] Get all (paginate)
+    - [x] Sorting
     - [x] Get
     - [x] Update
     - [x] Delete
@@ -32,6 +33,7 @@
     - [x] Feedback
         - [x] Create
         - [x] Get all (paginate)
+        - [x] Sorting
         - [x] Get
         - [x] Update
         - [x] Delete

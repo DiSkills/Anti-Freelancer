@@ -54,6 +54,38 @@ async def get_all_feedbacks(*, db: AsyncSession, page: int, page_size: int, quer
     )
 
 
+@paginate(
+    feedback_crud.sorting,
+    feedback_crud.exist_sorting,
+    f'{SERVER_OTHER_BACKEND}{API}/feedbacks/sort',
+    'desc',
+)
+async def sort_feedbacks(*, db: AsyncSession, page: int, page_size: int, queryset: list[Feedback], desc: bool):
+    """
+        Sort feedbacks
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param queryset: Feedbacks
+        :type queryset: list
+        :param desc: Sort is DESC?
+        :type desc: bool
+        :return: Feedbacks
+    """
+
+    ids = [feedback.user_id for feedback in queryset]
+    users = await requests.get_users(ids)
+    return (
+        {
+            **feedback.__dict__,
+            'user': users[f'{feedback.user_id}'],
+        } for feedback in queryset
+    )
+
+
 async def get_feedback(db: AsyncSession, pk: int) -> dict:
     """
         Get feedback
