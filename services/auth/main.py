@@ -7,6 +7,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.admin.routers import admin_router
 from app.auth.routers import auth_router
+from app.payments.routers import payments_router
 from app.routers import permission_router
 from app.skills.routers import skills_router
 from config import PROJECT_NAME, API, MEDIA_ROOT, ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL, SECRET_KEY, DOCKER
@@ -71,3 +72,4 @@ app.include_router(admin_router, prefix=f'/{API}/admin')
 app.include_router(auth_router, prefix=f'/{API}')
 app.include_router(permission_router, prefix=f'/{API}')
 app.include_router(skills_router, prefix=f'/{API}/skills')
+app.include_router(payments_router, prefix=f'/{API}')

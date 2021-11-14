@@ -123,3 +123,24 @@ class User(Base):
 
     def __repr__(self):
         return f'<User {self.username}>'
+
+
+class Payment(Base):
+    """ Payment """
+
+    __tablename__ = 'payment'
+
+    id: int = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    uuid: str = sqlalchemy.Column(sqlalchemy.String, unique=True, nullable=False)
+    amount: int = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
+    comment: str = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    user_id: int = sqlalchemy.Column(
+        sqlalchemy.Integer, sqlalchemy.ForeignKey('user.id', ondelete='CASCADE'), nullable=False,
+    )
+    is_completed: bool = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+
+    def __str__(self):
+        return f'<Payment {self.id}>'
+
+    def __repr__(self):
+        return f'<Payment {self.id}>'

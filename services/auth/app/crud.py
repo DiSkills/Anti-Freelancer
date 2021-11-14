@@ -4,7 +4,7 @@ import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import Register, VerificationCreate
-from app.models import User, Verification, GitHub, Skill, UserSkill
+from app.models import User, Verification, GitHub, Skill, UserSkill, Payment
 from crud import CRUD
 
 
@@ -172,8 +172,14 @@ class UserSkillCRUD(CRUD[UserSkill, UserSkill, UserSkill]):
     pass
 
 
+class PaymentCRUD(CRUD[Payment, Payment, Payment]):
+    """ Payment CRUD """
+    pass
+
+
 user_crud = UserCRUD(User)
 verification_crud = VerificationCRUD(Verification)
 github_crud = GitHubCRUD(GitHub)
 skill_crud = SkillCRUD(Skill)
 user_skill_crud = UserSkillCRUD(UserSkill)
+payment_crud = PaymentCRUD(Payment)
