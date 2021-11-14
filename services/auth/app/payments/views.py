@@ -9,6 +9,14 @@ from config import PUBLIC_QIWI_KEY
 
 
 async def pay_request(url: str) -> str:
+    """
+        Pay request
+        :param url: URL
+        :type url: str
+        :return: URL
+        :rtype: str
+    """
+
     async with aiohttp.ClientSession() as session:
         response = await session.get(url, allow_redirects=True)
         response.raise_for_status()
@@ -16,6 +24,18 @@ async def pay_request(url: str) -> str:
 
 
 async def pay(db: AsyncSession, user: User, amount: int) -> dict[str, str]:
+    """
+        Pay
+        :param db: DB
+        :type db: AsyncSession
+        :param user: User
+        :type user: User
+        :param amount: Amount
+        :type amount: int
+        :return: URL
+        :rtype: dict
+    """
+
     if await payment_crud.exist(db, user_id=user.id, is_completed=False):
         await payment_crud.remove(db, user_id=user.id, is_completed=False)
     payment = await payment_crud.create(
