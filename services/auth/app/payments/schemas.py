@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 
 
-class URL(BaseModel):
+class GetPayment(BaseModel):
     """ URL """
 
     url: str
+    id: int

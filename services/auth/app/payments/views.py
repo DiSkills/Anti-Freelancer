@@ -1,26 +1,12 @@
 import uuid
 
-import aiohttp
+from fastapi import status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud import payment_crud
+from app import requests
+from app.crud import payment_crud, user_crud
 from app.models import User
 from config import PUBLIC_QIWI_KEY
-
-
-async def pay_request(url: str) -> str:
-    """
-        Pay request
-        :param url: URL
-        :type url: str
-        :return: URL
-        :rtype: str
-    """
-
-    async with aiohttp.ClientSession() as session:
-        response = await session.get(url, allow_redirects=True)
-        response.raise_for_status()
-    return f'{response.url}'
 
 
 async def pay(db: AsyncSession, user: User, amount: int) -> dict[str, str]:
@@ -45,5 +31,37 @@ async def pay(db: AsyncSession, user: User, amount: int) -> dict[str, str]:
     _url = f'https://oplata.qiwi.com/create?' \
            f'publicKey={PUBLIC_QIWI_KEY}&billId={payment.uuid}&amount={payment.amount}&comment={payment.comment}'
 
-    url = await pay_request(_url)
-    return {'url': f'{url}'}
+    payment_url = await requests.pay_request(_url)
+    return {'url': f'{payment_url}', **payment.__dict__}
+
+
+async def check(db: AsyncSession,  pk: int) -> dict[str, str]:
+    """
+        Check payment and level up
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Payment ID
+        :type pk: int
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Payment not found
+        :raise HTTPException 400: The purchase has already been credited
+        :raise HTTPException 400: Payment not paid
+    """
+
+    if not await payment_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Payment not found')
+    payment = await payment_crud.get(db, id=pk)
+
+    if payment.is_completed:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='The purchase has already been credited')
+
+    response = await requests.check_request(f'https://api.qiwi.com/partner/bill/v1/bills/{payment.uuid}')
+
+    if response.get('status').get('value') != 'PAID':
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Payment not paid')
+
+    user = await user_crud.get(db, id=payment.user_id)
+    await user_crud.update(db, {'id': user.id}, level=user.level + payment.amount)
+    await payment_crud.update(db, {'id': payment.id}, is_completed=True)
+    return {'msg': 'Level has been up'}
