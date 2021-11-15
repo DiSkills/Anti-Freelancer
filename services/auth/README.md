@@ -68,47 +68,53 @@
     - [x] Is superuser
     - [x] Is freelancer
     - [x] Is customer
+- [x] Payments
+    - [x] Pay
+    - [x] Check
 - [x] Tests
     - [x] Get media
     - [x] Auth
-      - [x] Registration
-      - [x] Login
-      - [x] Activation account
-      - [x] Refresh token
-      - [x] Load avatar
-      - [x] Change data
-      - [x] Change password
-      - [x] Reset password
-      - [x] Get username
-      - [x] GitHub bind
-      - [x] GitHub unbind
-      - [x] OTP on/off
-      - [x] OTP login
-      - [x] Off OTP in reset password
-      - [x] Profile
-      - [x] Current profile
-      - [x] Profiles by ids
-      - [x] Get freelancers (username and ID)
-      - [x] Search freelancers by username
+        - [x] Registration
+        - [x] Login
+        - [x] Activation account
+        - [x] Refresh token
+        - [x] Load avatar
+        - [x] Change data
+        - [x] Change password
+        - [x] Reset password
+        - [x] Get username
+        - [x] GitHub bind
+        - [x] GitHub unbind
+        - [x] OTP on/off
+        - [x] OTP login
+        - [x] Off OTP in reset password
+        - [x] Profile
+        - [x] Current profile
+        - [x] Profiles by ids
+        - [x] Get freelancers (username and ID)
+        - [x] Search freelancers by username
     - [x] Permission
-      - [x] Is authenticated
-      - [x] Is active
-      - [x] Is superuser
-      - [x] Is freelancer
-      - [x] Is customer
+        - [x] Is authenticated
+        - [x] Is active
+        - [x] Is superuser
+        - [x] Is freelancer
+        - [x] Is customer
     - [x] Admin
-      - [x] Get all users
-      - [x] Get user
-      - [x] Create user
-      - [x] Update user
-      - [x] Unbind GitHub
+        - [x] Get all users
+        - [x] Get user
+        - [x] Create user
+        - [x] Update user
+        - [x] Unbind GitHub
     - [x] Skills
-      - [x] Import skills from excel
-      - [x] Get skills
-      - [x] Get skill
-      - [x] Create skill
-      - [x] Update skill
-      - [x] Delete skill
-      - [x] Add user skills
-      - [x] Get user skills
-      - [x] Remove user skills
+        - [x] Import skills from excel
+        - [x] Get skills
+        - [x] Get skill
+        - [x] Create skill
+        - [x] Update skill
+        - [x] Delete skill
+        - [x] Add user skills
+        - [x] Get user skills
+        - [x] Remove user skills
+    - [x] Payments
+        - [x] Pay
+        - [x] Check

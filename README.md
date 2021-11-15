@@ -16,5 +16,4 @@
 
 - [ ] Auth Service
     - [ ] Reviews freelancers
-    - [ ] Add a level purchase for a freelancer
 - [ ] Export user data
