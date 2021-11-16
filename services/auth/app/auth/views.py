@@ -207,7 +207,7 @@ async def profiles_by_ids(db: AsyncSession, ids: list[int]) -> dict[str, typing.
     return {
         user.id: {
             **user.__dict__,
-            'skills': [skill.__dict__ for skill in user.skills],
+            'skills': (skill.__dict__ for skill in user.skills),
             'github': user.github.git_username if user.github else None,
         } for user in await user_crud.get_by_ids(db, ids)
     }
