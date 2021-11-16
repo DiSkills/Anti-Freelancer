@@ -8,6 +8,7 @@ from app.message import views
 from app.message.schemas import MessagesPaginate
 from app.message.state import WebSocketState
 from app.permission import is_active
+from app.schemas import Message
 from db import get_db
 
 message_router = APIRouter()
@@ -36,6 +37,24 @@ async def get_messages_for_dialogue(
         page_size=page_size,
         dialogue_id=dialogue_id,
     )
+
+
+@message_router.put(
+    '/view',
+    name='View messages',
+    description='View messages',
+    response_description='Message',
+    response_model=Message,
+    status_code=status.HTTP_200_OK,
+    tags=['messages'],
+)
+async def view_messages(
+    ids: list[int],
+    dialogue_id: int,
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(is_active)
+):
+    return await views.view_messages(db=db, user_id=user_id, ids=ids, dialogue_id=dialogue_id)
 
 
 @message_router.websocket_route('/ws/{token}')

@@ -51,6 +51,12 @@ async def get_messages_for_dialogue(
     return (message.__dict__ for message in queryset)
 
 
+@dialogue_exist('dialogue_id', 'user_id')
+async def view_messages(*, db: AsyncSession, user_id: int, ids: list[int], dialogue_id: int) -> dict[str, str]:
+    await message_crud.view(db, ids, dialogue_id, user_id)
+    return {'msg': 'Messages has been viewed'}
+
+
 class MessengerView:
 
     def __init__(self):

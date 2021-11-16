@@ -34,7 +34,18 @@ class DialogueCRUD(CRUD[Dialogue, Dialogue, Dialogue]):
 
 class MessageCRUD(CRUD[Message, CreateMessage, UpdateMessage]):
     """ Message CRUD """
-    pass
+
+    @staticmethod
+    async def view(db: AsyncSession, ids: list[int], dialogue_id: int, user_id: int):
+        query = sqlalchemy.update(Message).filter(
+            sqlalchemy.and_(
+                Message.id.in_(ids),
+                Message.sender_id != user_id
+            )
+        ).filter_by(dialogue_id=dialogue_id).values(viewed=True)
+        query.execution_options(synchronize_session="fetch")
+        await db.execute(query)
+        await db.commit()
 
 
 class NotificationCRUD(CRUD[Notification, Notification, Notification]):

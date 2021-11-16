@@ -31,6 +31,7 @@
         - [x] Delete
     - [x] Get all messages for dialogue (pagination)
     - [x] Send email about new message
+    - [x] Viewed messages
 - [x] Dialogue
     - [x] Get all for user
     - [x] Get
@@ -48,6 +49,7 @@
             - [x] Update (change)
             - [x] Delete
         - [x] Get all messages for dialogue (pagination)
+        - [x] Viewed messages
     - [x] Dialogue
         - [x] Get all for user
         - [x] Get
