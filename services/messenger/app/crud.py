@@ -37,6 +37,18 @@ class MessageCRUD(CRUD[Message, CreateMessage, UpdateMessage]):
 
     @staticmethod
     async def view(db: AsyncSession, ids: list[int], dialogue_id: int, user_id: int):
+        """
+            View
+            :param db: DB
+            :type db: AsyncSession
+            :param ids: IDs
+            :type ids: list
+            :param dialogue_id: Dialogue ID
+            :type dialogue_id: int
+            :param user_id: User ID
+            :type user_id: int
+            :return: None
+        """
         query = sqlalchemy.update(Message).filter(
             sqlalchemy.and_(
                 Message.id.in_(ids),

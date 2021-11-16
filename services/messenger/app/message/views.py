@@ -53,6 +53,20 @@ async def get_messages_for_dialogue(
 
 @dialogue_exist('dialogue_id', 'user_id')
 async def view_messages(*, db: AsyncSession, user_id: int, ids: list[int], dialogue_id: int) -> dict[str, str]:
+    """
+        View messages
+        :param db: DB
+        :type db: AsyncSession
+        :param user_id: User ID
+        :type user_id: int
+        :param ids: IDs
+        :type ids: list
+        :param dialogue_id: Dialogue ID
+        :type dialogue_id: int
+        :return: Message
+        :rtype: dict
+    """
+
     await message_crud.view(db, ids, dialogue_id, user_id)
     return {'msg': 'Messages has been viewed'}
 
