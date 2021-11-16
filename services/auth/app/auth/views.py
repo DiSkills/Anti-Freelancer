@@ -230,7 +230,7 @@ async def profile(db: AsyncSession, user_id: int) -> dict[str, typing.Any]:
     user = await user_crud.get(db, id=user_id)
     return {
         **user.__dict__,
-        'skills': [skill.__dict__ for skill in user.skills],
+        'skills': (skill.__dict__ for skill in user.skills),
         'github': user.github.git_username if user.github else None,
     }
 
