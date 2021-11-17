@@ -2,7 +2,7 @@ import datetime
 
 from pydantic import BaseModel, validator
 
-from app.schemas import Paginate, UserData
+from app.schemas import Paginate
 
 
 class CreateFeedback(BaseModel):
@@ -22,7 +22,7 @@ class GetFeedback(UpdateFeedback):
 
     id: int
     created_at: datetime.datetime
-    user: UserData
+    user_id: int
 
     @validator('created_at')
     def validate_created_at(cls, created_at: datetime.datetime):

@@ -1,7 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import requests
 from app.crud import feedback_crud
 from app.feedback.schemas import CreateFeedback, UpdateFeedback
 from app.models import Feedback
@@ -44,14 +43,7 @@ async def get_all_feedbacks(*, db: AsyncSession, page: int, page_size: int, quer
         :type queryset: list
         :return: Feedbacks
     """
-    ids = [feedback.user_id for feedback in queryset]
-    users = await requests.get_users(ids)
-    return (
-        {
-            **feedback.__dict__,
-            'user': users[f'{feedback.user_id}'],
-        } for feedback in queryset
-    )
+    return (feedback.__dict__ for feedback in queryset)
 
 
 @paginate(
@@ -76,14 +68,7 @@ async def sort_feedbacks(*, db: AsyncSession, page: int, page_size: int, queryse
         :return: Feedbacks
     """
 
-    ids = [feedback.user_id for feedback in queryset]
-    users = await requests.get_users(ids)
-    return (
-        {
-            **feedback.__dict__,
-            'user': users[f'{feedback.user_id}'],
-        } for feedback in queryset
-    )
+    return (feedback.__dict__ for feedback in queryset)
 
 
 async def get_feedback(db: AsyncSession, pk: int) -> dict:
@@ -101,8 +86,7 @@ async def get_feedback(db: AsyncSession, pk: int) -> dict:
     if not await feedback_crud.exist(db, id=pk):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Feedback not found')
     feedback = await feedback_crud.get(db, id=pk)
-    user = await requests.get_user(feedback.user_id)
-    return {**feedback.__dict__, 'user': user}
+    return feedback.__dict__
 
 
 async def update_feedback(db: AsyncSession, pk: int, schema: UpdateFeedback) -> dict:
@@ -122,8 +106,7 @@ async def update_feedback(db: AsyncSession, pk: int, schema: UpdateFeedback) -> 
     if not await feedback_crud.exist(db, id=pk):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Feedback not found')
     feedback = await feedback_crud.update(db, {'id': pk}, **schema.dict())
-    user = await requests.get_user(feedback.user_id)
-    return {**feedback.__dict__, 'user': user}
+    return feedback.__dict__
 
 
 async def delete_feedback(db: AsyncSession, pk: int) -> dict[str, str]:
