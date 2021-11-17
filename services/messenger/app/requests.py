@@ -1,7 +1,6 @@
 import typing
 
 import aiohttp
-from fastapi import HTTPException
 
 from config import SERVER_AUTH_BACKEND, API, SERVER_USER_PASSWORD, SERVER_USER_USERNAME, TEST
 
@@ -100,37 +99,6 @@ async def sender_profile(token: str) -> dict:
         :rtype: dict
     """
     return await sender_profile_request(token)
-
-
-async def get_users_request(ids: list[int]) -> dict:
-    """
-        Get profiles users request
-        :param ids: Users IDs
-        :type ids: list
-        :return: Profiles
-        :rtype: dict
-        :raise HTTPException: Bad response
-    """
-
-    async with aiohttp.ClientSession() as session:
-        response = await session.post(url=f'{SERVER_AUTH_BACKEND}{API}/profile/ids', json=ids)
-
-        json = await response.json()
-        if not response.ok:
-            raise HTTPException(status_code=response.status, detail=json['detail'])
-
-    return json
-
-
-async def get_users(ids: list[int]) -> dict:
-    """
-        Get users profiles
-        :param ids: Users IDs
-        :type ids: list
-        :return: Profiles
-        :rtype: dict
-    """
-    return await get_users_request(ids)
 
 
 async def get_user_data_and_server_token(user_id: int) -> typing.Optional[tuple[str, dict]]:

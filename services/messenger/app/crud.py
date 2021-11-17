@@ -76,27 +76,6 @@ class NotificationCRUD(CRUD[Notification, Notification, Notification]):
         return notification
 
     @staticmethod
-    async def filter_ids(db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> list[Notification]:
-        """
-            Get notifications ids
-            :param db: DB
-            :type db: AsyncSession
-            :param skip: Skip
-            :type skip: int
-            :param limit: Limit
-            :type limit: int
-            :param kwargs: Filter params
-            :return: Notifications
-            :rtype: list
-        """
-        query = await db.execute(
-            sqlalchemy.select(Notification.sender_id).filter_by(
-                **kwargs
-            ).order_by(Notification.id.desc()).offset(skip).limit(limit)
-        )
-        return query.scalars().all()
-
-    @staticmethod
     async def view(db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs) -> None:
         """
             View notifications

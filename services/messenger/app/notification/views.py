@@ -2,7 +2,6 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import notification_crud
-from app.requests import get_users, get_user
 from config import NOTIFICATION_LIMIT
 
 
@@ -16,16 +15,11 @@ async def get_notifications(db: AsyncSession, user_id: int):
         :return: Notifications for user
     """
 
-    ids = await notification_crud.filter_ids(db, limit=NOTIFICATION_LIMIT, recipient_id=user_id)
-
-    users = await get_users(ids)
-
     return (
         {
             **notification.__dict__,
             'data': {
                 **notification.message.__dict__,
-                'sender': users[f'{notification.sender_id}'],
             }
         } for notification in await notification_crud.filter(db, limit=NOTIFICATION_LIMIT, recipient_id=user_id)
     )
@@ -53,13 +47,10 @@ async def get_notification(db: AsyncSession, user_id: int, pk: int) -> dict:
     if notification.recipient_id != user_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You not owner this notification')
 
-    sender = await get_user(notification.sender_id)
-
     return {
         **notification.__dict__,
         'data': {
             **notification.message.__dict__,
-            'sender': sender
         }
     }
 

@@ -1,8 +1,6 @@
-from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import dialogue_crud
-from app.requests import get_users, get_user
 from app.service import dialogue_exist
 
 
@@ -18,13 +16,9 @@ async def get_all_dialogues_for_user(db: AsyncSession, user_id: int):
 
     dialogues = await dialogue_crud.get_for_user(db, user_id)
 
-    ids = [dialogue.get_recipient_id(user_id) for dialogue in dialogues]
-
-    users = await get_users(ids)
     return (
         {
             **dialogue.__dict__,
-            'user': users[f'{dialogue.get_recipient_id(user_id)}']
         } for dialogue in dialogues
     )
 
@@ -45,5 +39,4 @@ async def get_dialogue(*, db: AsyncSession, user_id: int, pk: int) -> dict:
 
     dialogue = await dialogue_crud.get(db, id=pk)
 
-    user = await get_user(dialogue.get_recipient_id(user_id))
-    return {**dialogue.__dict__, 'user': user}
+    return {**dialogue.__dict__}

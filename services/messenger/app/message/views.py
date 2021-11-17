@@ -219,7 +219,7 @@ class MessengerView:
             recipient_id=schema.recipient_id,
             success_msg='Message has been send',
             response_type=SEND,
-            data=GetMessage(**msg.__dict__, sender=UserData(**user_data)).dict()
+            data={**GetMessage(**msg.__dict__).dict(), 'sender': UserData(**user_data).dict()}
         )
 
     async def update_message(self, websocket: WebSocket, schema: UpdateMessage) -> None:
@@ -262,7 +262,7 @@ class MessengerView:
             recipient_id=recipient_id,
             success_msg='Message has been changed',
             response_type=CHANGE,
-            data=GetMessage(**msg.__dict__, sender=UserData(**user_data)).dict()
+            data={**GetMessage(**msg.__dict__).dict(), 'sender': UserData(**user_data).dict()}
         )
 
     async def delete_message(self, websocket: WebSocket, schema: DeleteMessage) -> None:

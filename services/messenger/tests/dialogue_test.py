@@ -32,7 +32,7 @@ class DialogueTestCase(BaseTest, TestCase):
             with mock.patch('app.requests.get_user_request', return_value=self.get_new_user(2)) as _:
                 response = self.client.get(f'{self.url}/dialogues/1', headers=headers)
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.json(), {'id': 1, 'user': self.get_new_user(2)})
+                self.assertEqual(response.json(), {'id': 1, 'users_ids': '2_1'})
 
         with mock.patch('app.permission.permission', return_value=1) as _:
             response = self.client.get(f'{self.url}/dialogues/7', headers=headers)
@@ -48,52 +48,44 @@ class DialogueTestCase(BaseTest, TestCase):
         headers = {'Authorization': 'Bearer Token'}
 
         with mock.patch('app.permission.permission', return_value=1) as _:
-            with mock.patch(
-                    'app.requests.get_users_request',
-                    return_value={f'{user}': self.get_new_user(user) for user in self.true_results}
-            ) as _:
-                response = self.client.get(f'{self.url}/dialogues/', headers=headers)
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(len(response.json()), self.count_true_results)
-                self.assertEqual(
-                    response.json(),
-                    [
-                        {
-                            'id': 9,
-                            'user': self.get_new_user(111)
-                        },
-                        {
-                            'id': 8,
-                            'user': self.get_new_user(1111)
-                        },
-                        {
-                            'id': 3,
-                            'user': self.get_new_user(6)
-                        },
-                        {
-                            'id': 2,
-                            'user': self.get_new_user(4)
-                        },
-                        {
-                            'id': 1,
-                            'user': self.get_new_user(2)
-                        }
-                    ]
-                )
+            response = self.client.get(f'{self.url}/dialogues/', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json()), self.count_true_results)
+            self.assertEqual(
+                response.json(),
+                [
+                    {
+                        'id': 9,
+                        'users_ids': '1_111'
+                    },
+                    {
+                        'id': 8,
+                        'users_ids': '1111_1'
+                    },
+                    {
+                        'id': 3,
+                        'users_ids': '1_6'
+                    },
+                    {
+                        'id': 2,
+                        'users_ids': '1_4'
+                    },
+                    {
+                        'id': 1,
+                        'users_ids': '2_1'
+                    }
+                ]
+            )
 
         with mock.patch('app.permission.permission', return_value=2) as _:
-            with mock.patch(
-                    'app.requests.get_users_request',
-                    return_value={f'{user}': self.get_new_user(user) for user in [11, 12, 1]}
-            ) as _:
-                response = self.client.get(f'{self.url}/dialogues/', headers=headers)
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(len(response.json()), 3)
-                self.assertEqual(
-                    response.json(),
-                    [
-                        {'id': 5, 'user': self.get_new_user(12)},
-                        {'id': 4, 'user': self.get_new_user(11)},
-                        {'id': 1, 'user': self.get_new_user(1)},
-                    ]
-                )
+            response = self.client.get(f'{self.url}/dialogues/', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.json()), 3)
+            self.assertEqual(
+                response.json(),
+                [
+                    {'id': 5, 'users_ids': '12_2'},
+                    {'id': 4, 'users_ids': '11_2'},
+                    {'id': 1, 'users_ids': '2_1'},
+                ]
+            )

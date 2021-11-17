@@ -2,7 +2,7 @@ import datetime
 
 from pydantic import BaseModel, validator
 
-from app.schemas import UserData, Paginate
+from app.schemas import Paginate
 
 
 class CreateMessage(BaseModel):
@@ -26,8 +26,8 @@ class UpdateMessage(DeleteMessage):
     msg: str
 
 
-class GetMessageExcludeSender(BaseModel):
-    """ Get message exclude sender """
+class GetMessage(BaseModel):
+    """ Get message """
 
     id: int
     msg: str
@@ -42,13 +42,7 @@ class GetMessageExcludeSender(BaseModel):
         return f'{created_at}Z'.replace(' ', 'T')
 
 
-class GetMessage(GetMessageExcludeSender):
-    """ Get message """
-
-    sender: UserData
-
-
 class MessagesPaginate(Paginate):
     """ Message paginate """
 
-    results: list[GetMessageExcludeSender]
+    results: list[GetMessage]

@@ -1,7 +1,7 @@
 from unittest import TestCase, mock
 
 from app.crud import dialogue_crud, message_crud
-from app.message.schemas import GetMessageExcludeSender
+from app.message.schemas import GetMessage
 from config import SERVER_MESSENGER_BACKEND, API
 from tests import BaseTest, async_loop
 
@@ -114,7 +114,7 @@ class MessageTestCase(BaseTest, TestCase):
                     'previous': None,
                     'page': 1,
                     'results': [
-                        GetMessageExcludeSender(**async_loop(message_crud.get(self.session, id=2)).__dict__).dict()
+                        GetMessage(**async_loop(message_crud.get(self.session, id=2)).__dict__).dict()
                     ]
                 }
             )
@@ -131,7 +131,7 @@ class MessageTestCase(BaseTest, TestCase):
                     'previous': f'{SERVER_MESSENGER_BACKEND}{API}/messages/dialogue?page=1&page_size=1&dialogue_id=1',
                     'page': 2,
                     'results': [
-                        GetMessageExcludeSender(**async_loop(message_crud.get(self.session, id=1)).__dict__).dict()
+                        GetMessage(**async_loop(message_crud.get(self.session, id=1)).__dict__).dict()
                     ]
                 }
             )

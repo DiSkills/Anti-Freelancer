@@ -42,13 +42,15 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                         self.assertEqual(
                             response,
                             {
-                                'data': GetMessage(
-                                    **{
-                                        **async_loop(message_crud.get(self.session, id=1)).__dict__, 'viewed': False,
-                                        'msg': 'Hello python!'
-                                    },
-                                    sender=UserData(**self.get_new_user(1))
-                                ).dict(), 'type': CHANGE
+                                'data': {
+                                    'sender': UserData(**self.get_new_user(1)).dict(), **GetMessage(
+                                        **{
+                                            **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                            'viewed': False,
+                                            'msg': 'Hello python!'
+                                        },
+                                    ).dict()
+                                }, 'type': CHANGE
                             }
                         )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -89,14 +91,15 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                             self.assertEqual(
                                 response,
                                 {
-                                    'data': GetMessage(
-                                        **{
-                                            **async_loop(message_crud.get(self.session, id=1)).__dict__,
-                                            'viewed': False,
-                                            'msg': 'Hello python!'
-                                        },
-                                        sender=UserData(**self.get_new_user(1))
-                                    ).dict(), 'type': CHANGE
+                                    'data': {
+                                        'sender': UserData(**self.get_new_user(1)).dict(), **GetMessage(
+                                            **{
+                                                **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                                'viewed': False,
+                                                'msg': 'Hello python!'
+                                            },
+                                        ).dict()
+                                    }, 'type': CHANGE
                                 }
                             )
 
@@ -110,14 +113,15 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                             self.assertEqual(
                                 response,
                                 {
-                                    'data': GetMessage(
-                                        **{
-                                            **async_loop(message_crud.get(self.session, id=1)).__dict__,
-                                            'viewed': False,
-                                            'msg': 'Hello python!'
-                                        },
-                                        sender=UserData(**self.get_new_user(1))
-                                    ).dict(), 'type': CHANGE
+                                    'data': {
+                                        'sender': UserData(**self.get_new_user(1)).dict(), **GetMessage(
+                                            **{
+                                                **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                                'viewed': False,
+                                                'msg': 'Hello python!'
+                                            },
+                                        ).dict()
+                                    }, 'type': CHANGE
                                 }
                             )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -160,14 +164,15 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                                 self.assertEqual(
                                     response,
                                     {
-                                        'data': GetMessage(
-                                            **{
-                                                **async_loop(message_crud.get(self.session, id=1)).__dict__,
-                                                'viewed': False,
-                                                'msg': 'Hello python!'
-                                            },
-                                            sender=UserData(**self.get_new_user(1))
-                                        ).dict(), 'type': CHANGE
+                                        'data': {
+                                            'sender': UserData(**self.get_new_user(1)).dict(), **GetMessage(
+                                                **{
+                                                    **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                                    'viewed': False,
+                                                    'msg': 'Hello python!'
+                                                },
+                                            ).dict()
+                                        }, 'type': CHANGE
                                     }
                                 )
 
@@ -175,14 +180,15 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                                 self.assertEqual(
                                     response,
                                     {
-                                        'data': GetMessage(
-                                            **{
-                                                **async_loop(message_crud.get(self.session, id=1)).__dict__,
-                                                'viewed': False,
-                                                'msg': 'Hello python!'
-                                            },
-                                            sender=UserData(**self.get_new_user(1))
-                                        ).dict(), 'type': CHANGE
+                                        'data': {
+                                            'sender': UserData(**self.get_new_user(1)).dict(), **GetMessage(
+                                                **{
+                                                    **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                                    'viewed': False,
+                                                    'msg': 'Hello python!'
+                                                },
+                                            ).dict()
+                                        }, 'type': CHANGE
                                     }
                                 )
         self.assertEqual(len(async_loop(message_crud.all(self.session))), 1)
@@ -215,8 +221,12 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                                     'app.requests.sender_profile_request',
                                     return_value=self.get_new_user(2)
                             ) as _:
-                                with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_recipient_1:
-                                    with self.client.websocket_connect(f'{self.url}/messages/ws/token') as socket_recipient_2:
+                                with self.client.websocket_connect(
+                                        f'{self.url}/messages/ws/token'
+                                ) as socket_recipient_1:
+                                    with self.client.websocket_connect(
+                                            f'{self.url}/messages/ws/token'
+                                    ) as socket_recipient_2:
                                         socket_sender_1.send_json(
                                             {'msg': 'Hello python!', 'id': 1, 'type': CHANGE}
                                         )
@@ -230,14 +240,15 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                                         self.assertEqual(
                                             response,
                                             {
-                                                'data': GetMessage(
-                                                    **{
-                                                        **async_loop(message_crud.get(self.session, id=1)).__dict__,
-                                                        'viewed': False,
-                                                        'msg': 'Hello python!'
-                                                    },
-                                                    sender=UserData(**self.get_new_user(1))
-                                                ).dict(), 'type': CHANGE
+                                                'data': {
+                                                    'sender': UserData(**self.get_new_user(1)).dict(), **GetMessage(
+                                                        **{
+                                                            **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                                            'viewed': False,
+                                                            'msg': 'Hello python!'
+                                                        },
+                                                    ).dict()
+                                                }, 'type': CHANGE
                                             }
                                         )
 
@@ -245,14 +256,15 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                                         self.assertEqual(
                                             response,
                                             {
-                                                'data': GetMessage(
-                                                    **{
-                                                        **async_loop(message_crud.get(self.session, id=1)).__dict__,
-                                                        'viewed': False,
-                                                        'msg': 'Hello python!'
-                                                    },
-                                                    sender=UserData(**self.get_new_user(1))
-                                                ).dict(), 'type': CHANGE
+                                                'data': {
+                                                    'sender': UserData(**self.get_new_user(1)).dict(), **GetMessage(
+                                                        **{
+                                                            **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                                            'viewed': False,
+                                                            'msg': 'Hello python!'
+                                                        },
+                                                    ).dict()
+                                                }, 'type': CHANGE
                                             }
                                         )
 
@@ -266,14 +278,15 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                                         self.assertEqual(
                                             response,
                                             {
-                                                'data': GetMessage(
-                                                    **{
-                                                        **async_loop(message_crud.get(self.session, id=1)).__dict__,
-                                                        'viewed': False,
-                                                        'msg': 'Hello python!'
-                                                    },
-                                                    sender=UserData(**self.get_new_user(1))
-                                                ).dict(), 'type': CHANGE
+                                                'data': {
+                                                    'sender': UserData(**self.get_new_user(1)).dict(), **GetMessage(
+                                                        **{
+                                                            **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                                            'viewed': False,
+                                                            'msg': 'Hello python!'
+                                                        },
+                                                    ).dict()
+                                                }, 'type': CHANGE
                                             }
                                         )
 
@@ -281,14 +294,15 @@ class UpdateMessageTestCase(BaseTest, TestCase):
                                         self.assertEqual(
                                             response,
                                             {
-                                                'data': GetMessage(
-                                                    **{
-                                                        **async_loop(message_crud.get(self.session, id=1)).__dict__,
-                                                        'viewed': False,
-                                                        'msg': 'Hello python!'
-                                                    },
-                                                    sender=UserData(**self.get_new_user(1))
-                                                ).dict(), 'type': CHANGE
+                                                'data': {
+                                                    'sender': UserData(**self.get_new_user(1)).dict(), **GetMessage(
+                                                        **{
+                                                            **async_loop(message_crud.get(self.session, id=1)).__dict__,
+                                                            'viewed': False,
+                                                            'msg': 'Hello python!'
+                                                        },
+                                                    ).dict()
+                                                }, 'type': CHANGE
                                             }
                                         )
 
