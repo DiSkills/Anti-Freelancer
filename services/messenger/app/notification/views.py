@@ -18,9 +18,7 @@ async def get_notifications(db: AsyncSession, user_id: int):
     return (
         {
             **notification.__dict__,
-            'data': {
-                **notification.message.__dict__,
-            }
+            'data': notification.message.__dict__
         } for notification in await notification_crud.filter(db, limit=NOTIFICATION_LIMIT, recipient_id=user_id)
     )
 
@@ -49,9 +47,7 @@ async def get_notification(db: AsyncSession, user_id: int, pk: int) -> dict:
 
     return {
         **notification.__dict__,
-        'data': {
-            **notification.message.__dict__,
-        }
+        'data': notification.message.__dict__
     }
 
 

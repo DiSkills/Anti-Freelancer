@@ -16,11 +16,7 @@ async def get_all_dialogues_for_user(db: AsyncSession, user_id: int):
 
     dialogues = await dialogue_crud.get_for_user(db, user_id)
 
-    return (
-        {
-            **dialogue.__dict__,
-        } for dialogue in dialogues
-    )
+    return (dialogue.__dict__ for dialogue in dialogues)
 
 
 @dialogue_exist('pk', 'user_id')
@@ -39,4 +35,4 @@ async def get_dialogue(*, db: AsyncSession, user_id: int, pk: int) -> dict:
 
     dialogue = await dialogue_crud.get(db, id=pk)
 
-    return {**dialogue.__dict__}
+    return dialogue.__dict__
