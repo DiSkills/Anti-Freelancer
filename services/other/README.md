@@ -28,6 +28,7 @@
     - [ ] Get all (paginate)
     - [ ] Get
     - [ ] Update
+    - [ ] Update (admin)
     - [ ] Delete
 - [ ] Tests
     - [x] Feedback
@@ -48,4 +49,5 @@
         - [ ] Get all (paginate)
         - [ ] Get
         - [ ] Update
+        - [ ] Update (admin)
         - [ ] Delete

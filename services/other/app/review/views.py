@@ -2,7 +2,10 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import review_crud
+from app.models import Review
 from app.review.schemas import CreateReview
+from app.service import paginate
+from config import SERVER_OTHER_BACKEND, API
 
 
 async def create_review(db: AsyncSession, user_id: int, schema: CreateReview) -> dict:
@@ -23,3 +26,8 @@ async def create_review(db: AsyncSession, user_id: int, schema: CreateReview) ->
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Review exist')
     review = await review_crud.create(db, user_id=user_id, **schema.dict())
     return review.__dict__
+
+
+@paginate(review_crud.sorting, review_crud.exist_sorting, f'{SERVER_OTHER_BACKEND}{API}/reviews/', 'sort')
+async def get_all_reviews(*, db: AsyncSession, page: int, page_size: int, sort: str, queryset: list[Review]):
+    return (review.__dict__ for review in queryset)
