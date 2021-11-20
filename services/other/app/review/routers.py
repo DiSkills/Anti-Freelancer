@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.permission import is_active
 from app.review import views
-from app.review.schemas import CreateReview, GetReview, ReviewPaginate
+from app.review.schemas import CreateReview, GetReview, ReviewPaginate, UpdateReview
 from db import get_db
 
 review_router = APIRouter()
@@ -54,3 +54,21 @@ async def get_all_reviews(
 )
 async def get_review(pk: int, db: AsyncSession = Depends(get_db)):
     return await views.get_review(db, pk)
+
+
+@review_router.put(
+    '/{pk}',
+    name='Update review',
+    description='Update review',
+    response_description='Review',
+    status_code=status.HTTP_200_OK,
+    response_model=GetReview,
+    tags=['reviews'],
+)
+async def update_review(
+    pk: int,
+    schema: UpdateReview,
+    user_id: int = Depends(is_active),
+    db: AsyncSession = Depends(get_db),
+):
+    return await views.update_review(db, pk, schema, user_id)

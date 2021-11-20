@@ -27,7 +27,7 @@
     - [x] Create
     - [x] Get all (paginate and sort)
     - [x] Get
-    - [ ] Update
+    - [x] Update
     - [ ] Update (admin)
     - [ ] Delete
 - [ ] Tests
@@ -48,6 +48,6 @@
         - [x] Create
         - [x] Get all (paginate and sort)
         - [x] Get
-        - [ ] Update
+        - [x] Update
         - [ ] Update (admin)
         - [ ] Delete

@@ -90,6 +90,56 @@ class ReviewTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'detail': 'Review not found'})
 
+        # Update
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            response = self.client.put(
+                f'{self.url}/reviews/1',
+                headers=headers,
+                json={'appraisal': 3, 'text': 'Hello world!'}
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json(),
+                {
+                    'appraisal': 3,
+                    'created_at': f'{async_loop(review_crud.get(self.session, id=1)).created_at}Z'.replace(' ', 'T'),
+                    'id': 1,
+                    'text': 'Hello world!',
+                    'user_id': 1,
+                }
+            )
+
+        response = self.client.get(f'{self.url}/reviews/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                'appraisal': 3,
+                'created_at': f'{async_loop(review_crud.get(self.session, id=1)).created_at}Z'.replace(' ', 'T'),
+                'id': 1,
+                'text': 'Hello world!',
+                'user_id': 1,
+            }
+        )
+
+        # Bad
+        with mock.patch('app.permission.permission', return_value=143) as _:
+            response = self.client.put(
+                f'{self.url}/reviews/1',
+                headers=headers,
+                json={'appraisal': 3, 'text': 'Hello world!'}
+            )
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'User not owner this review'})
+
+            response = self.client.put(
+                f'{self.url}/reviews/143',
+                headers=headers,
+                json={'appraisal': 3, 'text': 'Hello world!'}
+            )
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Review not found'})
+
     def test_reviews_paginate(self):
         headers = {'Authorization': 'Bearer Token'}
 
@@ -208,7 +258,7 @@ class ReviewTestCase(BaseTest, TestCase):
                 ],
             }
         )
-        
+
         # ASC appraisal
         response = self.client.get(f'{self.url}/reviews/?page=1&page_size=1&sort=asc_appraisal')
         self.assertEqual(response.status_code, 200)

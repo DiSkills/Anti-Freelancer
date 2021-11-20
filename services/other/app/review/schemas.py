@@ -12,6 +12,11 @@ class CreateReview(BaseModel):
     appraisal: int = Field(default=1, gt=0, lt=6)
 
 
+class UpdateReview(CreateReview):
+    """ Update review """
+    pass
+
+
 class GetReview(CreateReview):
     """ Get review """
 
