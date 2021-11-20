@@ -2,7 +2,7 @@ import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.feedback.schemas import CreateFeedback
-from app.models import Feedback
+from app.models import Feedback, Review
 from crud import CRUD
 
 
@@ -62,4 +62,10 @@ class FeedbackCRUD(CRUD[Feedback, CreateFeedback, CreateFeedback]):
         return query.scalar()
 
 
+class ReviewCRUD(CRUD[Review, Review, Review]):
+    """ Review CRUD """
+    pass
+
+
 feedback_crud = FeedbackCRUD(Feedback)
+review_crud = ReviewCRUD(Review)

@@ -24,7 +24,7 @@
     - [ ] Update
     - [ ] Delete
 - [ ] Review
-    - [ ] Create
+    - [x] Create
     - [ ] Get all (paginate)
     - [ ] Get
     - [ ] Update
@@ -44,7 +44,7 @@
         - [ ] Update
         - [ ] Delete
     - [ ] Review
-        - [ ] Create
+        - [x] Create
         - [ ] Get all (paginate)
         - [ ] Get
         - [ ] Update

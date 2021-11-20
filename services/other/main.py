@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.feedback.routers import feedbacks_router
+from app.review.routers import review_router
 from config import PROJECT_NAME, DOCKER, MEDIA_ROOT, API
 from db import engine, Base
 
@@ -35,3 +36,4 @@ async def startup():
 
 
 app.include_router(feedbacks_router, prefix=f'/{API}/feedbacks')
+app.include_router(review_router, prefix=f'/{API}/reviews')

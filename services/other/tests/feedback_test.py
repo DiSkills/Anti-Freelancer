@@ -197,7 +197,7 @@ class FeedbackTestCase(BaseTest, TestCase):
             self.assertEqual(response.json()['results'][0]['id'], 1)
             self.assertEqual(response.json()['results'][1]['id'], 2)
 
-    # ASC
+        # ASC
         with mock.patch('app.permission.permission', return_value=1) as _:
             response = self.client.get(
                 f'{self.url}/feedbacks/sort?page=1&page_size=1&desc=false',
