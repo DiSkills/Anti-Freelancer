@@ -68,7 +68,14 @@ class ReviewCRUD(CRUD[Review, CreateReview, CreateReview]):
     """ Review CRUD """
 
     @staticmethod
-    def get_sort_variant(sort):
+    def get_sort_variant(sort: str):
+        """
+            Get sort variant
+            :param sort: Sort
+            :type sort: str
+            :return: Sort variant
+            :raise HTTPException 400: Sort not found
+        """
         sorting_variants = {
             'desc': Review.id.desc,
             'asc': Review.id.asc,
@@ -80,13 +87,39 @@ class ReviewCRUD(CRUD[Review, CreateReview, CreateReview]):
         except KeyError:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Sort not found')
 
-    async def sorting(self, db: AsyncSession, sort: str, skip: int = 0, limit: int = 100):
+    async def sorting(self, db: AsyncSession, sort: str, skip: int = 0, limit: int = 100) -> list[Review]:
+        """
+            Sorting reviews
+            :param db: DB
+            :type db: AsyncSession
+            :param sort: Sort
+            :type sort: str
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Reviews
+            :rtype: list
+        """
         query = await db.execute(
             sqlalchemy.select(Review).order_by(self.get_sort_variant(sort)).offset(skip).limit(limit)
         )
         return query.scalars().all()
 
-    async def exist_sorting(self, db: AsyncSession, sort: str, skip: int = 0, limit: int = 100):
+    async def exist_sorting(self, db: AsyncSession, sort: str, skip: int = 0, limit: int = 100) -> bool:
+        """
+            Exist sort page?
+            :param db: DB
+            :type db: AsyncSession
+            :param sort: Sort
+            :type sort: str
+            :param skip: Skip
+            :type skip: int
+            :param limit: Limit
+            :type limit: int
+            :return: Exist sort page?
+            :rtype: bool
+        """
         query = await db.execute(
             sqlalchemy.exists(
                 sqlalchemy.select(Review.id).order_by(self.get_sort_variant(sort)).offset(skip).limit(limit)

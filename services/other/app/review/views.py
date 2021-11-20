@@ -30,4 +30,18 @@ async def create_review(db: AsyncSession, user_id: int, schema: CreateReview) ->
 
 @paginate(review_crud.sorting, review_crud.exist_sorting, f'{SERVER_OTHER_BACKEND}{API}/reviews/', 'sort')
 async def get_all_reviews(*, db: AsyncSession, page: int, page_size: int, sort: str, queryset: list[Review]):
+    """
+        Get all reviews
+        :param db: DB
+        :type db: AsyncSession
+        :param page: Page
+        :type page: int
+        :param page_size: Page size
+        :type page_size: int
+        :param sort: Sort
+        :type sort: str
+        :param queryset: Reviews
+        :type queryset: list
+        :return: Reviews
+    """
     return (review.__dict__ for review in queryset)
