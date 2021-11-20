@@ -41,3 +41,16 @@ async def get_all_reviews(
     db: AsyncSession = Depends(get_db),
 ):
     return await views.get_all_reviews(db=db, page=page, page_size=page_size, sort=sort)
+
+
+@review_router.get(
+    '/{pk}',
+    name='Get review',
+    description='Get review',
+    response_description='Review',
+    status_code=status.HTTP_200_OK,
+    response_model=GetReview,
+    tags=['reviews'],
+)
+async def get_review(pk: int, db: AsyncSession = Depends(get_db)):
+    return await views.get_review(db, pk)

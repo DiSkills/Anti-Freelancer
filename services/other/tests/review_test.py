@@ -72,6 +72,24 @@ class ReviewTestCase(BaseTest, TestCase):
             self.assertEqual(response.json(), {'detail': 'Review exist'})
             self.assertEqual(len(async_loop(review_crud.all(self.session))), 1)
 
+        # Get
+        response = self.client.get(f'{self.url}/reviews/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                'appraisal': 5,
+                'created_at': f'{async_loop(review_crud.get(self.session, id=1)).created_at}Z'.replace(' ', 'T'),
+                'id': 1,
+                'text': 'Good site!',
+                'user_id': 1,
+            }
+        )
+
+        response = self.client.get(f'{self.url}/reviews/143')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'detail': 'Review not found'})
+
     def test_reviews_paginate(self):
         headers = {'Authorization': 'Bearer Token'}
 

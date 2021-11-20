@@ -45,3 +45,21 @@ async def get_all_reviews(*, db: AsyncSession, page: int, page_size: int, sort: 
         :return: Reviews
     """
     return (review.__dict__ for review in queryset)
+
+
+async def get_review(db: AsyncSession, pk: int) -> dict:
+    """
+        Get review
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Review ID
+        :type pk: int
+        :return: Review
+        :rtype: dict
+        :raise HTTPException 400: Review not found
+    """
+
+    if not await review_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Review not found')
+    review = await review_crud.get(db, id=pk)
+    return review.__dict__

@@ -26,7 +26,7 @@
 - [ ] Review
     - [x] Create
     - [x] Get all (paginate and sort)
-    - [ ] Get
+    - [x] Get
     - [ ] Update
     - [ ] Update (admin)
     - [ ] Delete
@@ -47,7 +47,7 @@
     - [ ] Review
         - [x] Create
         - [x] Get all (paginate and sort)
-        - [ ] Get
+        - [x] Get
         - [ ] Update
         - [ ] Update (admin)
         - [ ] Delete
