@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.permission import is_active
+from app.permission import is_active, is_superuser
 from app.review import views
 from app.review.schemas import CreateReview, GetReview, ReviewPaginate, UpdateReview
 from db import get_db
@@ -54,6 +54,24 @@ async def get_all_reviews(
 )
 async def get_review(pk: int, db: AsyncSession = Depends(get_db)):
     return await views.get_review(db, pk)
+
+
+@review_router.put(
+    '/admin/{pk}',
+    name='Update review (admin)',
+    description='Update review (admin)',
+    response_description='Review',
+    status_code=status.HTTP_200_OK,
+    response_model=GetReview,
+    tags=['admin'],
+)
+async def admin_update_review(
+    pk: int,
+    schema: UpdateReview,
+    user_id: int = Depends(is_superuser),
+    db: AsyncSession = Depends(get_db),
+):
+    return await views.update_review(db, pk, schema, user_id, True)
 
 
 @review_router.put(

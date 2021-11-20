@@ -28,7 +28,7 @@
     - [x] Get all (paginate and sort)
     - [x] Get
     - [x] Update
-    - [ ] Update (admin)
+    - [x] Update (admin)
     - [ ] Delete
 - [ ] Tests
     - [x] Feedback
@@ -49,5 +49,5 @@
         - [x] Get all (paginate and sort)
         - [x] Get
         - [x] Update
-        - [ ] Update (admin)
+        - [x] Update (admin)
         - [ ] Delete
