@@ -214,7 +214,7 @@ class ReviewTestCase(BaseTest, TestCase):
             self.assertEqual(response.json(), {'msg': 'Review has been deleted'})
             self.assertEqual(len(async_loop(review_crud.all(self.session))), 0)
 
-            response = self.client.delete(f'{self.url}/reviews/143', headers=headers)
+            response = self.client.delete(f'{self.url}/reviews/admin/143', headers=headers)
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Review not found'})
 
