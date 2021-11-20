@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.permission import is_active, is_superuser
 from app.review import views
 from app.review.schemas import CreateReview, GetReview, ReviewPaginate, UpdateReview
+from app.schemas import Message
 from db import get_db
 
 review_router = APIRouter()
@@ -90,3 +91,29 @@ async def update_review(
     db: AsyncSession = Depends(get_db),
 ):
     return await views.update_review(db, pk, schema, user_id)
+
+
+@review_router.delete(
+    '/admin/{pk}',
+    name='Delete review (admin)',
+    description='Delete review (admin)',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['admin'],
+)
+async def admin_delete_review(pk: int, user_id: int = Depends(is_superuser), db: AsyncSession = Depends(get_db)):
+    return await views.delete_review(db, pk, user_id, True)
+
+
+@review_router.delete(
+    '/{pk}',
+    name='Delete review',
+    description='Delete review',
+    response_description='Message',
+    status_code=status.HTTP_200_OK,
+    response_model=Message,
+    tags=['reviews'],
+)
+async def delete_review(pk: int, user_id: int = Depends(is_active), db: AsyncSession = Depends(get_db)):
+    return await views.delete_review(db, pk, user_id)

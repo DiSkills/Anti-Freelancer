@@ -92,3 +92,30 @@ async def update_review(db: AsyncSession, pk: int, schema: UpdateReview, user_id
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not owner this review')
     review = await review_crud.update(db, {'id': pk}, **schema.dict())
     return review.__dict__
+
+
+async def delete_review(db: AsyncSession, pk: int, user_id: int, is_admin: bool = False) -> dict[str, str]:
+    """
+        Delete review
+        :param db: DB
+        :type db: AsyncSession
+        :param pk: Review ID
+        :type pk: int
+        :param user_id: User ID
+        :type user_id: int
+        :param is_admin: User is admin?
+        :type is_admin: bool
+        :return: Message
+        :rtype: dict
+        :raise HTTPException 400: Review not found
+        :raise HTTPException 400: User not owner this review
+    """
+
+    if not await review_crud.exist(db, id=pk):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Review not found')
+    review = await review_crud.get(db, id=pk)
+
+    if (review.user_id != user_id) and (not is_admin):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not owner this review')
+    await review_crud.remove(db, id=pk)
+    return {'msg': 'Review has been deleted'}

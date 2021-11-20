@@ -23,13 +23,14 @@
     - [ ] Get
     - [ ] Update
     - [ ] Delete
-- [ ] Review
+- [x] Review
     - [x] Create
     - [x] Get all (paginate and sort)
     - [x] Get
     - [x] Update
     - [x] Update (admin)
-    - [ ] Delete
+    - [x] Delete
+    - [x] Delete (admin)
 - [ ] Tests
     - [x] Feedback
         - [x] Create
@@ -44,10 +45,11 @@
         - [ ] Get
         - [ ] Update
         - [ ] Delete
-    - [ ] Review
+    - [x] Review
         - [x] Create
         - [x] Get all (paginate and sort)
         - [x] Get
         - [x] Update
         - [x] Update (admin)
-        - [ ] Delete
+        - [x] Delete
+        - [x] Delete (admin)

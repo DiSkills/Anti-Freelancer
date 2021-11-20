@@ -167,6 +167,57 @@ class ReviewTestCase(BaseTest, TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Review not found'})
 
+        # Delete
+        with mock.patch('app.permission.permission', return_value=143) as _:
+            response = self.client.delete(f'{self.url}/reviews/1', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'User not owner this review'})
+
+            response = self.client.delete(f'{self.url}/reviews/143', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Review not found'})
+
+        self.assertEqual(len(async_loop(review_crud.all(self.session))), 1)
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            response = self.client.delete(f'{self.url}/reviews/1', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Review has been deleted'})
+        self.assertEqual(len(async_loop(review_crud.all(self.session))), 0)
+
+        # Delete (admin)
+        with mock.patch('app.permission.permission', return_value=1) as _:
+            response = self.client.post(
+                f'{self.url}/reviews/',
+                headers=headers,
+                json={'appraisal': 5, 'text': 'Good site!'}
+            )
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual(
+                response.json(),
+                {
+                    'appraisal': 5,
+                    'created_at': f'{async_loop(review_crud.get(self.session, id=2)).created_at}Z'.replace(' ', 'T'),
+                    'id': 2,
+                    'text': 'Good site!',
+                    'user_id': 1,
+                }
+            )
+            self.assertEqual(len(async_loop(review_crud.all(self.session))), 1)
+
+        with mock.patch('app.permission.permission', return_value=143) as _:
+            response = self.client.delete(f'{self.url}/reviews/2', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'User not owner this review'})
+
+            response = self.client.delete(f'{self.url}/reviews/admin/2', headers=headers)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'msg': 'Review has been deleted'})
+            self.assertEqual(len(async_loop(review_crud.all(self.session))), 0)
+
+            response = self.client.delete(f'{self.url}/reviews/143', headers=headers)
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), {'detail': 'Review not found'})
+
     def test_reviews_paginate(self):
         headers = {'Authorization': 'Bearer Token'}
 
