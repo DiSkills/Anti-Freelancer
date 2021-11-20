@@ -7,6 +7,9 @@ from app.review.schemas import CreateReview, GetReview, ReviewPaginate
 from db import get_db
 
 review_router = APIRouter()
+SORTING_DESCRIPTION = '''
+asc - sorting by ID; desc - sorting by -ID; asc_appraisal - sorting by appraisal; desc_appraisal - sorting by -appraisal
+'''
 
 
 @review_router.post(
@@ -32,7 +35,7 @@ async def create_review(schema: CreateReview, user_id: int = Depends(is_active),
     tags=['reviews'],
 )
 async def get_all_reviews(
-    sort: str = Query(default='desc'),
+    sort: str = Query(default='desc', description=SORTING_DESCRIPTION),
     page: int = Query(default=1, gt=0),
     page_size: int = Query(default=1, gt=0),
     db: AsyncSession = Depends(get_db),
