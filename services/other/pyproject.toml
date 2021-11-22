@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "Advertisement, Feedbacks and Reviews Service Anti-Freelancer"
+name = "Feedbacks and Reviews Service Anti-Freelancer"
 version = "0.1.0"
 description = ""
 authors = ["_Counter021_"]

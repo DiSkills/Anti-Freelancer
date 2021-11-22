@@ -7,7 +7,7 @@
     - [x] Main
     - [x] Email
     - [x] Messenger
-    - [ ] Advertisement, Feedbacks and Reviews
+    - [ ] Feedbacks and Reviews
 - [ ] Docker compose
 - [ ] Nginx
 - [x] Flower

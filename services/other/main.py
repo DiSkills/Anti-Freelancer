@@ -11,7 +11,7 @@ from db import engine, Base
 app = FastAPI(
     title=PROJECT_NAME,
     version='0.1.0',
-    description='Advertisement, Feedbacks and Reviews Service Anti-Freelancer',
+    description='Feedbacks and Reviews Service Anti-Freelancer',
 )
 
 app.add_middleware(

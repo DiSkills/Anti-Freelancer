@@ -1,4 +1,4 @@
-# Advertisement, Feedbacks and Reviews Service
+# Feedbacks and Reviews Service
 
 # TODO
 
@@ -17,12 +17,6 @@
     - [x] Get
     - [x] Update
     - [x] Delete
-- [ ] Advertisement
-    - [ ] Create
-    - [ ] Get all (paginate)
-    - [ ] Get
-    - [ ] Update
-    - [ ] Delete
 - [x] Review
     - [x] Create
     - [x] Get all (paginate and sort)
@@ -31,7 +25,7 @@
     - [x] Update (admin)
     - [x] Delete
     - [x] Delete (admin)
-- [ ] Tests
+- [x] Tests
     - [x] Feedback
         - [x] Create
         - [x] Get all (paginate)
@@ -39,12 +33,6 @@
         - [x] Get
         - [x] Update
         - [x] Delete
-    - [ ] Advertisement
-        - [ ] Create
-        - [ ] Get all (paginate)
-        - [ ] Get
-        - [ ] Update
-        - [ ] Delete
     - [x] Review
         - [x] Create
         - [x] Get all (paginate and sort)
