@@ -1,6 +1,32 @@
 version: "3.7"
 
 services:
+  email_db:
+    build:
+      context: ./services/email/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=email_user
+    volumes:
+      - ./services/email/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5431:5431"
+
+  email:
+    build:
+      context: ./services/email
+      dockerfile: Dockerfile
+    depends_on:
+      - email_db
+    ports:
+      - "7999:7999"
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 7999 --log-config logger.yml
+    volumes:
+      - ./services/email:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.email.env
+
   auth_db:
     build:
       context: ./services/auth/docker/postgres
@@ -18,17 +44,15 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - auth_db
+      - email
     ports:
       - "8000:8000"
     command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --log-config logger.yml
     volumes:
       - ./services/auth:/app
-    environment:
-      - DOCKER=1
     env_file:
-      - config.docker.env
-      - config.auth.env
-
+      - docker/configs/config.docker.env
+      - docker/configs/config.auth.env
 
   nginx:
     build:
@@ -39,3 +63,18 @@ services:
       - "443:443"
     depends_on:
       - auth
+
+  worker:
+    build: ./services/email
+    command: poetry run celery -A tasks.celery worker -l INFO
+    volumes:
+      - ./services/email:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.email.env
+    depends_on:
+      - email_db
+      - redis
+
+  redis:
+    image: redis

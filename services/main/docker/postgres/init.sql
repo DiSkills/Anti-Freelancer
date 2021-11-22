@@ -1,4 +1,0 @@
-CREATE USER main_user WITH PASSWORD 'main_user';
-
-CREATE DATABASE main_db;
-GRANT ALL PRIVILEGES ON DATABASE main_db TO main_user;

@@ -11,4 +11,4 @@ RUN poetry install
 
 COPY . .
 
-EXPOSE 8003
+EXPOSE 7999

@@ -3,13 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.client.routers import client_router
 from app.mail.routers import mail_router
-from config import PROJECT_NAME, API, DOCKER
+from config import PROJECT_NAME, API, VERSION, CLIENT_NAME
 from db import engine, Base
 
 app = FastAPI(
     title=PROJECT_NAME,
-    version='0.1.0',
+    version=VERSION,
     description='Email Service Anti-Freelancer by Counter',
+    root_path=f'/{CLIENT_NAME}',
 )
 
 app.add_middleware(
@@ -23,9 +24,8 @@ app.add_middleware(
 
 @app.on_event('startup')
 async def startup():
-    if int(DOCKER):
-        async with engine.begin() as connection:
-            await connection.run_sync(Base.metadata.create_all)
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
 
 
 app.include_router(mail_router, prefix=f'/{API}')

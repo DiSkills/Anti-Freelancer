@@ -12,7 +12,6 @@ redis = "^3.5.3"
 SQLAlchemy = {extras = ["asyncio"], version = "^1.4.25"}
 asyncpg = "^0.24.0"
 psycopg2-binary = "^2.9.1"
-alembic = "^1.7.4"
 aiohttp = "^3.8.0"
 flower = "^1.0.0"
 

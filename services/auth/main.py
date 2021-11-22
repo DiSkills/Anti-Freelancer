@@ -18,7 +18,8 @@ from config import (
     ADMIN_PASSWORD,
     ADMIN_EMAIL,
     SECRET_KEY,
-    CLIENT_NAME, VERSION,
+    CLIENT_NAME,
+    VERSION,
 )
 from createsuperuser import createsuperuser
 from db import async_session, engine, Base
