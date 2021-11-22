@@ -3,7 +3,7 @@ from unittest import TestCase, mock
 from fastapi import UploadFile
 
 from app.crud import user_crud, verification_crud, github_crud
-from config import SERVER_AUTH_BACKEND, SERVER_AUTH_BACKEND
+from config import SERVER_AUTH_BACKEND
 from tests import BaseTest, async_loop
 
 

@@ -8,7 +8,7 @@ from pyotp import TOTP
 
 from app.crud import verification_crud, user_crud, github_crud, user_skill_crud
 from app.tokens import ALGORITHM, create_reset_password_token
-from config import SECRET_KEY, SERVER_AUTH_BACKEND, API, SERVER_AUTH_BACKEND
+from config import SECRET_KEY, SERVER_AUTH_BACKEND, API
 from tests import BaseTest, async_loop
 
 
