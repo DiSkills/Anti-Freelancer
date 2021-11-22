@@ -2,7 +2,7 @@
 
 ## TODO
 
-- [x] Services
+- [ ] Services
     - [x] Auth
     - [x] Main
     - [x] Email

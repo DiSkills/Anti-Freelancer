@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "Main Service Anti-Freelancer"
-version = "0.1.0"
+version = "0.4.0"
 description = ""
-authors = ["_Counter021_"]
+authors = ["_Anti_"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
