@@ -8,7 +8,7 @@
     - [x] Email
     - [x] Messenger
     - [x] Feedbacks and Reviews
-- [x] Docker compose
+- [ ] Docker compose
 - [ ] Nginx
 - [x] Flower
 

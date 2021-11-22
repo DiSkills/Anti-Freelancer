@@ -7,10 +7,10 @@ from app.admin.schemas import RegisterAdmin, UpdateUser
 from app.crud import user_crud, github_crud
 from app.security import get_password_hash
 from app.service import paginate
-from config import SERVER_BACKEND, API
+from config import SERVER_AUTH_BACKEND, API
 
 
-@paginate(user_crud.all, user_crud.exist_page, f'{SERVER_BACKEND}{API}/admin/users')
+@paginate(user_crud.all, user_crud.exist_page, f'{SERVER_AUTH_BACKEND}{API}/admin/users')
 async def get_all_users(*, db: AsyncSession, page: int, page_size: int, queryset: list):
     """
         Get all users

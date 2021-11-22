@@ -8,7 +8,7 @@ from pyotp import TOTP
 
 from app.crud import verification_crud, user_crud, github_crud, user_skill_crud
 from app.tokens import ALGORITHM, create_reset_password_token
-from config import SECRET_KEY, SERVER_BACKEND
+from config import SECRET_KEY, SERVER_AUTH_BACKEND, API, SERVER_AUTH_BACKEND
 from tests import BaseTest, async_loop
 
 
@@ -53,7 +53,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(), {
-                'next': 'http://localhost:8000/api/v1/freelancers?page=2&page_size=1',
+                'next': f'{SERVER_AUTH_BACKEND}{API}/freelancers?page=2&page_size=1',
                 'previous': None,
                 'page': 1,
                 'results': [
@@ -72,7 +72,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(
             response.json(), {
                 'next': None,
-                'previous': 'http://localhost:8000/api/v1/freelancers?page=1&page_size=1',
+                'previous': f'{SERVER_AUTH_BACKEND}{API}/freelancers?page=1&page_size=1',
                 'page': 2,
                 'results': [
                     {
@@ -92,7 +92,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(), {
-                'next': 'http://localhost:8000/api/v1/freelancers?page=2&page_size=1',
+                'next': f'{SERVER_AUTH_BACKEND}{API}/freelancers?page=2&page_size=1',
                 'previous': None,
                 'page': 1,
                 'results': [
@@ -111,7 +111,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(
             response.json(), {
                 'next': None,
-                'previous': 'http://localhost:8000/api/v1/freelancers?page=1&page_size=1',
+                'previous': f'{SERVER_AUTH_BACKEND}{API}/freelancers?page=1&page_size=1',
                 'page': 2,
                 'results': [
                     {
@@ -149,7 +149,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(), {
-                'next': 'http://localhost:8000/api/v1/freelancers/search?page=2&page_size=1&search=test',
+                'next': f'{SERVER_AUTH_BACKEND}{API}/freelancers/search?page=2&page_size=1&search=test',
                 'previous': None,
                 'page': 1,
                 'results': [
@@ -168,7 +168,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(
             response.json(), {
                 'next': None,
-                'previous': 'http://localhost:8000/api/v1/freelancers/search?page=1&page_size=1&search=test',
+                'previous': f'{SERVER_AUTH_BACKEND}{API}/freelancers/search?page=1&page_size=1&search=test',
                 'page': 2,
                 'results': [
                     {
@@ -185,7 +185,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(), {
-                'next': 'http://localhost:8000/api/v1/freelancers/search?page=2&page_size=1&search=TeSt',
+                'next': f'{SERVER_AUTH_BACKEND}{API}/freelancers/search?page=2&page_size=1&search=TeSt',
                 'previous': None,
                 'page': 1,
                 'results': [
@@ -204,7 +204,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(
             response.json(), {
                 'next': None,
-                'previous': 'http://localhost:8000/api/v1/freelancers/search?page=1&page_size=1&search=TeSt',
+                'previous': f'{SERVER_AUTH_BACKEND}{API}/freelancers/search?page=1&page_size=1&search=TeSt',
                 'page': 2,
                 'results': [
                     {
@@ -232,7 +232,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(), {
-                'next': 'http://localhost:8000/api/v1/freelancers/search?page=2&page_size=1&search=test',
+                'next': f'{SERVER_AUTH_BACKEND}{API}/freelancers/search?page=2&page_size=1&search=test',
                 'previous': None,
                 'page': 1,
                 'results': [
@@ -251,7 +251,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(
             response.json(), {
                 'next': None,
-                'previous': 'http://localhost:8000/api/v1/freelancers/search?page=1&page_size=1&search=test',
+                'previous': f'{SERVER_AUTH_BACKEND}{API}/freelancers/search?page=1&page_size=1&search=test',
                 'page': 2,
                 'results': [
                     {
@@ -268,7 +268,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(), {
-                'next': 'http://localhost:8000/api/v1/freelancers/search?page=2&page_size=1&search=TeSt',
+                'next': f'{SERVER_AUTH_BACKEND}{API}/freelancers/search?page=2&page_size=1&search=TeSt',
                 'previous': None,
                 'page': 1,
                 'results': [
@@ -287,7 +287,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(
             response.json(), {
                 'next': None,
-                'previous': 'http://localhost:8000/api/v1/freelancers/search?page=1&page_size=1&search=TeSt',
+                'previous': f'{SERVER_AUTH_BACKEND}{API}/freelancers/search?page=1&page_size=1&search=TeSt',
                 'page': 2,
                 'results': [
                     {
@@ -661,7 +661,7 @@ class AuthTestCase(BaseTest, TestCase):
         self.assertEqual(os.path.exists(user.avatar), True)
 
         response = self.client.get(self.url + '/change-data', headers=headers)
-        self.assertEqual(response.json()['avatar'], f'{SERVER_BACKEND}{user.avatar}')
+        self.assertEqual(response.json()['avatar'], f'{SERVER_AUTH_BACKEND}{user.avatar}')
 
         # Media
         avatar = user.avatar.replace('media/tests/', '')
@@ -1287,7 +1287,7 @@ class AuthTestCase(BaseTest, TestCase):
                 'id': 1,
                 'date_joined': response.json()['date_joined'],
                 'last_login': response.json()['last_login'],
-                'avatar': f'{SERVER_BACKEND}{user.avatar}',
+                'avatar': f'{SERVER_AUTH_BACKEND}{user.avatar}',
                 'freelancer': True,
                 'skills': [],
                 'github': 'Counter021',
@@ -1305,7 +1305,7 @@ class AuthTestCase(BaseTest, TestCase):
                 'id': 1,
                 'date_joined': response.json()['date_joined'],
                 'last_login': response.json()['last_login'],
-                'avatar': f'{SERVER_BACKEND}{user.avatar}',
+                'avatar': f'{SERVER_AUTH_BACKEND}{user.avatar}',
                 'freelancer': True,
                 'skills': [],
                 'github': 'Counter021',

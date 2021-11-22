@@ -10,14 +10,24 @@ from app.auth.routers import auth_router
 from app.payments.routers import payments_router
 from app.routers import permission_router
 from app.skills.routers import skills_router
-from config import PROJECT_NAME, API, MEDIA_ROOT, ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_EMAIL, SECRET_KEY, DOCKER
+from config import (
+    PROJECT_NAME,
+    API,
+    MEDIA_ROOT,
+    ADMIN_USERNAME,
+    ADMIN_PASSWORD,
+    ADMIN_EMAIL,
+    SECRET_KEY,
+    CLIENT_NAME, VERSION,
+)
 from createsuperuser import createsuperuser
 from db import async_session, engine, Base
 
 app = FastAPI(
     title=PROJECT_NAME,
-    version='0.4.0',
+    version=VERSION,
     description='Auth Service Anti-Freelancer by Counter',
+    root_path=f'/{CLIENT_NAME}',
 )
 
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
@@ -33,9 +43,8 @@ app.add_middleware(
 
 @app.on_event('startup')
 async def startup():
-    if int(DOCKER):
-        async with engine.begin() as connection:
-            await connection.run_sync(Base.metadata.create_all)
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
     if not os.path.exists(MEDIA_ROOT):
         os.makedirs(MEDIA_ROOT)
     async with async_session() as session:

@@ -3,7 +3,7 @@ from unittest import TestCase, mock
 from fastapi import UploadFile
 
 from app.crud import user_crud, verification_crud, github_crud
-from config import SERVER_BACKEND
+from config import SERVER_AUTH_BACKEND, SERVER_AUTH_BACKEND
 from tests import BaseTest, async_loop
 
 
@@ -158,7 +158,7 @@ class AdminTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 200)
         user_1 = {
             'about': 'Hello world!',
-            'avatar': f'{SERVER_BACKEND}{async_loop(user_crud.get(self.session, id=1)).avatar}',
+            'avatar': f'{SERVER_AUTH_BACKEND}{async_loop(user_crud.get(self.session, id=1)).avatar}',
             'date_joined': response.json()['date_joined'],
             'email': 'test@example.com',
             'freelancer': True,
@@ -220,7 +220,7 @@ class AdminTestCase(BaseTest, TestCase):
         response = self.client.get(f'{self.url}/admin/users?page=1&page_size=2', headers=headers)
         self.assertEqual(response.status_code, 200)
         page_1 = {
-            'next': f'{SERVER_BACKEND}{self.url[1:]}/admin/users?page=2&page_size=2',
+            'next': f'{SERVER_AUTH_BACKEND}{self.url[1:]}/admin/users?page=2&page_size=2',
             'previous': None,
             'page': 1,
             'results': [
@@ -248,7 +248,7 @@ class AdminTestCase(BaseTest, TestCase):
         self.assertEqual(response.status_code, 200)
         page_2 = {
             'next': None,
-            'previous': f'{SERVER_BACKEND}{self.url[1:]}/admin/users?page=1&page_size=2',
+            'previous': f'{SERVER_AUTH_BACKEND}{self.url[1:]}/admin/users?page=1&page_size=2',
             'page': 2,
             'results': [
                 {

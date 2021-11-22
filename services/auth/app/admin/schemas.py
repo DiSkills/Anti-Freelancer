@@ -5,7 +5,7 @@ from pydantic import validator, BaseModel, EmailStr
 
 from app.auth.schemas import Register
 from app.schemas import Paginate
-from config import SERVER_BACKEND
+from config import SERVER_AUTH_BACKEND
 
 
 class UserMinimal(BaseModel):
@@ -24,7 +24,7 @@ class UserMinimal(BaseModel):
 
     @validator('avatar')
     def set_avatar(cls, avatar):
-        return SERVER_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'
+        return SERVER_AUTH_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'
 
 
 class GitHub(BaseModel):

@@ -4,9 +4,10 @@ from fastapi.security import OAuth2PasswordBearer
 from app.crud import user_crud
 from app.models import User
 from app.tokens import verify_token
+from config import SERVER_AUTH_BACKEND, API
 from db import async_session
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl='/api/v1/login')
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f'{SERVER_AUTH_BACKEND}/{API}/login')
 
 
 async def is_authenticated(token: str = Security(reusable_oauth2)) -> int:

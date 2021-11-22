@@ -13,7 +13,7 @@ from app.crud import user_crud, verification_crud
 from app.models import User
 from app.security import verify_password_hash
 from app.send_email import send_register_email
-from config import social_auth, SERVER_BACKEND, API
+from config import social_auth, SERVER_AUTH_BACKEND, API
 
 
 async def github_data(request: Request) -> dict[str, typing.Any]:
@@ -67,7 +67,7 @@ async def validate_login(db: AsyncSession, username: str, password: str) -> User
         else:
             verification = await verification_crud.get(db, user_id=user.id)
 
-        await send_register_email(user.email, user.username, f'{SERVER_BACKEND}{API}/verify?link={verification.link}')
+        await send_register_email(user.email, user.username, f'{SERVER_AUTH_BACKEND}{API}/verify?link={verification.link}')
 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='You not activated')
 

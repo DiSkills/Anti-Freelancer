@@ -18,3 +18,5 @@
 /services/other/venv/
 /services/other/.idea/
 /services/other/config.env
+/config.env
+/config.auth.env

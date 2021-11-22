@@ -19,7 +19,7 @@ from app.security import get_password_hash, verify_password_hash
 from app.send_email import send_register_email, send_reset_password_email, send_username_email
 from app.service import validate_login, remove_file, write_file, github_data, paginate
 from app.tokens import create_login_tokens, verify_token, create_access_token, create_reset_password_token
-from config import SERVER_BACKEND, API, MEDIA_ROOT, social_auth, redirect_url, PROJECT_NAME
+from config import SERVER_AUTH_BACKEND, API, MEDIA_ROOT, social_auth, redirect_url, PROJECT_NAME
 
 
 async def register(db: AsyncSession, schema: Register, link: typing.Optional[str]) -> dict[str, str]:
@@ -74,7 +74,7 @@ async def register(db: AsyncSession, schema: Register, link: typing.Optional[str
 
     verification = await verification_crud.create(db, **VerificationCreate(user_id=user.id, link=str(uuid4())).dict())
 
-    await send_register_email(user.email, user.username, f'{SERVER_BACKEND}{API}/verify?link={verification.link}')
+    await send_register_email(user.email, user.username, f'{SERVER_AUTH_BACKEND}{API}/verify?link={verification.link}')
 
     return {'msg': 'Send email for activate your account'}
 
@@ -158,7 +158,7 @@ async def refresh(db: AsyncSession, token: str) -> dict[str, str]:
     return create_access_token(user_id)
 
 
-@paginate(user_crud.freelancers, user_crud.freelancers_exist, f'{SERVER_BACKEND}{API}/freelancers')
+@paginate(user_crud.freelancers, user_crud.freelancers_exist, f'{SERVER_AUTH_BACKEND}{API}/freelancers')
 async def get_freelancers(*, db: AsyncSession, page: int, page_size: int, queryset: list[User]):
     """
         Get freelancers
@@ -175,7 +175,7 @@ async def get_freelancers(*, db: AsyncSession, page: int, page_size: int, querys
     return (user.__dict__ for user in queryset)
 
 
-@paginate(user_crud.search, user_crud.search_exist, f'{SERVER_BACKEND}{API}/freelancers/search', 'search')
+@paginate(user_crud.search, user_crud.search_exist, f'{SERVER_AUTH_BACKEND}{API}/freelancers/search', 'search')
 async def search_freelancers(*, db: AsyncSession, page: int, page_size: int, search: str, queryset: list[User]):
     """
         Search freelancers
@@ -333,7 +333,7 @@ async def reset_password_request(db: AsyncSession, email: str) -> dict[str, str]
 
     user = await user_crud.get(db, email=email)
     token = create_reset_password_token(user.id)
-    link = SERVER_BACKEND + f'{API}/reset-password?token={token}'
+    link = SERVER_AUTH_BACKEND + f'{API}/reset-password?token={token}'
     await send_reset_password_email(user.email, user.username, link)
     return {'msg': 'Send reset password email. Check your email address'}
 

@@ -1,7 +1,7 @@
 from unittest import TestCase, mock
 
 from app.crud import verification_crud, user_crud, payment_crud
-from config import SERVER_BACKEND
+from config import SERVER_AUTH_BACKEND
 from tests import BaseTest, async_loop
 
 
@@ -20,18 +20,18 @@ class PaymentsTestCase(BaseTest, TestCase):
         self.assertEqual(len(async_loop(payment_crud.all(self.session))), 0)
 
         # Pay
-        with mock.patch('app.requests.pay_request', return_value=f'{SERVER_BACKEND}') as _:
+        with mock.patch('app.requests.pay_request', return_value=f'{SERVER_AUTH_BACKEND}') as _:
             response = self.client.get(f'{self.url}/pay?amount=1', headers=headers)
             self.assertEqual(response.status_code, 201)
-            self.assertEqual(response.json(), {'url': SERVER_BACKEND, 'id': 1})
+            self.assertEqual(response.json(), {'url': SERVER_AUTH_BACKEND, 'id': 1})
             self.assertEqual(len(async_loop(payment_crud.all(self.session))), 1)
 
         self.assertEqual(async_loop(payment_crud.exist(self.session, id=1)), True)
 
-        with mock.patch('app.requests.pay_request', return_value=f'{SERVER_BACKEND}') as _:
+        with mock.patch('app.requests.pay_request', return_value=f'{SERVER_AUTH_BACKEND}') as _:
             response = self.client.get(f'{self.url}/pay?amount=1', headers=headers)
             self.assertEqual(response.status_code, 201)
-            self.assertEqual(response.json(), {'url': SERVER_BACKEND, 'id': 2})
+            self.assertEqual(response.json(), {'url': SERVER_AUTH_BACKEND, 'id': 2})
             self.assertEqual(len(async_loop(payment_crud.all(self.session))), 1)
 
             self.assertEqual(async_loop(payment_crud.exist(self.session, id=1)), False)
@@ -64,10 +64,10 @@ class PaymentsTestCase(BaseTest, TestCase):
             self.assertEqual(response.status_code, 400)
             self.assertEqual(response.json(), {'detail': 'Payment not found'})
 
-        with mock.patch('app.requests.pay_request', return_value=f'{SERVER_BACKEND}') as _:
+        with mock.patch('app.requests.pay_request', return_value=f'{SERVER_AUTH_BACKEND}') as _:
             response = self.client.get(f'{self.url}/pay?amount=500', headers=headers)
             self.assertEqual(response.status_code, 201)
-            self.assertEqual(response.json(), {'url': SERVER_BACKEND, 'id': 3})
+            self.assertEqual(response.json(), {'url': SERVER_AUTH_BACKEND, 'id': 3})
             self.assertEqual(len(async_loop(payment_crud.all(self.session))), 2)
 
         with mock.patch('app.requests.check_request', return_value={'status': {'value': 'PAID'}}) as _:

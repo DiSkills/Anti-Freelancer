@@ -6,7 +6,7 @@ from pydantic import BaseModel, validator, EmailStr
 
 from app.schemas import Paginate
 from app.skills.schemas import GetSkill
-from config import SERVER_BACKEND
+from config import SERVER_AUTH_BACKEND
 
 
 class Password(BaseModel):
@@ -104,7 +104,7 @@ class GetFreelancer(BaseModel):
 
     @validator('avatar')
     def set_avatar(cls, avatar):
-        return SERVER_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'
+        return SERVER_AUTH_BACKEND + avatar if avatar else 'https://via.placeholder.com/400x400'
 
 
 class UserPublic(UserChangeData, GetFreelancer):

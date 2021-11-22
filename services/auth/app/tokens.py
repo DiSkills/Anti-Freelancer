@@ -1,5 +1,4 @@
 import datetime
-from functools import wraps
 
 import jwt
 from fastapi import HTTPException, status
