@@ -78,3 +78,27 @@ services:
 
   redis:
     image: redis
+
+  pg_admin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    depends_on:
+      - auth_db
+      - email_db
+
+  flower:
+    build: ./services/email
+    command: poetry run celery flower --app=tasks.celery --port=5555 --broker=redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./services/email:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.email.env
+    depends_on:
+      - worker

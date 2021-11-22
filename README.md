@@ -10,7 +10,8 @@
     - [ ] Feedbacks and Reviews
 - [ ] Docker compose
 - [ ] Nginx
-- [ ] Flower
+- [x] Flower
+- [x] PG admin
 
 ### Ideas
 
