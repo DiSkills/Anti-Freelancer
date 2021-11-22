@@ -4,7 +4,7 @@
 
 - [x] Services
     - [x] Auth
-    - [ ] Main
+    - [x] Main
     - [x] Email
     - [ ] Messenger
     - [ ] Feedbacks and Reviews
