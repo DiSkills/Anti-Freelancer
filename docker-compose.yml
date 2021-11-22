@@ -45,6 +45,17 @@ services:
     ports:
       - "5436:5436"
 
+  other_db:
+    build:
+      context: ./services/other/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=other_user
+    volumes:
+      - ./services/other/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5437:5437"
+
   pg_admin:
     image: dpage/pgadmin4
     ports:
@@ -114,6 +125,21 @@ services:
     command: poetry run uvicorn main:app --host 0.0.0.0 --port 8002 --log-config logger.yml
     volumes:
       - ./services/messenger:/app
+    environment:
+      - DOCKER=1
+
+  other:
+    build:
+      context: ./services/other
+      dockerfile: Dockerfile
+    depends_on:
+      - auth
+      - other_db
+    ports:
+      - "8004:8004"
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8004 --log-config logger.yml
+    volumes:
+      - ./services/other:/app
     environment:
       - DOCKER=1
 

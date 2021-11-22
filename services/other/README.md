@@ -2,8 +2,8 @@
 
 # TODO
 
-- [ ] Docker
-- [ ] Logger errors in file
+- [x] Docker
+- [x] Logger errors in file
 - [x] Permission requests
     - [x] Is authenticated
     - [x] Is active

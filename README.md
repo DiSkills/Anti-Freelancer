@@ -2,13 +2,13 @@
 
 ## TODO
 
-- [ ] Services
+- [x] Services
     - [x] Auth
     - [x] Main
     - [x] Email
     - [x] Messenger
-    - [ ] Feedbacks and Reviews
-- [ ] Docker compose
+    - [x] Feedbacks and Reviews
+- [x] Docker compose
 - [ ] Nginx
 - [x] Flower
 
