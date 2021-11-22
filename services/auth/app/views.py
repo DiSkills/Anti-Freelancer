@@ -7,7 +7,7 @@ from app.tokens import verify_token
 from config import SERVER_AUTH_BACKEND, API
 from db import async_session
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f'{SERVER_AUTH_BACKEND}/{API}/login')
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f'{SERVER_AUTH_BACKEND}{API}/login')
 
 
 async def is_authenticated(token: str = Security(reusable_oauth2)) -> int:

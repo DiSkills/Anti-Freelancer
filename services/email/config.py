@@ -11,10 +11,9 @@ CLIENT_NAME = 'email'
 
 LOGIN_URL = os.environ.get('LOGIN_URL', f'{SERVER_AUTH_BACKEND}{API}/login')
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'SECRET_KEY')
-
 TEST = os.environ.get('TEST', 0)
 
+# DB
 DB_USER = os.environ.get('DB_USER', 'email_user')
 DB_PASSWORD = os.environ.get('DB_PASSWORD', 'email_user')
 DB_NAME = os.environ.get('DB_NAME', 'email_db')

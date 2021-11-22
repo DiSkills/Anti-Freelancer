@@ -4,13 +4,13 @@
 
 - [x] Services
     - [x] Auth
-    - [x] Main
+    - [ ] Main
     - [x] Email
-    - [x] Messenger
-    - [x] Feedbacks and Reviews
+    - [ ] Messenger
+    - [ ] Feedbacks and Reviews
 - [ ] Docker compose
 - [ ] Nginx
-- [x] Flower
+- [ ] Flower
 
 ### Ideas
 
