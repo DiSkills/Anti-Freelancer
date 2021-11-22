@@ -1,11 +1,13 @@
 /docker/configs/
 *.log
 /services/auth/media/
+/services/main/media/
 
 /services/email/.idea/
 /services/auth/.idea/
+/services/main/.idea/
 /.idea/
 
 /services/auth/venv/
 /services/email/venv/
-
+/services/main/venv/

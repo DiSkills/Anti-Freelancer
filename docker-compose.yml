@@ -54,6 +54,33 @@ services:
       - docker/configs/config.docker.env
       - docker/configs/config.auth.env
 
+  main_db:
+    build:
+      context: ./services/main/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=main_user
+    volumes:
+      - ./services/main/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5434:5434"
+
+  main:
+    build:
+      context: ./services/main
+      dockerfile: Dockerfile
+    depends_on:
+      - auth
+      - main_db
+    ports:
+      - "8001:8001"
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8001 --log-config logger.yml
+    volumes:
+      - ./services/main:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.main.env
+
   nginx:
     build:
       context: ./docker/nginx
@@ -89,6 +116,7 @@ services:
     depends_on:
       - auth_db
       - email_db
+      - main_db
 
   flower:
     build: ./services/email
