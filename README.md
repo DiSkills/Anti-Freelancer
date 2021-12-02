@@ -6,7 +6,7 @@
     - [x] Auth
     - [x] Main
     - [x] Email
-    - [ ] Messenger
+    - [x] Messenger
     - [ ] Feedbacks and Reviews
 - [ ] Docker compose
 - [ ] Nginx
