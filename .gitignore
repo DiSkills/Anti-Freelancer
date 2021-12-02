@@ -6,8 +6,10 @@
 /services/email/.idea/
 /services/auth/.idea/
 /services/main/.idea/
+/services/messenger/.idea/
 /.idea/
 
 /services/auth/venv/
 /services/email/venv/
 /services/main/venv/
+/services/messenger/venv/
