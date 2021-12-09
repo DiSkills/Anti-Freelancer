@@ -10,7 +10,6 @@ fastapi = {version = "0.68.1", extras = ["all"]}
 psycopg2-binary = "^2.9.1"
 SQLAlchemy = {extras = ["asyncio"], version = "^1.4.26"}
 asyncpg = "^0.24.0"
-alembic = "^1.7.4"
 aiohttp = "^3.8.0"
 
 [tool.poetry.dev-dependencies]
