@@ -6,7 +6,8 @@ PROJECT_NAME = os.environ.get('PROJECT_NAME', 'Anti-Freelancer')
 
 API = os.environ.get('API', 'api/v1')
 SERVER_AUTH_BACKEND = os.environ.get('SERVER_AUTH_BACKEND', 'http://auth:8000/')
-SERVER_EMAIL = os.environ.get('SERVER_EMAIL_BACKEND', 'http://email:8003/')
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL_BACKEND', 'http://email:7999/')
+SERVER_MAIN_BACKEND = os.environ.get('SERVER_MAIN_BACKEND', 'http://main:8001/')
 SERVER_BACKEND = os.environ.get('SERVER_BACKEND', 'http://localhost/')
 VERSION = os.environ.get('VERSION', '0.1.0')
 CLIENT_NAME = 'messenger'

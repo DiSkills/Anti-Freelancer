@@ -12,7 +12,7 @@ API = os.environ.get('API', 'api/v1')
 VERSION = os.environ.get('VERSION', '0.1.0')
 CLIENT_NAME = 'auth'
 SERVER_AUTH_BACKEND = SERVER_BACKEND + CLIENT_NAME + '/'
-SERVER_EMAIL = os.environ.get('SERVER_EMAIL_BACKEND', 'http://email:8003/')
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL_BACKEND', 'http://email:7999/')
 
 TEST = os.environ.get('TEST', 0)
 
