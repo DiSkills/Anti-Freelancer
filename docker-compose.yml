@@ -171,6 +171,8 @@ services:
       - auth_db
       - email_db
       - main_db
+      - messenger_db
+      - other_db
 
   flower:
     build: ./services/email
