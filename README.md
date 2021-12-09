@@ -2,14 +2,14 @@
 
 ## TODO
 
-- [ ] Services
+- [x] Services
     - [x] Auth
     - [x] Main
     - [x] Email
     - [x] Messenger
-    - [ ] Feedbacks and Reviews
-- [ ] Docker compose
-- [ ] Nginx
+    - [x] Feedbacks and Reviews
+- [x] Docker compose
+- [x] Nginx
 - [x] Flower
 - [x] PG admin
 
