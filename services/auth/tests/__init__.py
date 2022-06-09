@@ -1,0 +1,50 @@
+import asyncio
+import os
+import shutil
+
+from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from config import API, MEDIA_ROOT
+from db import engine, Base
+from main import app
+
+
+async def create_all():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+
+async def drop_all():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+
+
+def async_loop(function):
+    loop = asyncio.get_event_loop()
+    try:
+        return loop.run_until_complete(function)
+    finally:
+        pass
+
+
+class BaseTest:
+
+    def setUp(self) -> None:
+        self.session = AsyncSession(engine)
+        self.client = TestClient(app)
+        self.user_data = {
+            'password': 'Test1234!',
+            'confirm_password': 'Test1234!',
+            'username': 'test',
+            'email': 'test@example.com',
+            'freelancer': False,
+        }
+        self.url = f'/{API}'
+        async_loop(create_all())
+        os.makedirs(MEDIA_ROOT)
+
+    def tearDown(self) -> None:
+        async_loop(self.session.close())
+        async_loop(drop_all())
+        shutil.rmtree(MEDIA_ROOT)

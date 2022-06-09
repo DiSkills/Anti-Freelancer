@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "Feedbacks and Reviews Service Anti-Freelancer"
+version = "0.4.0"
+description = ""
+authors = ["_Anti_"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = {version = "0.68.1", extras = ["all"]}
+psycopg2-binary = "^2.9.1"
+SQLAlchemy = {extras = ["asyncio"], version = "^1.4.26"}
+asyncpg = "^0.24.0"
+aiohttp = "^3.8.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

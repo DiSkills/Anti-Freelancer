@@ -1,0 +1,188 @@
+version: "3.7"
+
+services:
+  email_db:
+    build:
+      context: ./services/email/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=email_user
+    volumes:
+      - ./services/email/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5431:5431"
+
+  email:
+    build:
+      context: ./services/email
+      dockerfile: Dockerfile
+    depends_on:
+      - email_db
+    ports:
+      - "7999:7999"
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 7999 --log-config logger.yml
+    volumes:
+      - ./services/email:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.email.env
+
+  auth_db:
+    build:
+      context: ./services/auth/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=auth_user
+    volumes:
+      - ./services/auth/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5433"
+
+  auth:
+    build:
+      context: ./services/auth
+      dockerfile: Dockerfile
+    depends_on:
+      - auth_db
+      - email
+    ports:
+      - "8000:8000"
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --log-config logger.yml
+    volumes:
+      - ./services/auth:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.auth.env
+
+  main_db:
+    build:
+      context: ./services/main/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=main_user
+    volumes:
+      - ./services/main/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5434:5434"
+
+  main:
+    build:
+      context: ./services/main
+      dockerfile: Dockerfile
+    depends_on:
+      - auth
+      - main_db
+    ports:
+      - "8001:8001"
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8001 --log-config logger.yml
+    volumes:
+      - ./services/main:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.main.env
+
+  messenger_db:
+    build:
+      context: ./services/messenger/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=messenger_user
+    volumes:
+      - ./services/messenger/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5435:5435"
+
+  messenger:
+    build:
+      context: ./services/messenger
+      dockerfile: Dockerfile
+    depends_on:
+      - main
+      - messenger_db
+    ports:
+      - "8002:8002"
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8002 --log-config logger.yml
+    volumes:
+      - ./services/messenger:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.messenger.env
+
+  other_db:
+    build:
+      context: ./services/other/docker/postgres
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=other_user
+    volumes:
+      - ./services/other/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5436:5436"
+
+  other:
+    build:
+      context: ./services/other
+      dockerfile: Dockerfile
+    depends_on:
+      - messenger
+      - other_db
+    ports:
+      - "8003:8003"
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8003 --log-config logger.yml
+    volumes:
+      - ./services/other:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.other.env
+
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - other
+
+  worker:
+    build: ./services/email
+    command: poetry run celery -A tasks.celery worker -l INFO
+    volumes:
+      - ./services/email:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.email.env
+    depends_on:
+      - email_db
+      - redis
+
+  redis:
+    image: redis
+
+  pg_admin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    depends_on:
+      - auth_db
+      - email_db
+      - main_db
+      - messenger_db
+      - other_db
+
+  flower:
+    build: ./services/email
+    command: poetry run celery flower --app=tasks.celery --port=5555 --broker=redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./services/email:/app
+    env_file:
+      - docker/configs/config.docker.env
+      - docker/configs/config.email.env
+    depends_on:
+      - worker
